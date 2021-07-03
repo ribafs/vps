@@ -1,0 +1,19 @@
+Do desktop execute
+
+telnet www.dominio.com.br 80
+
+Quando aparecer
+
+Trying 187.39.175.14...
+Connected to ribafs.org.
+Escape character is '^]'.
+
+Então digite:
+
+GET http://www.dominio.com.br/
+
+E tecle Enter
+
+Aparecerá o inteiro código em HTML da página inicial do site.
+
+

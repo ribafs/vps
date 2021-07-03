@@ -1,0 +1,351 @@
+Servidor OpenBSD 6.2 no Vultr
+
+
+512 MB Server - 45.77.195.154
+Has been successfully created!
+IP Address: 45.77.195.154
+OS: OpenBSD 6 x64
+RAM: 512 MB
+Storage: 20 GB SSD
+Location: Miami
+Label: ribafs
+
+45.77.195.154
+
+uname -r
+
+openbsd 6.2
+
+Tamanho - 512MB de RAM
+
+ssh root@45.77.195.154
+
+passwd
+
+vi /etc/ssh/sshd_config
+
+vi /etc/rc.conf
+sshd_enable="YES"
+
+/etc/rc.d/sshd restart
+
+adduser
+
+Timezone
+cd /usr/share/zoneinfo
+ls -l 
+cp /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+ou
+export TZ=America/Fortaleza
+
+date
+
+vi /etc/installurl
+
+https://mirror.esc7.net/pub/OpenBSD/
+
+pkg_add -v -i links
+
+    -v : Verbose mode (display more information)
+    -i : Interactive installation. It may ask you question such as which version you would like to install and so on.
+
+pkg_add nano
+
+pkg_add sudo
+
+pkg_delete pkgNameHere
+
+vi /etc/sudoers
+
+sudo usermod -G wheel ribafs
+
+pkg_info
+
+Atualização de pacotes existentes
+
+pkg_add -u links
+
+Atualização de todos os pacotes
+pkg_add -u
+
+
+Ports
+
+cd /home/ribafs
+
+wget http://ftp.usa.openbsd.org/pub/OpenBSD/$(uname -r)/ports.tar.gz
+wget http://ftp.usa.openbsd.org/pub/OpenBSD/$(uname -r)/SHA256.sig
+
+signify -C -p /etc/signify/openbsd-62-base.pub -x SHA256.sig ports.tar.gz
+tar -zxvf ports.tar.gz -C /usr/
+
+cd /usr/ports/lang/php/7.0/
+make install clean
+
+cd /usr/ports
+make search key=php-gd-7
+
+Parar sendmail
+/etc/rc.d/sendmail stop
+
+nano /etc/rc.conf
+
+sendmail_enable="NONE"
+sendmail_submit_enable="NO"
+sendmail_outbound_enable="NO"
+sendmail_msp_queue_enable="NO"
+
+nano /etc/hosts
+
+Adicionar
+45.77.195.154          www.ribafs.org       www
+
+
+Timezone
+
+bsdconfig
+
+
+Firewall
+
+nano /etc/pf.conf
+
+ifconfig
+vio0
+
+Adicionar
+
+## Início ##
+me="vio0"                
+table <bruteforcers> persist    
+table <trusted> persist file "/etc/trusted"
+icmp_types = "echoreq"          
+junk_ports="{ 135,137,138,139,445,68,67,3222 }"
+junk_ip="224.0.0.0/4"           
+
+set loginterface vtnet0           
+scrub on vio0 reassemble tcp no-df random-id
+
+# ---- First rule obligatory "Pass all on loopback"
+pass quick on lo0 all           
+
+# ---- Block junk logs
+block quick proto { tcp, udp } from any to $junk_ip 
+block quick proto { tcp, udp } from any to any port $junk_ports
+
+# ---- Second rule "Block all in and pass all out"
+block in log all                
+pass out all keep state         
+
+############### FIREWALL ###############################################
+# ---- Allow all traffic from my Home
+pass quick proto {tcp, udp} from 45.77.195.154 to $me keep state
+
+# ---- block SMTP out 
+block quick proto tcp from $me to any port 25
+
+# ---- Allow incoming Web traffic
+pass quick proto tcp from any to $me port { 80, 443 } flags S/SA keep state
+
+# ---- Allow my team member SSH access 
+pass quick proto tcp from 45.77.195.154 to $me port 65522 flags S/SA keep state
+
+# ---- Block bruteforcers
+block log quick from <bruteforcers>
+
+# ---- Allow SSH from trusted sources, but block bruteforcers
+pass quick proto tcp from <trusted> to $me port 65522 \
+flags S/SA keep state \
+(max-src-conn 10, max-src-conn-rate 20/60, \
+overload <bruteforcers> flush global)
+
+# ---- Allow ICMP 
+pass in inet proto icmp all icmp-type $icmp_types keep state
+pass out inet proto icmp all icmp-type $icmp_types keep state
+## Final ##
+
+Criar o arquivo
+
+nano /etc/trusted
+
+Adicionar os IPs
+
+#Casa
+177.130.208.59
+
+#DNOCS
+
+Habilitar e desabilitar PF
+
+pfctl -e
+pfctl -d
+
+pfctl -f  /etc/pf.conf	Load the pf.conf file
+pfctl -nf /etc/pf.conf	Parse the file, but don't load it
+pfctl -sr			Show the current ruleset
+pfctl -ss			Show the current state table
+pfctl -si			Show filter stats and counters
+pfctl -sa			Show EVERYTHING it can show
+
+reboot
+
+tcpdump -n -e -ttt -i pflog0
+
+tcpdump -n -e -ttt -r /var/log/pflog
+
+pfctl -t bruteforcers -T show
+
+
+pfctl -t bruteforce -T expire 86400
+
+pkg_add pftop
+
+pftop
+
+pftop - visualizar tráfego pelo pf
+
+
+== Instalar Apache
+
+Já estava instalado
+
+Criar o arquivo
+
+nano /etc/httpd.conf
+
+server "default" {
+    listen on egress port 80
+    root "/wordpress"
+    directory index index.php
+
+    location "*.php*" {
+            fastcgi socket "/run/php-fpm.sock"
+    }
+}
+
+types {
+        text/css                css
+        text/html               html htm
+        text/txt                txt
+        image/gif               gif
+        image/jpeg              jpeg jpg
+        image/png               png
+        application/javascript  js
+        application/xml         xml
+}
+
+FILES
+
+/etc/httpd.conf -     Default configuration file.
+/etc/ssl/private/server.key -     Default SSL/TLS server key.
+/etc/ssl/server.crt -     Default SSL/TLS server certificate.
+/var/run/httpd.sock -     UNIX-domain socket used for communication with httpd.
+/var/www/logs/access.log -     Default access log file.
+/var/www/logs/error.log -     Default error log file. 
+
+/etc/rc.d/httpd -f start
+
+
+== MariaDB
+
+pkg_add mariadb-server
+
+The following new rcscripts were installed: /etc/rc.d/mysqld
+See rcctl(8) for details.
+Look in /usr/local/share/doc/pkg-readmes for extra documentation.
+
+mysql_install_db
+
+nano /etc/rc.conf
+
+mysql_server_enable=YES
+
+/etc/rc.d/mysqld start
+
+mysql_secure_installation
+
+
+== PHP
+
+pkg_info php
+
+pkg_add php
+
+5.6 e 7.0
+
+Instalar a 7.0
+
+The following new rcscripts were installed: /etc/rc.d/php70_fpm
+See rcctl(8) for details.
+Look in /usr/local/share/doc/pkg-readmes for extra documentation.
+
+nano /etc/httpd.conf
+
+server "default" {
+    listen on egress port 80
+    directory index index.php
+
+    location "*.php*" {
+            fastcgi socket "/run/php-fpm.sock"
+    }
+
+}
+
+types {
+        text/css                css
+        text/html               html htm
+        text/txt                txt
+        image/gif               gif
+        image/jpeg              jpeg jpg
+        image/png               png
+        application/javascript  js
+        application/xml         xml
+}
+
+mkdir /var/www/htdocs/portal
+
+nano /var/www/htdocs/portal/info.php
+
+<?php
+phpinfo();
+
+/etc/rc.d/php70_fpm start
+/etc/rc.d/httpd restart
+
+http://45.77.195.154/portal/info.php
+
+Ao tentar criar o banco o mysql apresentou:
+ERROR 2006 (HY000) at line 764: MySQL server has gone away
+
+nano /etc/my.cnf
+
+Mudei a linha
+max_allowed_packet = 4M
+
+/etc/rc.d/mysqld restart
+/etc/rc.d/php70_fpm restart
+
+Quando instalei o site em Joomla na pasta
+/var/www/htdocs/portal
+
+Criei o banco e chamei pelo navegador após ter reiniciado
+Apareceu o erro 500.
+
+Então 
+/etc/rc.d/php70_fpm restart
+
+E aproveitei e adicionei no 
+nano /etc/rc.conf
+php70_fpm_enable=YES
+
+== Via ports
+cd /usr/ports/lang/php/7.0/
+make install clean
+
+Demora muito, mais de 2 horas em servidor com 512MB de RAM
+make check
+
+Instalou o php 7 e o apache 2.4.47
+
+http://45.77.195.154

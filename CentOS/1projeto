@@ -1,0 +1,13 @@
+Instalação do CentOS 7 com nginx, mysql 5.7 e php 7.1
+
+45.63.104.148
+
+- Criação do servidor no Vultr, com 1GB de RAM, 1 vCPU e 25GB SSD
+- Configurar o DNS e apontar seu domínio para os nameservers da Vultr
+- Ajuste do hostname
+- Atualização do servidor
+- Reiniciar para garantir que novo kernel seja usado
+- Criação de usuário comum com poderes de sudo e acesso via ssh
+- Instalação do restante do LEMP
+- Configuração da segurança, firewall com firewalld, melhora do ssh, fail2ban, rkhunteer, etc
+

@@ -1,0 +1,41 @@
+
+
+adduser ribafs
+gpasswd -a ribafs wheel
+
+
+nano /etc/sudoers
+
+Adicione a linha a seguir abaixo da linha do root
+nomeuser ALL=(ALL) NOPASSWD:ALL
+
+su - nomeuser
+mkdir .ssh
+chmod 700 .ssh
+cd .ssh
+ssh-keygen -b 1024 -f id_nomeuser -t dsa (Enter 2 vezes)
+cat ../.ssh/id_nomeuser*.pub > ../.ssh/authorized_keys
+chmod 600 ../.ssh/*
+exit	
+
+
+nano /etc/ssh/sshd_config
+
+#Faça as alterações abaixo:
+Port 65522
+LoginGraceTime 30 # reduzir tempo do timeout
+PasswordAuthentication yes
+AllowUsers nomeuser root
+
+service ssh restart
+exit
+
+
+Após testar remotamente com o usuário criado via ssh.
+Volte e desabilite o acesso de root via ssh:
+PermitRootLogin no
+
+
+Agora no desktop execute
+
+ssh-copy-id ribafs@ip_servidor -p 10522

@@ -1,0 +1,16 @@
+CIPI
+
+O Cipi é um painel de controle para servidores cloud baseado no Laravel que suporta Digital Ocean, AWS, Linode, Azure, Vultr, Google Cloud e outros VPS.
+Ele vem com nginx, Mysql, multi PHP-FPM versions, multi-users, Supervisor, Composer, npm, free Let's Encrypt certificates, Git deployment, fail2ban, Redis, API e com um simple graphical interface útil para manage Laravel, Codeigniter, Symfony, WordPress or other PHP sites.
+
+Features
+
+- Fácil instalação - configure um ou mais servidores com apenas um único clique em menos de um minuto sem ser um exeprt em linux
+- Gerenciamento dos servidores - com facilidade gerencie servidores com Nginx
+- Várias versões do PHP para selecionar uma na criação de um site/app
+- Segurança - Somente as portas 22, 80 e 443 são abertas. PHP desprivilegiado, usuários do sistema icolados, uso somente de SFTP ao invés de FTP
+- Atualizações automáticas
+- Estatísticas em termpo eal doss ervidores
+- Suporta Ubuntu 20.04, último LTS
+
+https://cipi.sh/docs.html

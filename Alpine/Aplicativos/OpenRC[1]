@@ -1,0 +1,253 @@
+OpenRC
+
+Habilitar no boot
+
+rc-update add sshd
+rc-update add postgresql
+rc-update add apache2
+
+rc-status
+
+
+rc-service networking stop 
+rc-service sshd start 
+rc-service chronyd status 
+rc-service postgresql status
+
+O rc suporta flags
+
+-c | --ifcrashed
+
+    Only run the specified command if the service has crashed.
+-N | --ifnotstarted
+
+    Only run the specified command if the service is not currently started.
+-s | --ifstarted
+
+rc-update show -v 
+rc-update add sshd default 
+rc-update add sshd 
+rc-update delete sshd 
+rc-update delete chronyd -a 
+
+-c | --crashed
+
+    Show a list of all the crashed services.
+-l | --list
+
+    List all the available runlevels.
+-s | --servicelist
+
+    Show a list of all the services.
+
+# Usando OpenRC no Alpine com Docker
+
+## Instalação
+
+apk add openrc
+
+apk add apache2
+
+rc-service apache2 status
+
+rc-service apache2 start
+
+
+Adicionar mariadb para iniciar com o boot
+
+rc-update add mariadb default
+
+rc-status --list
+
+rc-status --manual
+
+rc-status --crashed
+
+rc-service --list | grep -i nginx
+
+rc-update add {service-name} {run-level-name}
+
+rc-update add apache2 default
+
+rc-service {service-name} start
+
+ou
+    
+/etc/init.d/{service-name} start
+
+rc-service {service-name} stop
+
+rc-service {service-name} restart
+
+https://www.cyberciti.biz/faq/how-to-enable-and-start-services-on-alpine-linux/
+
+
+1.rc-update
+
+rc-update is mainly used to add or remove services at different runlevels.
+
+rc-update syntax format:
+
+    Usage: rc-update [options] add […]
+
+    or: rc-update [options] del […]
+
+    or: rc-update [options] [show […]]
+
+    Options: [ asuChqVv ]
+
+    -a, --all Process all runlevels
+
+    -s, --stack Stack a runlevel instead of a service
+
+    -u, --update Force an update of the dependency tree
+
+    -h, --help Display this help output
+
+    -C, --nocolor Disable color output
+
+    -V, --version Display software version
+
+    -v, --verbose Run verbosely
+
+    -q, --quiet Run quietly (repeat to suppress errors)
+
+Example use:
+
+    $ rc-update add docker boot #Add a service
+    $ rc-update del docker boot #Delete a service
+
+2.rc-status
+
+rc-status is mainly used for run-level state management.
+
+rc-status syntax format:
+
+    Usage: rc-status [options] …
+
+    or: rc-status [options] [-a | -c | -l | -r | -s | -u]
+
+    Options: [ aclrsuChqVv ]
+
+    -a, --all Show services from all run levels
+
+    -c, --crashed Show crashed services
+
+    -l, --list Show list of run levels
+
+    -r, --runlevel Show the name of the current runlevel
+
+    -s, --servicelist Show service list
+
+    -u, --unused Show services not assigned to any runlevel
+
+    -h, --help Display this help output
+
+    -C, --nocolor Disable color output
+
+    -V, --version Display software version
+
+    -v, --verbose Run verbosely
+
+    -q, --quiet Run quietly (repeat to suppress errors)
+
+Example use:
+
+    $ rc-status  #Check the status of the default runlevel
+    $ rc-status -a #Check the status of all runlevels
+
+3.rc-service
+
+rc-service is primarily used to manage the status of services
+
+rc-service syntax format:
+
+    Usage: rc-service [options] [-i] …
+
+    or: rc-service [options] -e
+
+    or: rc-service [options] -l
+
+    or: rc-service [options] -r
+
+    Options: [ e:ilr:INChqVv ]
+
+    -e, --exists tests if the service exists or not
+
+    -i, --ifexists if the service exists then run the command
+
+    -I, --ifinactive if the service is inactive then run the command
+
+    -N, --ifnotstarted if the service is not started then run the command
+
+    -l, --list list all available services
+
+    -r, --resolve resolve the service name to an init script
+
+    -h, --help Display this help output
+
+    -C, --nocolor Disable color output
+
+    -V, --version Display software version
+
+    -v, --verbose Run verbosely
+
+    -q, --quiet Run quietly (repeat to suppress errors)
+
+Example use:
+
+    $ rc-service sshd start #Start a service.
+    $ rc-service sshd stop  #Stop a service.
+    $ rc-service sshd restart  #Restart a service.
+
+4.openrc
+
+openrc is primarily used to manage different runlevels.
+
+openrc syntax format:
+
+    Usage: openrc [options] []
+
+    Options: [ a:no:s:SChqVv ]
+
+    -n, --no-stop do not stop any services
+
+    -o, --override override the next runlevel to change into when leaving single user or boot runlevels
+
+    -s, --service runs the service specified with the rest of the arguments
+
+    -S, --sys output the RC system type, if any
+
+    -h, --help Display this help output
+
+    -C, --nocolor Disable color output
+
+    -V, --version Display software version
+
+    -v, --verbose Run verbosely
+
+    -q, --quiet Run quietly (repeat to suppress errors)
+
+Available runtimes for Alpine Linux
+
+1.default
+
+2.sysinit
+
+3.boot
+
+4.single
+
+5.reboot
+
+6.shutdown
+
+7. Use examples
+
+    $ openrc single #Change to single runlevel
+
+8. Other Instructions
+
+    $ reboot  #Restart the system, similar to shutdown-r now.
+    $ halt     #Shut down, similar to shutdown-h now.
+    $ poweroff #Shutdown

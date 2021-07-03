@@ -1,0 +1,158 @@
+Criei um servidor no Vultr com Fedora 27
+
+1024 MB Server - 144.202.38.148
+Has been successfully created!
+IP Address: 144.202.38.148
+OS: Fedora 27 x64
+RAM: 1024 MB
+Storage: 25 GB SSD
+Location: Miami
+Label: fedora
+
+Lembrou o Ubuntu, pois conectou com o root de primeira via ssh.
+
+Troquei a senha do root com
+
+passwd
+
+Adicionei o usuário ribafs
+
+adduser ribafs
+passwd ribafs
+
+Adicionei para o grupo do root
+
+gpasswd -a ribafs wheel
+
+Fiz ajustes no ssh
+
+nano /etc/ssh/sshd_config
+
+Efetuei logoff e voltei para meu desktop
+exit
+
+Configurei para salvar a chave do ssh e não pedir senha:
+ssh-copy-id ribafs@server_ip -p 15522
+
+Não funcionou e quando quiz voltar com o root também não voltou mais, deu o erro:
+No route to host
+
+Já suspeitei do firewall. Vejamos. Vou agora acessar pela console como root para ver.
+
+Executei
+service iptables stop
+
+Disse que iptables.service não estava presente
+
+Então experimentei
+service firewalld status
+
+E tava lá. O Fedora 27 também, como o CentOS 7 usa o firewalld. Como não quero aprender outra ferramenta vou remover e usar o iptables.
+
+Não estava conseguindo nem parando o firewalld, nem com iptables -F, dara conexão recusada.
+Então deveria haver algo mais recusando a conexão. Executei
+
+sestatus
+
+E tava lá o SELinux habilitado.
+
+nano /etc/selinux/config
+
+SELINUX=disables
+
+reboot
+
+Após o boot disse que não tinha rota para o host. Então agora é com o firewalld
+
+service firewalld stop
+
+Agora foi.
+
+Configurar o timezone
+ls -sf /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+Mas vou querer aprender a usar o selinux, que deve reforçar bem a segurança.
+
+yum provides semanage
+
+yum install policycoreutils-python-utils-2.7-4.fc27.x86_64
+
+Atualizei com
+yum update
+reboot
+
+Demorou mais que Centos7, Debian9 e Ubuntu 16.04 para atualizar
+
+Resolvi, por enquanto, desabilitar firewalld e selinux e instalar iptables-services e o habilitar e iniciar.
+Então usar minhas regras.
+
+Após o boot ainda travou o acesso via ssh.
+Fui verificar e o firewalld estava no ar.
+
+Desabilitei, parei e desinstalei:
+
+service firewalld stop
+systemctl disable firewall
+yum remove firewalld
+
+Instalar
+dnf install -y unzip mc wget
+
+Instalei LAMP sem dificuldades.
+
+Vejamos agora com o LEMP
+
+nano /etc/php-fpm.d/www.conf
+
+listen.mode = 0750
+listen.owner = nginx
+listen.group = nginx
+
+Ainda tive problema após reiniciar o sistema.
+Não mais tive acesso via ssh.
+Mudei a rede para IP estático
+Então resolvi desinstalar o iptables e instalar o firewalld. Experimentei mas nada, somente acesso quando paro o firewalld.
+
+Vou deinstalar o firewalld e voltar ao iptables:
+
+systemctl stop firewalld
+systemctl disable firewalld
+
+dnf remove firewalld
+
+Assim, sem firewall algum acesso, mas não é interessante.
+
+reboot
+
+yum install iptables-services
+systemctl enable iptables.service
+service iptables start
+iptables -L
+iptables -F
+
+Copiei as minhas regras
+
+systemctl restart iptables
+Antes após este comando o terminal já travava. Agora não travou.
+reboot
+
+Mesmo após o reboot consegui acessar. O problema parece que eram 3 regras que estava instando e barravam meu acesso.
+
+Mas o nginx com php não rola. Somente nhinx funciona, mas com php não.
+Beleza. É importante ler os comentários encontrados pois podem ajudar.
+Acabei removendo todos os pacotes php:
+
+yum remove php*
+
+E instalando apenas estes:
+
+dnf install php php-fpm php-mysqlnd php-gd
+
+E após reiniciar o nginx e o php-fpm funcionou:
+service nginx restart
+service php-fpm restart
+
+http://localhost/info.php
+
+
+

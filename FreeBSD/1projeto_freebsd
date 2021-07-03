@@ -1,0 +1,61 @@
+Projeto de Servidor com o FreeBSD 11.1
+
+Alternativas de servidores
+Critérios:
+    - Ter suporte no DO e na Vultr
+    - Ser seguro
+    - Ter os pacotes mais atualizados
+
+FreeBSD 11.1
+Debian 9.4
+Fedora 27
+
+O preferido é o FreeBSD o qual testarei exaustivamente e tentarei não desistir dele até deixar redondo.
+Para isso estudar os tutoriais existentes e outros/procurar.
+- Configuração básica
+- Configurar SSH, firewall e sshdguard
+- AMP: Apache 2.4, último MariaDB e PHP 7.0
+- Joomla com o portal
+- Backup e criação de snapshot
+
+Criar servidor no DO
+- Atualizar chave SSH/ criar outra
+- FreeBSD 11.1 64
+- Nome - ribafs
+- Tamanho - US $ 5/mês
+- IP - 
+
+Configurações básicas
+- Firewall com Sshdguard
+- Instalar e configurar:
+    - pacotes básicos
+    - AMP
+    - Joomla com portal
+- Criar backup e snapshot
+- Então instalar e configurar
+
+CodeIgniter
+cakephp
+laravel
+
+drupal
+wordpress
+Joomla
+
+Magento
+opencart
+prestashop
+
+phpBB
+kunena
+
+PostgreSQL
+
+moodle
+
+Criando tutorial resumido para cada um
+
+
+Imprimir livros do FreeBSD para estudar
+
+

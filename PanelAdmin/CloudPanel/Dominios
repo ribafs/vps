@@ -1,0 +1,52 @@
+despertai.net.br
+
+registro.br
+- Alterar servidores DNS para apontar para os nameserver do Linode (ns1.linode.com, ns2...)
+
+linode.com
+- Criar servidor com Debian 10 para o despertai
+- Criar domínio no Linode para o deseprtai.net.br e apontar o registro A para o IP criado (45.56.113.182)
+- Criar também pelo menos um registro www (CNAME) apontando para deseprtai.net.br
+- Instalar o AMP/EMP neste servidor ou pelo menos o servidor web
+- Aguardar que o domínio propague e acessar
+despertai.net.br
+- Caso o domínio ainda não tenha propagado pode acessar pelo IP
+http://45.56.113.182
+
+Agora é um bom momento de instalar o Certbot para implementar o SSL
+
+
+Logar como usuário
+
+O domínio a ser adicionado deve estar valendo: registrado e com os nameserver adequados e propagado
+
+Adicionar Domínio
+
+Nome - www.ribafs.cf
+Raiz de documentos - ribafs
+/home/cloudpanel/htdocs/ribafs
+
+O caminho acima cria uma pasta no raiz web
+Para que o site ocupe toda a pasta web, em Raiz do documento devemos informar - /
+
+Template - Joomla 3.9
+
+Versão do PHP - 7.4
+
+
+    The Document Root: /home/cloudpanel/htdocs/ribafs
+    Vhost file for NGINX: /etc/nginx/sites-enabled/ribafs.cf.conf
+    NGINX Access and Error Log file:
+        /home/cloudpanel/logs/ribafs.cf/nginx/access.log
+        /home/cloudpanel/logs/ribafs.cf/nginx/error.log
+    PHP-FPM Error Log file:
+        /home/cloudpanel/logs/ribafs.cf/php/error.log
+    A self-signed TLS certificate
+
+When you enter your Domain Name with www a redirection from non-www to www will be created automatically and vice versa. Furthermore http requests are redirected to https.
+
+Clique sobre o nome do domínio para acessar mais informações e configurações
+
+    Definições Vhost Definições de PHP Aut Básica Registos Certificados SSL 
+
+

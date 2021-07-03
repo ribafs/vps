@@ -1,0 +1,383 @@
+Criação de Servidor com FreeBSD 11.1 no DO
+
+Usando uma chave ssh
+
+IP - 138.197.169.181
+
+Na criação do servidor associar a uma chave SSH anteriormente criada
+
+ssh root@138.197.169.181
+
+Não pedirá senha, mas devemos mudar logo no primeiro acesso:
+
+passwd root
+
+pkg install nano
+
+nano /usr/local/etc/sudoers
+
+ribafs	ALL=(ALL)	NOPASSWD:ALL
+
+Criar novo usuário
+
+adduser ribafs
+
+nano /etc/ssh/sshd_config
+
+Port 55522
+LoginGraceTime 30
+PermitRootLogin without-password
+AllowUsers ribafs root
+
+service sshd restart
+
+Acessar pelo desktop como ribafs
+
+ssh -p 55522 ribafs@138.197.169.181
+
+sudo su
+
+Atualizar
+
+pkg update
+
+pkg upgrade
+
+Pacotes básicos
+
+pkg install -y unzip wget
+
+Para que o shell os encontre
+
+Mudar (se desejar)
+setenv  EDITOR  vi
+
+para
+setenv  EDITOR  nano
+
+Alterando o shell default
+pkg install bash
+
+Baixar com fetch
+cd ~
+fetch http://wordpress.org/latest.tar.gz
+tar -zxvf latest.tar.gz 
+
+Adicionar ao /etc/fstab
+sh -c 'echo "fdesc /dev/fd fdescfs rw 0 0" >> /etc/fstab'
+
+mount -a
+
+Execute para atualizar o shell
+bash
+
+Para mudar para um usuário
+
+chsh -s /usr/local/bin/bash ribafs
+
+Para que root sem senha no SSH
+PermitRootLogin without-password
+
+
+Mudar o paginador default:
+
+nano ~/.bash_profile
+
+Mudar
+
+export PAGER=less
+export EDITOR=nano
+
+Criar uma chave para o ssh
+
+ssh-keygen -b 4096
+
+
+== Ativar o firewall IPFW
+
+nano /etc/rc.conf
+
+Adicione ao final
+
+firewall_enable="YES"
+firewall_quiet="YES"
+
+Configurar o firewall. Adicionar abaixo das 2 linhas:
+
+firewall_type="workstation"
+firewall_myservices="65522 80 443"
+firewall_allowservices="any"
+firewall_logdeny="YES"
+
+Pode ser assim:
+firewall_myservices="ssh http"
+
+Edite
+
+nano /etc/rc.firewall
+
+Após este código
+
+...
+        for i in ${firewall_allowservices} ; do
+          for j in ${firewall_myservices} ; do
+            case $j in
+            [0-9A-Za-z]*/[Pp][Rr][Oo][Tt][Oo])
+              ${fwcmd} add pass ${j%/[Pp][Rr][Oo][Tt][Oo]} from $i to me
+            ;;
+            [0-9A-Za-z]*/[Tt][Cc][Pp])
+              ${fwcmd} add pass tcp from $i to me ${j%/[Tt][Cc][Pp]}
+            ;;
+            [0-9A-Za-z]*/[Uu][Dd][Pp])
+              ${fwcmd} add pass udp from $i to me ${j%/[Uu][Dd][Pp]}
+            ;;
+            *[0-9A-Za-z])
+              echo "Consider using ${j}/tcp in firewall_myservices." \
+                > /dev/stderr
+              ${fwcmd} add pass tcp from $i to me $j
+            ;;
+            *)
+              echo "Invalid port in firewall_myservices: $j" > /dev/stderr
+            ;;
+            esac
+          done
+        done
+...
+
+Adicione a linha
+
+${fwcmd} add pass udp from any to me port_num
+
+Salve e feche
+
+Inicie o firewall
+
+service ipfw start
+
+Precisa configurar o ssh para a porta 65522 antes
+
+nano /etc/ssh/sshd_config
+
+service sshd restart
+
+Configurar os IPs negados
+
+nano /etc/sysctl.conf
+
+Limitar a apenas 5 tentativas. Adicionar ao início do arquivo
+
+net.inet.ip.fw.verbose_limit=3
+
+Isso será efetivado no próximo boot
+
+Para implementar na atual sessão, execute:
+sysctl net.inet.ip.fw.verbose_limit=3
+
+Ajustar o fuso horário
+
+tzsetup
+
+America
+Brazil
+Brazil
+
+Adicionar swap de 1GB
+
+Ver o swap existente em GB, caso exista
+swapinfo -g
+
+truncate -s 1G /swapfile
+chmod 0600 /swapfile
+sh -c 'echo "md99 none swap sw,file=/swapfile,late 0 0" >> /etc/fstab'
+swapon -aqL
+swapinfo -g
+
+Memória RAM
+
+pkg install freecolor
+
+freecolor
+
+freecolor -m -o
+
+             total       used       free     shared    buffers     cached
+Mem:           962        622        340          0          0          0
+Swap:         3072         84       2987
+
+pkg install htop
+
+htop
+
+
+top d1
+
+Procurar atualizações e instalar
+
+/usr/sbin/freebsd-update fetch
+freebsd-update fetch install
+
+Reiniciar agora
+shutdown -r now
+
+Desabilitando soft-updates
+
+Verificar atualizações automáticas
+nano /etc/crontab
+
+Adicione non início do arquivo
+@daily root freebsd-update -t freebsd cron
+
+Checar vulnerabilidades em softwares
+pkg audit -F
+
+Atualizar todos os softwares opcionais instalados:
+
+
+Serviços
+
+pkg search apache24
+
+pkg install apache24
+
+sysrc apache24_enable=yes
+
+service apache24 start
+
+http://159.65.50.168
+OK
+
+
+MySQL
+
+pkg search mysql57
+
+pkg install mysql57-server
+
+sysrc mysql_enable=yes
+
+service mysql-server start
+
+mysql_secure_installation
+
+
+PHP
+
+pkg search php72
+
+pkg install mod_php72 php72-gd php72-pdo php72-mbstring php72-xml php72-zip php72-bcmath php72-memcache php72-pdo_mysql php72-json php72-simplexml php72-curl php72-opcache php72-simplexml php72-mysqli
+
+Adicionar ao conf do Apache
+nano /usr/local/etc/apache24/httpd.conf
+
+ServerName localhost
+
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+</IfModule>
+
+# Descomentar a linha abaixo
+LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+
+RewriteEngine On
+RewriteOptions Inherit
+
+sysrc apache24_enable=yes
+
+service apache24 restart
+
+Para instalar o Joomla no subdiretório portal fiz assim:
+
+nano /usr/local/etc/apache24/httpd.conf
+
+<Directory /usr/local/www/apache22/data/portal>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+</Directory>
+
+service apache24 restart
+
+Da documentação
+<VirtualHost *>
+    ServerName www.domain.tld
+    DocumentRoot /www/domain.tld
+</VirtualHost>
+
+<VirtualHost *>
+    ServerName www.someotherdomain.tld
+    DocumentRoot /www/someotherdomain.tld
+</VirtualHost>
+
+Diretório web
+/usr/local/www/apache24/data
+
+group - www
+user - www
+
+cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+nano /usr/local/etc/php.ini
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+allow_url_fopen = On
+
+service apache24 restart
+
+nano /usr/local/www/apache24/data/info.php
+
+<?php
+phpinfo();
+
+http://138.197.169.181/info.php
+
+rm /usr/local/www/apache24/data/info.php
+
+Informações sobre pacotes
+
+pkg info package_name
+
+Excluindo pacote
+
+pkg delete package_name
+
+Remover dependências usadas
+pkg autoremove
+
+Busca
+pkg search package_name
+
+Para busca com detalhes
+pkg search -f package_name
+
+Com descrição
+pkg search -D pattern
+
+pkg help subcommand
+
+
+Ativar o daemon do rsysc
+rsyncd_enable="YES"
+
+sudo sh -c "echo 'rsyncd_enable="YES"' >> /etc/rc.conf"
+
+sudo service rsyncd start
+
+
+Segurança
+
+/usr/bin/netstat plunt
+
+
+== Observação
+As operações em disco geralmente demoram mais no FreeBAS que nos linux.
+
+
+
+https://www.digitalocean.com/community/tutorials/how-to-install-an-apache-mysql-and-php-famp-stack-on-freebsd-10-1

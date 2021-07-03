@@ -1,0 +1,104 @@
+docean
+
+Instalar MariaDB
+
+sudo apt update; sudo apt install -y mariadb-server
+
+
+== Configurar mysql para executar sem sudo
+
+Criar a pasta backup no home do ribafs para guardar os scripts de configuração
+
+sudo systemctl stop mysql
+sudo mkdir -p /var/run/mysqld
+sudo chown mysql:mysql /var/run/mysqld
+sudo -i
+sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
+exit;
+mysql -u root
+USE mysql;
+update user set plugin="mysql_native_password";
+flush privileges;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'senhaforte';
+\q
+sudo pkill mysqld
+sudo systemctl start mysql
+
+Testando
+
+mysql -uroot -p
+\q
+
+https://solidfoundationwebdev.com/blog/posts/how-to-fix-mysql-error-1524-hy000-plugin-auth_socket-is-not-loaded-in-mysql-5-7
+https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
+
+mysql_secure_installation
+
+- Enter current password for root (enter for none):
+
+Entrar com a senha atual do root, que acabamos de atribuir
+
+- Set root password? [Y/n]
+n
+
+- Remove anonymous users? [Y/n]
+Apenas tecle enter para aceitar
+
+- Disallow root login remotely? [Y/n]
+Enter
+
+- Remove test database and access to it? [Y/n
+Enter
+	
+- Reload privilege tables now? [Y/n]
+Enter
+
+Cleaning up...
+
+All done!  If you've completed all of the above steps, your MariaDB
+installation should now be secure.
+
+Thanks for using MariaDB!
+
+
+== Criação de usuários restritos e bancos
+
+Evite usar 'GRANT ALL PRIVILEGES ON ...'
+
+Privilégios obrigatórios - CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, 
+Outros - INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, GRANT (alguns aplicativos e CMS exigem estes também, como é o caso do Joomla, para a instalação de algumas extensões)
+
+Para sites com joomla precisa?: CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, GRANT
+
+
+mysql -uroot -p
+
+CREATE USER 'ribafs_us' IDENTIFIED BY 'senhaforte';
+
+CREATE DATABASE `ribafs_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP ON `ribafs_db`.* TO `ribafs_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+
+CREATE USER 'portal_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `portal_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Neste usarei Joomla
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `portal_db`.* TO `portal_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+\q
+
+Observar se estes privilégios serão suficientes para se instalar e gerenciar o Joomla. Caso não sejam adicionar
+
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, GRANT ON `ribafs_db`.* TO `ribafs_us`@localhost IDENTIFIED BY 'senhaforte';
+
+Testar
+
+mysql -uribafs_us -p
+\q
+
+mysql -uportal_us -p
+\q
+
+Agora o 4SegurancaSO/
+

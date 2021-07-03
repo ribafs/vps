@@ -1,0 +1,6 @@
+Redis Configuration
+
+Redis is available in every Applications using:
+Host 	127.0.0.1
+Port 	6379
+Auth 	No password

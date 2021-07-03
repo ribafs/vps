@@ -1,0 +1,25 @@
+Estou usando o Linode como hospedagem dos server mas praticamente qualquer outro serve:
+Digital Ocean, AWS, Linode, Azure, Vultr, Google Cloud and other VPS (https://cipi.sh/docs.html)
+
+- Criar um servidor com Ubuntu 20.04 para o cipi, CIPI - 45.56.116.13, que é o server com a administração web dos servidores e sites e respectivas criações de VPS para sites
+- Criar outro servidor no Linode e cadastrar no cipi (será o Servidor1, 23.92.28.125)
+- Criar um site (site1) no cliente1 e instalar nele dois aplicativos: 
+    - admin-br-demo (cake)
+    - laravel-acl-demo (laravel)
+
+Inicialmente seguir a risca as recomendações do autor do cipi
+
+Depois de tudo funcionando redondinho, estarei efetuando algums customizações:
+    - SSH numa porta alta
+    - Add user comum para administrar o cipi e desab o root
+
+Mudei planos
+
+Acabo de usar o IP do server com cipi no domínio ribamar.net.br
+
+Depois usarei o certbot para adicionar SSL, pois tanto melhora a segurança quanto algumas configurações do cipi exigem isso
+
+O servidor1 não precisa de domínio, aparentemente, assim como o do cipi, mas vejamos
+
+Usarei o domínio despertai.net.br no site1
+

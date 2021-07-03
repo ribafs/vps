@@ -1,0 +1,31 @@
+== Adicionar partição de swap com 2GB
+Especialmente importante para quem tem pouca RAM
+
+sudo su
+
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+mkswap /swapfile
+chmod 600 /swapfile
+swapon /swapfile
+
+nano /etc/fstab
+/swapfile	swap	swap	defaults	0	0
+
+Testar
+free -m
+
+== Criar script para limpar o cache da RAM
+
+nano /usr/local/bin/m
+
+sysctl -w vm.drop_caches=3
+swapoff -a
+swapon -a
+
+chmod +x /usr/local/bin/m
+
+Rodar como root
+
+m
+free -m
+

@@ -1,0 +1,25 @@
+Hardening FreeBSD 11 to Joomla 3.8.6
+
+FreeBSD
+SSH
+PF
+Users
+Apache
+PHP
+Joomla
+fail2ban
+sshguard
+denyhosts
+Lynis
+rkhunter
+chrootkit
+mod_security?
+
+
+Desktop
+nmap
+nikto
+
+
+Caso seja aprovado o primeiro artigo criarei mais este para a Vultr
+

@@ -1,0 +1,71 @@
+Cliente do cipi
+
+- Ubuntu 20.04
+- 1GB RAM
+- 1 vCPU
+- 25 GB disco
+- 1TB transf
+
+Frankfurt - FRA1
+
+Após a criação da VM, instalar o cipi, de acordo com as instruções recebidas:
+
+ssh root@46.101.134.23
+
+Manter o firewall desabilitado ou liberar as portas 22, 80 e 443 do firewall
+
+wget -O - http://159.89.10.166/sh/go/cbc841cfc508e95aaaa54aaebf60b150b92a6ead | bash
+
+Ao final recebi
+
+***********************************************************
+                    SETUP COMPLETE
+***********************************************************
+
+Use http://159.89.10.166 to manage your server.
+
+If you need SSH into this server:
+Cipi SSH username: cipi
+Cipi SSH password: 1ca1209ebab905432c00f874b42b9984be42e95a
+Cipi MySql root/cipi pass: 63f2f284e1fd519837ce63f5b10dd91fabe326e7
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+***********************************************************
+
+1ca1209ebab905432c00f874b42b9984be42e95a
+
+su - cipi
+passwd cipi
+Changing password for cipi.
+Current password: 
+New password: 
+Retype new password: 
+passwd: password updated successfully
+
+
+Acessar mysql
+su - cipi
+sudo mysql -uroot
+
+Mudar a porta do SSH
+
+Abrir portas no ufw
+65522
+http
+https
+ufw enable
+ufw status verbose
+
+Deletar a 22
+ufw status numbered
+ufw delete 1
+ufw status numbered
+
+reboot
+
+Acessar com
+ssh -p 65522 cipi@46.101.134.23
+
+Acessar pela web
+http://46.101.134.23/

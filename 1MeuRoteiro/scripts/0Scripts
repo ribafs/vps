@@ -1,0 +1,8 @@
+- buscastr - Procurar string em todos os arquivos de uma pasta. buscastr $1 $1. 1 - pasta, 2 - string
+- l8 - laravel new $1 --jet --teams --stack=livewire
+- m - libera cache de ram mas requer root
+- perms - permissões do /var/www/html ou sub
+- porta - verificar se uma portta está aberta. Ex porta 443
+- rdb - recriar um banco, excluind tudo: rdb nomedb
+- ubin - criar novo arquivo em /usr/local/bin. Exemplo: ubin nome
+- umod - setar a permissão de execução para um script criado com ubin no /var/www/html

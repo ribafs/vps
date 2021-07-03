@@ -1,0 +1,89 @@
+- Criar o servidor usando Debian 10
+
+Neste servidor serãoc riados os usuários, adicionados seus respetivos domínios
+Os domínios dos clientes devem ser adicionados todos ao servidor principal, onde foi instalado o CloudPanel
+
+- Acessar via SSH como root
+
+- Atualizar e isntalar dependências
+
+apt update && apt upgrade -y && apt -y install curl wget sudo && reboot
+
+- Instalar o CloudPanel
+
+curl -sSL https://installer.cloudpanel.io/ce/v1/install.sh | sudo bash
+
+- Acessar o painel web via navegador
+
+https://serverIP:8443
+
+The installation of CloudPanel is complete!
+
+CloudPanel can be accessed now: https://138.122.83.79:8443/
+
+Se numa box do vagrant, usar o IP 192.168.30.10
+
+https://192.168.30.10:8443
+
+- Criar o user administrador e acessar
+
+Acessar a área do usuário comum (clicar acima e à direita em Frontend Area), supondo ser o cliente1
+
+- Adicionar um domínio do cliente1
+    - Clicar no botão Domínios na barra vertical da esquerda
+
+Nome do domínio - www.despertai.net.br
+Raiz de documeto - site    (neste caso quero o site no raiz. Podemos criar em um sundiretório, então entramos o mesmo aqui com /subdir)
+Modelo de Vhost - Joomla 3.9
+Versão do PHP - 7.4
+
+Ficará assim:
+www.despertai.net.br 	/home/cloudpanel/htdocs/site
+
+Após adicionar um domínio são criados no servidor os seguintes arquivos:
+
+    The Document Root: /home/cloudpanel/htdocs/site
+    Vhost file for NGINX: /etc/nginx/sites-enabled/dominio.ext.conf
+    NGINX Access and Error Log file:
+        /home/cloudpanel/logs/dominio.ext/nginx/access.log
+        /home/cloudpanel/logs/dominio.ext/nginx/error.log
+    PHP-FPM Error Log file:
+        /home/cloudpanel/logs/dominio.ext/php/error.log
+    A self-signed TLS certificate
+
+- Adicionar usuário
+    - Clicar no botão Utilizadores
+Veja que podemos criar dois tipos de usuários: SSH e FTP, ou melhor, SFTP
+
+Prefira sempre usar SSH e se quizer usar FTP, ao invés use SFTP. Uma boa ferramenta é o FileZilla
+
+Nome do utilizador - ribafs (ele adiciona o sufixo -ssh)
+Palavra-passe (senha) - ********
+
+- Criar banco de dados
+
+Clicar no botão Bases de dados
+
+Veja que temos Bases de Dados e phpMyAdmin. Após criar o banco já podemos gerenciá-lo com o phpMyAdmin
+
+Clicar em Adicionar base de dados
+
+Nome da base de dados - sitedb
+Nome do usuário - siteus
+Senha - zmxnxxxxS@
+
+Adicionar base de dados
+
+Agora já podemos acessar o banco criado usando o phpMyAdmin
+
+Clique acima em phpMyAdmin
+
+No caso instalaremos um Joomla no site do cliente, então não precisaremos importar nada, o Joomla criará e populará tudo.
+
+Agora já estamos prontos para instalar o Joomla na área do cliente
+
+- Backup
+
+Será criado automaticamente backup de todos os bancos toda noite
+
+Podemos criar backup do banco

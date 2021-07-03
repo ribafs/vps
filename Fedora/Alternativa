@@ -1,0 +1,85 @@
+Install Apache/PHP 7.2.3 on Fedora 27/26, CentOS/RHEL 7.4/6.9
+https://www.if-not-true-then-false.com/2010/install-apache-php-on-fedora-centos-red-hat-rhel/
+
+== Módulos do PHP
+
+OPcache (php-opcache) – The Zend OPcache provides faster PHP execution through opcode caching and optimization. 
+APCu (php-pecl-apcu) – APCu userland caching 
+CLI (php-cli) – Command-line interface for PHP 
+PEAR (php-pear) – PHP Extension and Application Repository framework 
+PDO (php-pdo) – A database access abstraction module for PHP applications 
+MySQL (php-mysqlnd) – A module for PHP applications that use MySQL databases 
+PostgreSQL (php-pgsql) – A PostgreSQL database module for PHP 
+MongoDB (php-pecl-mongodb) – PHP MongoDB database driver 
+Redis (php-pecl-redis) – Extension for communicating with the Redis key-value store 
+Memcache (php-pecl-memcache) – Extension to work with the Memcached caching daemon 
+Memcached (php-pecl-memcached) – Extension to work with the Memcached caching daemon 
+GD (php-gd) – A module for PHP applications for using the gd graphics library 
+XML (php-xml) – A module for PHP applications which use XML 
+MBString (php-mbstring) – A module for PHP applications which need multi-byte string handling 
+MCrypt (php-mcrypt) – Standard PHP module provides mcrypt library support 
+
+sudo su
+
+== Remi Dependency on Fedora 27 / 26 / 25 ##
+rpm -Uvh http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm 
+rpm -Uvh http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm
+
+== Fedora 27 ##
+rpm -Uvh http://rpms.famillecollet.com/fedora/remi-release-27.rpm
+
+== Install Apache (httpd) Web server and PHP 7.2.3 on Fedora 27/26/25
+
+dnf --enablerepo=remi --enablerepo=remi-php72 install httpd php php-common
+
+
+== Install PHP 7.2.3 modules on Fedora 27/26/25
+Select what you need: OPcache, APCu, CLI, PEAR, PDO, MySQL, PostgreSQL, MongoDB, Memcache, Memcached, GD, MBString, MCrypt, XML
+
+dnf  --enablerepo=remi --enablerepo=remi-php72 install php-pecl-apcu php-cli php-pear php-pdo php-mysqlnd php-pgsql php-pecl-mongodb php-pecl-memcache php-pecl-memcached php-gd php-mbstring php-mcrypt php-xml
+
+
+== Start Apache HTTP server (httpd) and autostart Apache HTTP server (httpd) on boot
+
+## Fedora 27/26/25 and CentOS/RHEL 7.4 ##
+systemctl start httpd.service ## use restart after update
+
+
+== Create test PHP page to check that Apache, PHP and PHP modules are working
+Add following content to /var/www/html/test.php file.
+
+<?php
+    phpinfo();
+
+
+== Check created page with browser
+Access following address, with your browser. http://localhost/test.php
+
+
+== Enable Remote Connection to Apache HTTP Server (httpd) –> Open Web server Port (80) on Iptables Firewall (as root user again)
+
+2.2 Fedora 27/26/25 and CentOS/Red Hat (RHEL) 7.4
+2.2.1 List Your Active Firewalld Zones
+
+firewall-cmd --get-active-zones
+
+Example output:
+public interfaces: wlp1s0
+
+2.2.2 Add New Rule to Firewalld
+You might have active zone like public, FedoraWorkstation, FedoraServer.
+
+firewall-cmd --permanent --zone=public --add-service=http
+
+## OR ##
+
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+2.2.3 Restart firewalld.service
+
+systemctl restart firewalld.service
+3. Test remote connection
+Access following address, with your browser. 
+
+http://your.domain/test.php
+
+

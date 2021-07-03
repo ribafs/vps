@@ -1,0 +1,26 @@
+## Criar alguns scripts e aliases para agilizar as atividades
+
+Na pasta Scripts tem alguns e também um arquivo com aliases. Enviá-los para o servidor com o nemo
+
+Enviar a pasta Scripts para /root
+No servidor usar o root para copiar todos os scripts para o /usr/local/bin
+
+Sair do root e logar com ribafs, então editar o .bashrc e adicionar os scriots/aliases
+
+## Instalar ufw no debian
+
+apt install ufw
+
+Liberar somente as portas SSH, HTTP e HTTPS
+
+ufw allow 65522
+ufw allow 80
+ufw allow 443
+
+ufw enable
+
+ufw status
+
+Configurar o SSH
+
+

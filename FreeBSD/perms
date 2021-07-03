@@ -1,0 +1,10 @@
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /usr/local/www/apache24/data/$1";
+echo "";
+chown -R www:www /usr/local/www/apache24/data/$1;
+find /usr/local/www/apache24/data/$1 -type d -exec chmod 755 {} \;
+find /usr/local/www/apache24/data/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+

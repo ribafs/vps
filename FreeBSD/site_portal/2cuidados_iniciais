@@ -1,0 +1,73 @@
+Instalar Pacotes Básicos
+
+pkg install nano wget mc
+
+nano /usr/local/etc/sudoers
+
+ribafs	ALL=(ALL)	NOPASSWD:ALL
+
+Criar novo usuário
+
+adduser ribafs
+
+nano /etc/ssh/sshd_config
+
+Port 55522
+LoginGraceTime 30
+PermitRootLogin without-password
+AllowUsers ribafs root
+
+service sshd restart
+
+Acessar pelo desktop como ribafs
+
+ssh -p 55522 ribafs@138.197.169.181
+
+Após o login aparece
+
+============
+Last login: Sat Mar 31 22:35:53 2018 from 177.130.216.50
+FreeBSD 11.1-RELEASE (GENERIC) #0 r321309: Fri Jul 21 02:08:28 UTC 2017
+
+Welcome to FreeBSD!
+
+Release Notes, Errata: https://www.FreeBSD.org/releases/
+Security Advisories:   https://www.FreeBSD.org/security/
+FreeBSD Handbook:      https://www.FreeBSD.org/handbook/
+FreeBSD FAQ:           https://www.FreeBSD.org/faq/
+Questions List: https://lists.FreeBSD.org/mailman/listinfo/freebsd-questions/
+FreeBSD Forums:        https://forums.FreeBSD.org/
+
+Documents installed with the system are in the /usr/local/share/doc/freebsd/
+directory, or can be installed later with:  pkg install en-freebsd-doc
+For other languages, replace "en" with a language code like de or fr.
+
+Show the version of FreeBSD installed:  freebsd-version ; uname -a
+Please include that output and any error messages when posting questions.
+Introduction to manual pages:  man man
+FreeBSD directory layout:      man hier
+
+Edit /etc/motd to change this login announcement.
+To see how much disk space is left on your partitions, use
+
+	df -h
+		-- Dru <genesis@istar.ca>
+===========
+
+Veja que podemos mudar a mensagem de pós login editando:
+
+nano /etc/motd
+
+Esta é uma ótima característica do FreeBSD, após a instalação de cada software aparece mensagem contendo informações importantes.
+
+
+sudo su
+
+Para que root sem senha no SSH
+PermitRootLogin without-password
+
+Criar uma chave para o ssh no desktop
+
+ssh-keygen -b 4096
+
+

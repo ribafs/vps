@@ -1,0 +1,4 @@
+Snapshot é um backup que pode ser usado na recriação de uma droplet.
+É gratuito.
+Sugestão: usar no nome do snapshot
+nomedroplet-snap-data-hora

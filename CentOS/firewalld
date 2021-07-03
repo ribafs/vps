@@ -1,0 +1,29 @@
+FirewallD
+
+sudo su
+
+firewall-cmd --state
+
+iptables -F
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+firewall-cmd --zone=public --permanent --add-service=http
+firewall-cmd --zone=public --permanent --add-service=https
+firewall-cmd --zone=public --permanent --remove-service=ssh
+firewall-cmd --zone=public --permanent --add-rich-rule='rule family="ipv4" source address="177.CASA.IP" port port="65522" protocol="tcp" accept'
+firewall-cmd --zone=public --permanent --add-rich-rule='rule family="ipv4" source address="177.14.224.187" port port="65522" protocol="tcp" accept'
+
+firewall-cmd --zone=public --permanent --list-services
+
+firewall-cmd --reload
+systemctl restart firewalld.service
+
+
+firewall-cmd --zone=public --remove-port=65522/tcp --permanent

@@ -1,0 +1,31 @@
+Instalação do UFW
+
+UFW - Uncomplicated Firewall
+
+Instalação
+
+requer repositório testing
+
+apk add ufw
+
+Configurações
+
+ufw enable
+
+ufw status verbose
+
+ufw limit 65522         # Abre a porta do SSH e protege contra ataques de brute-force em login
+
+ufw allow out DNS     # allow outgoing DNS
+ufw allow out 80/tcp  # allow outgoing HTTP traffic
+
+Rodar no boot
+
+rc-update add ufw
+
+Checar o status do UFW:
+
+ufw status verbose
+
+https://wiki.alpinelinux.org/wiki/Uncomplicated_Firewall
+

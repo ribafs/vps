@@ -1,0 +1,3 @@
+Extensões do PHP 7.0.23
+
+pkg_add php-bz2-7.0.23 php-cgi-7.0.23 php-curl-7.0.23 php-dba-7.0.23 php-gd-7.0.23 php-gmp-7.0.23 php-imap-7.0.23 php-intl-7.0.23 php-ldap-7.0.23 php-7.0.23 php-mcrypt-7.0.23 php-mysqli-7.0.23 php-odbc-7.0.23 php-pcntl-7.0.23 php-pdo_dblib-7.0.23 php-pdo_mysql-7.0.23 php-pdo_pgsql-7.0.23 php-pgsql-7.0.23 php-pspell-7.0.23 php-shmop-7.0.23 php-snmp-7.0.23 php-soap-7.0.23 php-tidy-7.0.23 php-xmlrpc-7.0.23 php-xsl-7.0.23 php-zip-7.0.23 

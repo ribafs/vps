@@ -1,0 +1,16 @@
+tail -f /var/log/secure
+
+tail -f /var/log/messages
+
+Monitorar quem está tentando acessar o servidor em tempo real
+tcpdump -n -e -ttt -i pflog0
+
+grep CRON /var/log/syslog
+
+service rsyslog restart
+
+grep -i cron /var/log/syslog|tail -2
+
+
+tail -fn 50 /var/log/apache2/error.log
+

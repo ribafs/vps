@@ -1,0 +1,46 @@
+Mudar apra porta maior que 50.000 para maior segurança
+
+nano /etc/ssh/sshd_config
+
+Port 55522
+LoginGraceTime 30
+PermitRootLogin without-password
+AllowUsers ribafs root
+
+service sshd restart
+
+
+Para que root sem senha no SSH
+PermitRootLogin without-password
+
+Criar uma chave para o ssh no desktop
+
+ssh-keygen -t rsa -b 4096
+
+Para maior segurança usar a chave ED25519 ou ECDSA:
+
+ssh-keygen -t ecdsa -b 4096
+
+ssh-keygen -t ed25519 -b 4096
+
+
+Então copie sua chave para o servidor, para que possa conectar sem digitar a senha. Na primeira vez te pedirá a senha mas sua senha do desktop, mas memorizará e não mais pedirá. Assim ficará mais seguro.
+
+ssh-copy-id ribafs@ip_servidor -p 10522
+
+Mesmo com scp não pedirá senha.
+
+
+Sugestão - Criar um script para conectar:
+
+sudo nano /usr/local/bin/servidor
+
+ssh -p 55522 ribafs@128.199.63.251
+
+sudo chmod +x /usr/local/bin/servidor
+
+Conecte com
+servidor
+
+
+

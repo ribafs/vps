@@ -1,0 +1,28 @@
+The truth is, Virtualmin is a supercharged version of Webmin—which is also on this list. Its source is open and widely used all over the world, with thousands of downloads and active users. Written in PHP, it perfectly supports UNIX operating systems, Linux distributions, and BSD extensions.
+
+Moreover, Virtualmin is available in three product versions: Virtualmin GPL, Virtualmin Professional, and Cloudmin Professional. As expected, the first is free and open source while the last two are commercial. Regardless of which you use, Virtualmin is perfect for domain hosting and virtual servers like OpenVZ and KEN.
+
+To reiterate, this is closest you can get in comparison with cPanel and Plesk.
+Features
+
+Web and email domains management: YES
+Web-based virtual servers management: YES
+Database systems management: YES
+Multiple servers from one control panel management: YES
+Great flexibility; integration with another control panel: YES
+Support for IPv6: YES
+Management of DNS: YES
+Management of emails: YES
+FTP administration: YES
+Availability of website statistics: NO
+Multilingual (multiple languages): NO
+Management of command line: YES
+User-friendly web interface: YES
+Logfile reporting and access: YES
+Direct access to server logs: YES
+Presence of built-in plugins: NO
+High extensibility with Python: NO
+Authentication of LDAP and 2-factor: YES
+Availability of firewall for maximum security: NO
+Availability of numerous modules for the utmost configuration: NO
+Mirrors and Clusters configuration: YES

@@ -1,0 +1,145 @@
+Configurações no CentOS 8.3
+
+== Primeiro acesso via SSH
+
+ssh root@IP
+
+== Atualização
+
+dnf update
+dnf upgrade
+
+reboot
+
+== Swap
+
+Criar swap
+
+fallocate -l 1G /swapfile
+
+
+Caso o fallocate não esteja disponível, então use o dd
+
+dd if=/dev/zero of=/swapfile bs=1024 count=1048576
+
+chmod 600 /swapfile
+
+mkswap /swapfile
+
+swapon /swapfile
+
+swapon --show
+
+free -h
+
+Tornar permanente
+
+dnf install nano
+
+nano /etc/fstab
+
+/swapfile swap swap defaults 0 0
+
+Referência
+https://linuxize.com/post/how-to-add-swap-space-on-centos-8/
+
+
+== Adicionar usuário comum
+
+adduser testsecvps
+passwd testsecvps
+
+
+== Adicionar ao grupo wheel com privilégios de sudo
+
+usermod -aG wheel testsecvps
+
+
+== Configurar o SSH
+
+nano /etc/ssh/sshd_config
+
+Porta 55522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+AllowUsers testsecvps
+X11Forwarding no
+
+
+Liberar no SELinux
+
+sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd
+sudo semodule -i my-sshd.pp
+sudo systemctl restart sshd
+
+
+Copiar a chave SSH do root para o testsecvps e sincronizar
+
+rsync --archive --chown=testsecvps:testsecvps ~/.ssh /home/testsecvps
+
+exit
+
+
+Acessar agora como testsecvps
+
+docean
+
+
+Instalar o Nginx, PostgreSQL, PHP e cia e configurar
+
+Scripts/install.sh
+
+Configurar com
+
+Scripts/config.txt
+
+
+== Instalar/configurar o FirewallD
+
+sudo dnf -y install firewalld
+sudo systemctl enable --now firewalld
+
+sudo systemctl status firewalld
+
+Liberar uma porta alta no SSH e liberar o SSH no SELinux
+
+sudo semanage port -l | grep ssh
+ssh_port_t                     tcp      22
+
+sudo semanage port -a -t ssh_port_t -p tcp 55522
+
+sudo semanage port -l | grep ssh
+
+ssh_port_t                     tcp      55522, 22
+
+semanage port -l | grep ssh
+
+
+Abrir a porta 55522 no FirewallD
+
+É sempre recomendável manter o serviço de Firewall em execução e permitir apenas serviços confiáveis.
+
+sudo firewall-cmd --add-port=55533/tcp --permanent
+sudo firewall-cmd --reload
+
+Agora podemos remover o serviço de SSH que roda na porta 22
+
+sudo firewall-cmd --remove-service=ssh --permanent
+sudo firewall-cmd --reload
+
+sudo systemctl restart sshd
+
+
+Liberar FirewallD no SELinux
+
+sudo ausearch -c 'firewalld' --raw | audit2allow -M my-firewalld
+
+sudo semodule -X 300 -i my-firewalld.pp
+
+
+Adicionar o usuário para a whitelist do firewalld, com sudo execute:
+
+sudo firewall-cmd --add-lockdown-whitelist-user=testsecvps
+

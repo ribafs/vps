@@ -1,0 +1,80 @@
+Criei um Servidor com Ubuntu 16.04 no DO
+
+Para instalar uma interface web de administração de servidores
+Com o Vesta Control Panel
+
+IP - 138.68.191.87
+
+Soluções para Administração Web de Servidor
+
+VESTACP
+https://vestacp.com
+
+Documentação
+https://vestacp.com/docs/
+
+Versões free e comercial/suporte e plugins
+
+Serviços disponíveis
+- Domínios
+- DNS
+- E-mail e webmail: spamassassin, clamav, dovecot, exim, roundcub
+- Bancos de dados (My ou PG)
+- Cron Jobs
+- Backup - apenas para o próprio vesta e sua estrutura
+- vsFTPd ou proFTPd
+- Web - nginx ou apache/php
+- Gráficos
+- Estísticas e logs
+- Firewall - iptables/fail2ban
+- Aplicativos/Softaculous
+- Filemanager - plugin comercial
+Alternativamente podemos instalar o eXtplorer
+- Chroot no SFTP - plugin comercial
+
+
+OBS: Me parece que 1GB de RAM é pouco para instalar o pacote completo, especialmente com antivirus e antispam.
+
+Suporta Ubuntu, Debian, RedHat e CentOS
+
+Instalar
+
+OBS: Instalar somente em servidor limpo e recem instalado
+
+# Connect to your server as root via SSH
+ssh -p 65522 ribafs@ribafs.org
+
+# Download installation script 
+curl -O http://vestacp.com/pub/vst-install.sh
+
+# Run it
+
+bash vst-install.sh --nginx yes --phpfpm yes --apache no --named yes --remi yes --vsftpd yes --proftpd no --iptables yes --fail2ban yes --quota yes --exim yes --dovecot yes --spamassassin yes --clamav yes --softaculous yes --mysql yes --postgresql no --hostname ribafs.org --email ribafs@gmail.com
+
+
+Acusou erro: user admin já existe.
+
+Usuário não existe mas grupo sim:
+groupdel admin
+
+Refiz e instalou.
+
+https://138.68.191.87:8083
+
+Mas a porta acima é bloqueada em meu trabalho, então pesquisei.
+
+Para alterar a porta
+nano /usr/local/vesta/nginx/conf/nginx.conf
+
+...
+   # Vhost
+    server {
+        listen          443;
+...
+
+service vesta restart
+
+https://138.68.191.87
+
+A 443 é a default do SSL e liberada aqui.
+

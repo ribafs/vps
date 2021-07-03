@@ -1,0 +1,51 @@
+Instalar e configurar o AMP
+
+Apache, PHP e outros, visto que o MariaDB já foi instalado e configurado
+
+For Apache <=2.2 (where /var/www/chamilo should be replaced by the path to your Chamilo install):
+
+    <Directory />
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+    <Directory /var/www/chamilo/>
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+    
+
+and for Apache >=2.4:
+
+    <Directory />
+        AllowOverride All
+        Require all granted
+    </Directory>
+    <Directory /var/www/chamilo/>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+
+== Criar os scripts de
+
+5.2Scripts
+
+
+== Enviar o 5.2Scripts/install.sh para o servidor
+
+Abrir a pasta Scripts e acessar o terminal
+
+scp -P 65522 install.sh ribafs@165.232.148.216:/home/ribafs
+
+Executar no servidor, na apsta /home/ribafs para instalar o LAMP
+
+sudo sh install.sh
+
+
+== Após instalar configure com
+
+5.2Scripts/config.txt
+
+

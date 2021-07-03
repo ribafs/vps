@@ -1,0 +1,50 @@
+Planejamento de uso das VMs no DO
+
+Tão logo finalize a instalação básica e as configurações e cuidados básicos com a segurança criar um Snapshot.
+
+ribafs
+- Ubuntu 20.04
+- hostname - ribafs
+- 8GB de RAM
+- IP - 159.89.10.166
+- Datacenter - Frankfurt - FRA1
+- Add domínio ribafs.me neste
+
+Instalar:
+- LAMP - MariaDB no luar do mysql
+- adminer
+- PostgreSQL
+- Joomla
+- Wordpress
+- Drupal4
+- Laravel8 - Criar aplicativo "demo" para abrigar o demo do laravel-acl 
+- OpenCArt
+
+
+FreeBSD
+- FreeBSD 12.1 zfs x64
+- hostname - freebsd
+- 1 GB de RAM
+- IP - 159.89.109.1
+- Datacenter - Frankfurt - FRA1
+- Cuidar da segurança do FreeBSD
+
+Instalar:
+- FEMP com mariadb e adminer
+- Joomla
+- Laravel
+- PostgreSQL
+- OpenCart
+- WordPress
+
+
+Testes1 (criar nova vm)
+- Ubuntu 20.04
+- hostname - testes1
+- 1 GB de RAM
+- IP - 138.68.88.218
+- Datacenter - Frankfurt - FRA1
+
+Instalar:
+- LEMP com mariadb e adminer
+

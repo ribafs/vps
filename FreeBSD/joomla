@@ -1,0 +1,119 @@
+https://docs.joomla.org/FreeBSD_Installation
+
+FreeBSD 11.1
+Apache 2.4
+MySQL 5.7
+PHP 7.2
+Joomla! 3.8.x
+
+Instalação via ports
+
+Criar cópia de todos os scripts alterados, antes de alterar para:
+mkdir /root/backup
+
+== Apache
+
+cd /usr/ports/www/apache24
+make install clean
+
+nano /etc/rc.conf
+
+apache24_enable="YES"
+apache24_http_accept_enable="YES"
+
+service apache24 start
+
+cd /usr/ports/lang/php72
+make install clean
+
+cd /usr/ports/www/mod_php72
+make install clean
+
+nano /usr/local/etc/apache24/httpd.conf
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+Trocar a linha:
+DirectoryIndex index.html
+
+por
+DirectoryIndex index.php index.html
+
+== PHP
+
+cd /usr/ports/lang/php72-extensions
+make config
+
+Algumas opções podem ser desselecionadas
+JSON 
+MYSQLI 
+SESSION 
+SIMPLEXML 
+XML 
+ZLIB 
+
+make install
+
+cd /usr/local/etc/
+cp php.ini-production php.ini
+
+nano /usr/local/etc/php.ini
+
+memory_limit: Mínimo: 64M Recomendado: 128M ou mais
+upload_max_filesize: Mínimo: 20M 
+post_max_size: Mínimo: 20M 
+max_execution_time: Pelo menos 120 Recomendado: 300 
+
+service apache24 restart
+
+
+== MySQL
+
+cd /usr/ports/databases/mysql57-server
+make install clean
+
+nano /etc/rc.conf
+
+mysql_enable="YES"
+
+service mysql-server start
+
+cat /root/.mysql_secret
+
+mysql_secure_installation
+
+== Joomla
+
+wget https://downloads.joomla.org/cms/joomla3/3-8-5/Joomla_3-8-5-Stable-Full_Package.zip
+
+cp Joomla_*.zip /usr/local/www/apache24/data/
+cd /usr/local/www/apache24/data/
+unzip Joomla_*.zip
+
+chown -R www:www ../data
+
+Criar o banco de dados para o site no MySQL
+
+Abra no navegador e instale
+http://<ip_address>
+
+service apache24 restart
+
+Logs
+
+/var/log/httpd-error.log
+
+e
+/var/db/mysql/ nomeado <hostname>.err and <hostname>-slow.log por default.
+
+Bancos de dados ficam gravador em
+/var/db/mysql/
+
+Importante copiar o configuration.php para umas duas pastas antes, ficando fora do diretório web.
+No caso do FreeBSD copiar para:
+/usr/share/www
+E manter apenas um arquivo vazio com nome de configuration.php com um include para o arquivo de fato duas pastas antes

@@ -1,0 +1,10 @@
+Lets Encript
+
+We recommend renewing certificates automatically when they have a third of their total lifetime left. For Let's Encrypt's current 90-day certificates, that means renewing 30 days before expiration. See https://letsencrypt.org/docs/integration-guide/ for details.
+
+despertai.net.br
+www.despertai.net.br
+
+For any questions or support, please visit: https://community.letsencrypt.org/ Unfortunately, we can't provide support by email.
+
+For details about when we send these emails, please visit: https://letsencrypt.org/docs/expiration-emails/ In particular, note that this reminder email is still sent if you've obtained a slightly different certificate by adding or removing names. If you've replaced this certificate with a newer one that covers more or fewer names than the list above, you may be able to ignore this message. 

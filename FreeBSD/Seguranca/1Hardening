@@ -1,0 +1,739 @@
+Hardening no FreeBSD 11.1
+
+O FreeBSD é bem seguro e conservador por default, mas mudar algumas configurações e reforçar alguns aspectos dos softwares/pacotes instalados é importante para manter o servidor mais resistente às tentativas de ataque, especialmente se o servidor estiver na internet.
+
+Atualizações - as atualizações são muito importantes para manter o sistema operacional estável e seguro. Uma boa ideia é assinar a lista de anúncios de segurança do FreeBSD em https://lists.freebsd.org/mailman/listinfo/freebsd-announce
+
+Lembre que após algumas atualizações precisamos reiniciar alguns serviços. Um exemplo é a atualização do php que precisa que o apache seja reiniciado para que seja usada. Outra é a atualização do kernel que precisa que o FreeBSD seja reiniciado para que seja usada.
+
+Backup - Snapshot ou Backup do servidor para nosso servidor. Sempre que fizermos alterações ou mesmo atualizações do servidor é importante atualizar este backup.
+
+IMPORTANTE - sempre antes de qualquer grande alteração nas configurações do servidor, devemos atualizar o backup ou snapshot, para em caso de problema poder ter de volta o backup do servidor funcionando.
+
+Por padrão o FreeBSD é muito seguro. Problema de segurança no core do sistema é pouco frequente.
+Usar boas práticas para tornar o FreeBSD mais resistente às ações maliciosas, especialmente em servidores publicanos na internet.
+
+Aplicar hardening em um sistema operacional é alterar algumas das suas configurações default para que ele se torne mais seguro contra invasões.
+
+Uma instalação padrão do FreeBSD é muito segura mas com as configurações abaixo procuramos reforçar esta segurança.
+
+- Atualização do sistema
+- Ajustar usuários, mudando senha, impondo restrições como impedir login do root.  A senha do root deve ser conhecida da menor quantidade de gente possível. Usar senhas bem fortes para todos os usuários. Contas de usuários devem ser auditadas frequentemente e mudadas ou excluídas as sem uso. O root nunca deve fazer login diretamente. Sempre logar como usuário comum e mudar apra sudo ou su quando precisar.
+- Configuarar um firewall, no caso o PF
+- Configuarar o NTP
+- Adicionar partição de swap
+- Confirar Timezone
+
+== Impedir login direto do root
+
+Para que somente usuários comuns possam fazer login no servidor, inclusive na console da hospedagem, edite o arquivo
+
+Antes disso instale e use o sudo para fazer login como usuário comum e mudar para sudo quando precisar.
+
+nano /etc/ttys 
+
+Faça um backup full do sistema ou atualize o snapshot
+
+E troque todas as ocorrências de 'secure' por 'insecure'
+
+
+== Atualização
+
+Prucurar por atualizações, baixar as que existirem e instalar
+
+sudo freebsd-update fetch
+sudo freebsd-update install
+
+Sempre que instalar uma nova versão do kernel será necessário um reboot:
+
+shutdown -r now
+
+Alternativas:
+
+Posts
+
+sudo portsnap fetch extract
+sudo portsnap fetch update
+
+sudo pkg install portmaster
+
+cd /usr/ports/ports-mgmt/portmaster
+sudo make install clean
+
+Checar por atualizações
+portmaster -L
+
+Binários
+
+sudo pkg update
+sudo pkg upgrade
+
+
+== Evitando problemas na atualização
+
+sudo nextboot -o "-s" -k kernel
+sudo reboot
+
+
+== Automatizando verificação de atualizações
+
+sudo nano /etc/crontab
+
+Adicione ao final do arquivo:
+@dialy root freebsd-update -t freebsd cron
+
+No próximo login verifique com
+mail
+
+
+== Reforçando a Segurança dos usuários
+
+Cada usuário deve ter sua conta restrita
+Devem usar senhas fortes
+A senha do root deve ser conhecida pela menor quantidade de pessoas possível
+As contas de usuários devem ser auditadas periodicamente e desabilitar ou remover usuários que não são mais usados
+
+
+== Restringindo Acessos
+
+Restringindo acesso para alguns arquivos:
+
+sudo su
+
+Guardar uma cópia do estado dos arquivos abaixo antes de alterar
+
+chmod o= /etc/sysctl.conf
+chmod o= /etc/ttys
+chmod o= /etc/inetd.conf
+chmod o= /etc/login.*
+chmod o= /etc/fstab
+chmod o= /etc/rc.conf
+chmod o= /etc/ftpusers
+chmod o= /etc/group
+chmod o= /etc/host*
+chmod o= /etc/inetd.conf
+chmod o= /usr/bin/users
+chmod o= /usr/bin/w
+chmod o= /usr/bin/who
+chmod o= /usr/bin/lastcomm
+chmod o= /usr/bin/last
+
+chmod o= /var/log
+chflags sappnd /var/log
+chflags sappnd /var/log/*
+
+exit
+
+Agora os logs não podem ser rotacionados
+
+== Comando sudo do linux
+É uma boa forma de ganhar acesso de root temporariamente. Não vem instalado por default no FreeBSD 11, mas pode ser instalado com
+
+pkg install sudo
+
+Pelos ports
+cd /usr/ports/security/sudo
+make install
+
+Adicionar um usuário ao sudoers ou para um grupo que já esteja lá, como o wheel
+
+nano /usr/local/etc/sudoers
+
+ribafs  ALL=(ALL)   ALL
+
+ou adicionar ao grupo wheel, que é um grupo com privilégios administrativos
+
+pw usermod ribafs -G wheel
+
+
+== Reforçando
+
+Meu exemplo
+
+hostname="ribafs"
+cloudinit_enable="YES"
+sshd_enable="YES"
+digitaloceanpre="YES"
+digitalocean="YES"
+zfs_enable="YES"
+
+ntpd_enable="YES"
+ntpd_sync_on_start="YES"
+
+clear_tmp_enable="YES"
+syslog_flags="-ss"
+sendmail_enable="NONE"
+sendmail_submit_enable="NO"
+sendmail_outbount_enable="NO"
+sendmail_msp_queue_enable="NO"
+sendmail_cert_create="NO"
+kern_securelevel_enable="YES
+indet_enable="NO"
+icmp_drop_redirect="YES"
+tcp_drop_synfin="YES"
+icmp_log_redirect="YES"
+portmap_enable="NO"
+log_in_vain="YES"
+
+sshguard_enable="YES"
+
+apache24_enable="yes"
+mysql_enable="yes"
+
+#Adicionei
+firewall_enable="YES"
+firewall_quiet="YES"
+firewall_type="workstation"
+firewall_myservices="65522 80 443"
+firewall_allowservices="any"
+firewall_logdeny="YES"
+#firewall_script="/usr/local/etc/IPFW.rules"
+
+# DigitalOcean Dynamic Configuration lines and the immediate line below it,
+# are removed each boot.
+
+# DigitalOcean Dynamic Configuration
+defaultrouter="167.99.160.1"
+# DigitalOcean Dynamic Configuration
+ipv6_defaultrouter=""
+# DigitalOcean Dynamic Configuration
+ipv6_activate_all_interfaces="yes"
+
+
+sudo nano /etc/sysctl.conf
+
+Adicionar ou mudar
+
+security.bsd.see_other_uids=0
+security.bsd.see_other_gids=0
+security.bsd.unprivileged_read_msgbuf=0
+security.bsd.unprivileged_proc_debug=0
+security.bsd.stack_guard_page=1
+kern.randompid=$(jot -r 1 9999)
+kern.securelevel=3
+kern.ps.showallprocs=0
+net.inet.tcp.blackhole=2
+net.inet.udp.blackhole=1
+net.inet.ip.random_id=1
+
+net.inet.tcp.sendbuf_max=16777216
+net.inet.tcp.recvbuf_max=16777216
+net.inet.tcp.sendbuf_auto=1
+net.inet.tcp.recvbuf_auto=1
+net.inet.tcp.sendbuf_inc=16384
+net.inet.tcp.recvbuf_inc=524288
+
+net.inet.tcp.mssdflt=1460
+net.inet.tcp.minmss=1300
+net.inet.tcp.syncache.rexmtlimit=0
+net.inet.tcp.syncookies=0
+net.inet.tcp.tso=0
+net.inet.ip.check_interface=1
+net.inet.ip.process_options=0
+net.inet.ip.redirect=0
+net.inet.icmp.drop_redirect=1
+net.inet.tcp.always_keepalive=0
+net.inet.tcp.drop_synfin=1
+net.inet.tcp.ecn.enable=1
+net.inet.tcp.icmp_may_rst=0
+net.inet.tcp.msl=5000
+net.inet.carp.preempt=1
+
+e estas linhas para /etc/rc.conf:
+
+clear_tmp_enable="YES"
+syslog_flags="-ss"
+sendmail_enable="NONE"
+sendmail_submit_enable="NO"
+sendmail_outbount_enable="NO"
+sendmail_msp_queue_enable="NO"
+sendmail_cert_create="NO"
+kern_securelevel_enable="YES
+indet_enable="NO"
+icmp_drop_redirect="YES"
+tcp_drop_synfin="YES"
+icmp_log_redirect="YES"
+portmap_enable="NO"
+log_in_vain="YES"
+
+Se usar o Firewall PF
+
+pf_enable="YES"
+pf_rules="/etc/firewall"
+pf_flags=""
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
+pflog_flags=""
+
+Digital Ocean adicionou
+
+# DigitalOcean Dynamic Configuration
+defaultrouter="167.99.160.1"
+# DigitalOcean Dynamic Configuration
+ifconfig_vtnet0="inet 167.99.175.44 netmask 255.255.240.0"
+# DigitalOcean Dynamic Configuration
+ifconfig_vtnet0_alias0="inet 10.46.0.5 netmask 255.255.0.0"
+# DigitalOcean Dynamic Configuration
+ipv6_defaultrouter=""
+# DigitalOcean Dynamic Configuration
+ipv6_activate_all_interfaces="yes"
+
+
+Ao instalar o FreeBSD ele cria dois diretórios temporários: /tmp e /var/tmp. Vamos excluir o último e criar um link simbólico de /tmp para ele
+
+sudo su
+
+mv /var/tmp/* /tmp/
+rm -rf /var/tmp
+ln -s /tmp /var/tmp
+
+
+== Timezone
+
+sudo tzsetup
+
+
+== NTP
+
+sudo nano /etc/rc.conf
+
+ntpd_enable="YES"
+ntpd_sync_on_start="YES"
+
+sudo service ntpd restart
+
+Configurações
+/etc/ntp.conf
+
+
+== Checando vulnerabilidade conhecidas de softwares
+
+sudo pkg audit -F
+
+
+== Configurações
+
+Base do sistema em
+/etc
+
+E atualziado com
+freebsd-update
+
+Softwares opcionais em
+/usr/local/etc
+
+Ports em
+/usr/ports
+
+Atualizados com:
+sudo portsnap fetch update
+
+Ao procurar por um software opcional e somente o encontrar na pasta dos ports, significa que ele não está instalado.
+
+
+== Instalando Ports
+
+cd /usr/ports-ports-mgmt/portmaster
+sudo make install
+
+Comando de instalação simples
+sudo make config-recursive install distclean
+
+Usando o tcsh faça uma atualização no path com
+rehash
+
+
+== Removendo um port instalado
+
+cd /usr/ports/ports-mgmt/portmaster
+sudo make deinstall
+
+Removendo configurações
+sudo make rmconfig
+
+Remover configurações e de todas as dependências
+sudo make rmconfig-recursive
+
+Reinstalar portmaster
+sudo make reinstall distclean
+
+
+== Atualizar um software nos ports:
+
+cd /usr/porta/pasta/do/software
+sudo make deinstall reinstall
+
+
+== Consultar que ports estão disponíveis
+
+sudo portmaster -L
+
+ou
+
+sudo portmaster ftp/wget
+
+
+== Atualizar todos os softwares de uma única vez
+
+sudo portmaster -a
+
+
+== Gerenciamento de pacotes binários com PKG
+
+sudo pkg update
+sudo pkg upgrade
+
+sudo pkg search nome
+
+sudo pkg install pacote1
+
+sudo pkg install pacote1 pacote2
+
+sudo pkg delete pacote1
+
+sudo pkg delete pacote1 pacote2 ...
+
+sudo pkg info pacote1
+
+Removendo dependências
+sudo pkg autoremove
+
+Para pesquisar um pacote com informações detalhadas sobre o mesmo:
+sudo pkg search -f pacote1
+
+Pesquisar um pacote por sua descrição
+sudo pkg search -D pacote1
+
+Ajuda
+sudo pkg help
+
+sudo pkg help subcomando
+
+
+== Monitorando/Auditando
+
+AIDE
+
+pkg install aide
+
+via ports
+make install /usr/ports/security/aide
+
+Configuração - /usr/local/et/aide.conf
+
+aide --init
+cd /var/db/aide/databases
+mv aide.db.new aide.db
+
+Comparar os bancos de dados
+
+aide
+
+Na primeira vez não verá mudançcas
+
+LYNIS
+
+Este software nasceu no FreeBSD e atualmente tmabém é utilizado nos Linux
+
+Via ports
+cd /usr/ports/security/lynis
+make install clean
+
+Via PKG
+pkg install security/lynis
+
+Rodando
+lynis -c -Q
+
+-c - executa scan com todos os testes habilitados
+-Q - evitar aguardar por feedback do usuário
+
+Logs
+/var/log/lynis.log
+
+
+== HardenedBSD
+
+Se precisar de ainda mais segurança é indicado
+
+https://hardenedbsd.org/
+https://github.com/HardenedBSD/hardenedBSD
+https://installer.hardenedbsd.org/hardened_11_stable_master-LAST/
+https://www.youtube.com/watch?v=mbyZqnILRVI
+
+Cujo objetivo é reduzir as possibidades de problemas de segurança no FreeBSD
+
+
+== 
+
+nano /etc/periodic.conf
+
+daily_clean_tmps_enable="YES"
+daily_clean_hoststat_enable="NO"
+daily_status_include_submit_mailq="NO"
+daily_status_mail_rejects_enable="NO"
+daily_queuerun_enable="NO"
+daily_submit_queuerun="NO"
+
+
+== Firewall com PF
+
+O Packet Filter é bem simples de configurar. Somente habilite se deseja acesso externo.
+O PF já vem embutido no kernel do FreeBSD, portanto não requer instalação de nenhum pacote.
+
+nano /etc/pf.conf
+
+Testar regras
+pfctl -nf /etc/pf.conf
+
+Aplicar regras
+pfctl -f /etc/pf.conf
+
+Habilitar
+pfctl -e
+
+Regras simples:
+
+nano /etc/pf.conf
+
+ext_if="bge0"
+
+IP_FREEBSD_HOST="192.168.0.xxx"
+IP_WEB="192.168.0.xxx"
+SSH_HOSTS= "{" $IP_FREEBSD_HOST $IP_WEB "}"
+ICMP_TYPES="{echoreq,unreach}"
+
+PORT_WEB="{80,443}"
+PORT_SSH="{22,1413}"
+PORT_ZABBIX="{10059}"
+
+scrub in all
+set skip on lo0
+block in on vtnet0
+pass in on vtnet0 proto icmp
+pass in on vtnet0 proto icmp6
+pass in on vtnet0 proto tcp from any to any port 65522
+pass in on vtnet0 proto tcp from any to any port 80
+pass in on vtnet0 proto tcp from any to any port 443
+
+pass quick proto tcp from 177.x.x.x to vtnet0 port 65522 flags S/SA keep state
+pass in quick proto tcp from <workssh> to $SSH_HOSTS port $PORT_SSH flags S/SA keep state (max-src-conn 10, max-src-conn-rate 3/5, overload <fail2ban> flush)
+
+pfctl -f /etc/pf.conf
+
+service pf reload
+
+reboot
+
+Logs
+/var/log/pflog
+
+Adicionar IP ao hosts
+
+nano /etc/hosts
+
+IP  www.dominio.org www
+
+bsdconfig
+
+Troque vtnet0 pela sua placa de rede. Veja com o ifconfig
+
+
+= Exemplo
+
+nano /etc/firewall
+
+#######################################################################
+me="vtnet0"                
+table <bruteforcers> persist    
+table <trusted> persist file "/etc/trusted"
+icmp_types = "echoreq"          
+junk_ports="{ 135,137,138,139,445,68,67,3222 }"
+junk_ip="224.0.0.0/4"           
+
+set loginterface vtnet0           
+scrub on vtnet0 reassemble tcp no-df random-id
+
+# ---- First rule obligatory "Pass all on loopback"
+pass quick on lo0 all           
+
+# ---- Block junk logs
+block quick proto { tcp, udp } from any to $junk_ip 
+block quick proto { tcp, udp } from any to any port $junk_ports
+
+# ---- Second rule "Block all in and pass all out"
+block in log all                
+pass out all keep state         
+
+############### FIREWALL ###############################################
+# ---- Allow all traffic from my Home
+pass quick proto {tcp, udp} from 1.2.3.4 to $me keep state
+
+# ---- block SMTP out 
+block quick proto tcp from $me to any port 25
+
+# ---- Allow incoming Web traffic
+pass quick proto tcp from any to $me port { 80, 443 } flags S/SA keep state
+
+# ---- Allow my team member SSH access 
+pass quick proto tcp from 1.2.3.5 to $me port ssh flags S/SA keep state
+
+# ---- Block bruteforcers
+block log quick from <bruteforcers>
+
+# ---- Allow SSH from trusted sources, but block bruteforcers
+pass quick proto tcp from <trusted> to $me port ssh \
+flags S/SA keep state \
+(max-src-conn 10, max-src-conn-rate 20/60, \
+overload <bruteforcers> flush global)
+
+# ---- Allow ICMP 
+pass in inet proto icmp all icmp-type $icmp_types keep state
+pass out inet proto icmp all icmp-type $icmp_types keep state
+
+
+Criar o arquivo e adicionar os IPs confiáveis
+
+nano /etc/trusted
+
+# Hosting
+1.2.0.0/16
+
+# My friends
+1.2.4.0/24
+
+
+= Outro Exemplo
+#These limits are far beyond FreeBSD's pf default limit.
+set limit { states 100000, frags 25000, src-nodes 50000 }
+
+pass quick on lo0 all
+
+#The default Vulture's pf policy is:
+# - Drop and log everything in input
+# - Accept any outgoing traffic
+# - IPV6 is enabled by default
+
+block in log all
+pass in proto icmp6 all
+pass out proto icmp6 all
+pass out all keep state
+
+# Whitelist for Vulture Cluster
+# This table is auto managed by Vulture
+table <vulture_cluster> persist file "/usr/local/etc/pf.vulturecluster.conf"
+pass in quick from <vulture_cluster>
+
+# Brute force / SYN Flood / DDOS mitigation rule
+# Use pfctl -t abusive_hosts -T show to show currently blacklisted hosts
+# You can add manual persistent IP in this file
+table <abusive_hosts> persist file "/usr/local/etc/pf.abuse.conf"
+block in log quick from <abusive_hosts>
+
+# SSH brute-force protection
+# Use pfctl -t ssh_abusive_hosts -T show to show currently blacklisted hosts for ssh port
+# You can add manual persistent IP in this file
+table <ssh_abusive_hosts> persist file "/usr/local/etc/pf.sshabuse.conf"
+block in log quick from <ssh_abusive_hosts>
+
+# Incoming policy: By default, HTTP and HTTPS ports are accepted from everywhere on em0
+pass log quick inet proto tcp from any to em0 port { 80, 443 } flags S/SA keep state \
+                                (max-src-conn 100, max-src-conn-rate 15/5, \
+                                 overload <abusive_hosts> flush global)
+
+# Incoming policy: By default, SSH port is accepted from everywhere
+pass log quick inet proto tcp from any to em0 port 22 flags S/SA keep state \
+                                (max-src-conn 100, max-src-conn-rate 3/5, \
+                                 overload <ssh_abusive_hosts> flush global)
+
+# Incoming policy: By default inter-cluster communication are allowed from everywhere on em0
+pass quick proto tcp from any to em0 port 8000 flags S/SA keep state
+pass quick proto tcp from any to em0 port { 6379, 9091, 26379 } flags S/SA keep state
+
+# ---- Allow CARP communications between nodes
+pass in proto carp all
+
+
+
+Ver quem está tentando conectar para nosso servidor
+tcpdump -n -e -ttt -i pflog0
+
+Mostrar histórico
+tcpdump -n -e -ttt -r /var/log/pflog
+
+Tentativas de força bruta
+pfctl -t bruteforcers -T show
+
+
+== Monitorar segurança das atualizações dos ports instalados
+
+cd /usr/ports/ports-mgmt/portaudit
+usr/ports/ports-mgmt/portaudir
+make install clean
+
+
+== Verificar que portas tcp e udp estão abertas
+
+Portas IPv4
+sockstat -4l
+
+Portas IPv6
+sockstat -6l
+
+Ambos
+sockstat -l
+
+
+== Reforçar Chave pública do SSH
+
+Preferir acesso com chaves do SSH do que com senha
+
+Temos diversas opções para gerar a chave, da menos para a mais segura:
+
+ssh-keygen -t rsa -b 4096
+ssh-keygen -t dsa
+ssh-keygen -t ecdsa -b 521
+ssh-keygen -t ed25519
+
+Após gerar a chave enviar para o servidor, do desktop assim:
+
+ssh-copy-id -i ribafs@ribafs.org -p 65522
+
+ssh-copy-id -i ~/.ssh/tatu-key-ecdsa user@host
+
+
+== Usando Denyhosts para bloquear tentativas falhas de login
+
+pkg install denyhosts
+
+Criar um arquivo vazio
+
+touch /etc/hosts.deniedssh
+
+E referir para ele em:
+
+/etc/hosts.deny
+
+nano /usr/local/etc/denyhosts.conf
+
+Adicionar a linha
+SSHD_PORT = 65522
+
+Descomentar a linha
+BLOCK_SERVICE  = sshd
+
+Habilitar
+
+nano /etc/rc.conf
+
+denyhosts_enable="YES"
+
+service denyhosts start
+
+Referências
+http://bsdadventures.com/harden-freebsd/print/
+https://fleximus.org/howto/secure-freebsd
+https://www.funzi.org/2015/03/01/basic-freebsd-hardening/
+http://hemantthakur.github.io/2015/02/22/FreeBSD-Server-Hardening.html
+https://linux-audit.com/freebsd-hardening-lynis/
+

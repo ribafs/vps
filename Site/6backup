@@ -1,0 +1,23 @@
+Nesta fase farei o backup:
+
+- Dos scripts originais e alterados
+- Do banco de dados do site
+
+mysqldump -uroot -p portal > portal_09032018.sql
+
+tar zcpvf portal_09032018.tar.gz /var/www/html/portal
+
+A guardarei com cuidado.
+
+
+Efetuar backup completo do site pelo administrator, usando o componente SimpleBackup ou o Akeba
+
+Crie o banco portal2, pode ser o mesmo user e senha
+
+Restaure pela web:
+
+http://165.227.227.139/portal2
+
+
+== Acabei por instalar o componente Akeeba Backup para criar um backup completo do site.
+

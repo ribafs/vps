@@ -1,0 +1,31 @@
+Apache e PHP
+
+Apache
+
+sudo nano /etc/apache2/apache2.conf
+
+ServerName localhost
+
+Mudar as ocorrenciasn de 
+AllowOverride none
+Para
+AllowOverride All
+
+<Directory />
+    Options -Indexes -FollowSymLinks Includes ExecCGI
+    AllowOverride All
+    Order deny,allow
+    Allow from all
+</Directory>
+
+sudo service apache2 restart
+
+PHP
+
+sudo nano /etc/php/7.4/apache2/php.ini
+
+display_error = Off
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+html_errors = Off
+output_buffering = Off
+

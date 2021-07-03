@@ -1,0 +1,53 @@
+Criar no Vultr um servidor
+
+- 1CPU e 1GB de RAM
+- Centos6
+- nginx com ssl e modsecurity, php7, mysql 5.7
+- 
+
+Primeiro instalar com apache
+
+Centos 6.9
+
+1024 MB Server - 144.202.38.148
+Has been successfully created!
+IP Address: 144.202.38.148
+OS: CentOS 6 x64
+RAM: 1024 MB
+Storage: 25 GB SSD
+Location: Miami
+Label: centos6
+
+Precisei criar o user ribafs, adicionar ao sudoers e ao ssh
+Depois precisei parar o iptables e então pude acessar via ssh com ribafs
+
+O CO6 vem com o iptables e o CO7 vem com o firewalld
+
+Limpei todas as regras com
+iptables -F
+
+Colei as minhas regras
+service iptables save
+
+Ao reiniciar veio com as minhas regras
+
+Agora vou instalar apache, php e mysql
+
+Resultado: beleza, instalei o LAMP e o site e consegui atualizar o Joomla.
+Bem, o CentOS 6 atende com apache. Agora vejamos com nginx, imagino que sim:
+
+apache - /var/www/html
+
+nginx - /usr/share/nginx/html
+
+Grande descoberta, o problema do centos7 aparece no 6 também e é de permissão
+
+Troquei o user e o group de apache para nginx em
+/etc/php-fpm.d/www.conf
+
+Maravilha: mudando user e group acima consegui alterar o administrator do Joomla.
+Provavelmente funcionará também no CentOS7.
+
+Depois, destruir e criar outro e instalar com nginx para comparar.
+
+

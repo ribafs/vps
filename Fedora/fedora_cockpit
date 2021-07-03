@@ -1,0 +1,26 @@
+https://www.liquidweb.com/kb/how-to-use-cockpit-in-fedora-23/
+
+dnf update
+dnf install cockpit
+systemctl start cockpit
+systemctl enable cockpit.socket
+systemctl status cockpit
+
+firewall-cmd --add-service=cockpit
+firewall-cmd --permanent --add-port=9090/tcp
+firewall-cmd --reload
+
+Logar como root
+https://123.123.123.123:9090
+
+
+- Carga do sistema
+- serviços
+- Containers
+- Logs
+- Armazenamento
+- Uso da Rede
+- Ferramentas
+
+http://cockpit-project.org/guide/latest/
+

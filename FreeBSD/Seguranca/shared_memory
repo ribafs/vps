@@ -1,0 +1,51 @@
+Melhorar a segurança da memória compartilhada
+
+Check what is the Page size:
+
+ # getconf PAGE_SIZE
+ 4096
+
+
+Default values for FreeBSD:
+
+ kern.ipc.shmall: 8192
+ kern.ipc.shmmax: 33554432
+
+
+Description of parameters:
+
+ kern.ipc.shmall: Maximum number of pages (normally 4096 bytes) available for shared memory 
+ kern.ipc.shmmax: Maximum shared memory segment size in bytes
+
+
+Check current values of parameters:
+
+# sysctl -a | grep -E "shmall|shmmax"
+kern.ipc.shmall: 8192
+kern.ipc.shmmax: 33554432
+
+or alternative way:
+
+# ipcs -M
+shminfo:
+	shmmax:     33554432	(max shared memory segment size)
+	shmmin:            1	(min shared memory segment size)
+	shmmni:          192	(max number of shared memory identifiers)
+	shmseg:          128	(max shared memory segments per process)
+	shmall:         8192	(max amount of shared memory in pages)
+
+
+Need to increase kern.ipc.shmall=2097152 which allows to allocate 8 Gbytes of shared memory for OS.
+And increase kern.ipc.shmmax=134217728 which allows to use 128M for any cache related parameter in the Zabbix server configuration.
+
+To make the configuration persistent, need to add these lines to the /etc/sysctl.conf:
+
+ kern.ipc.shmall=2097152
+ kern.ipc.shmmax=134217728
+
+which means 2097152*4096=8 Gbytes and 128 Mbytes respectively
+
+To apply changes in the /etc/sysctl.conf immediately, execute:
+
+ # service sysctl restart
+

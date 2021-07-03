@@ -1,0 +1,42 @@
+   _  __          _   _     _    (R)
+  | |/ /___ _   _| |_| |___| |___ 
+  | | /  -_) |_/ |  _  | -_) | _ \
+  |_|\_\___|\__, |_| |_|___|_|  _/ Your Server Control Panel
+=========== |___/ ========== |_| ========================================
+
+Installation is running:
+
+Update sources list ...                     [OKAY]
+Installation requirements ...               [OKAY]
+Hostname ...                                [OKAY]
+Sudo ...                                    [OKAY]
+Bind9 ...                                   [OKAY]
+SSL/TLS ...                                 [OKAY]
+PHP ...                                     [OKAY]
+Apache web server ...                       [OKAY]
+PHP-FPM ...                                 [OKAY]
+MariaDB ...                                 [OKAY]
+KeyHelp ...                                 [OKAY]
+Firewall ...                                [OKAY]
+SSH ...                                     [OKAY]
+ProFTPD ...                                 [OKAY]
+Postfix ...                                 [OKAY]
+Dovecot ...                                 [OKAY]
+OpenDKIM ...                                [OKAY]
+Email protection ...                        [OKAY]
+AWStats ...                                 [OKAY]
+Fail2ban ...                                [OKAY]
+Logrotate ...                               [OKAY]
+PhpMyAdmin 5.1.0 ...                        [OKAY]
+Adminer 4.8.0 ...                           [OKAY]
+Roundcube 1.4.11 Multilanguage ...          [OKAY]
+Rainloop 1.15.0 (Community Edition) ...     [OKAY]
+Quota ...                                   [OKAY]
+Apparmor ...                                [OKAY]
+7-zip ...                                   [OKAY]
+Nano ...                                    [OKAY]
+Curl ...                                    [OKAY]
+Cron daemon ...                             [OKAY]
+
+
+

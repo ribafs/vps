@@ -1,0 +1,99 @@
+Instalar e publicar um aplicativo laravel em servidor em produção
+
+- Instalar LAMP
+- Instalar o SSL
+- Instalar laravel em /var/www/html
+- Criar o banco no server
+- Configurar em
+
+.env
+
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=http://ribamar.net.br
+LOG_LEVEL=notice
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=banco
+DB_USERNAME=user
+DB_PASSWORD=pass
+
+php artisan key:gen
+
+Ajustar as permissões do /var/www/html
+
+php artisan migrate --seed
+
+Criar a entrada no hosts
+
+sudo nano /etc/hosts
+
+127.0.0.1   laravel
+
+Criar
+
+sudo nano /etc/apache2/sites-available/laravel.conf
+
+<VirtualHost *:80>
+    ServerName laravel
+    ServerAlias www.laravel
+    ServerAdmin ribafs@gmail.com
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+       Order allow,deny
+       Allow from all
+       Require all granted
+       Options +Indexes +FollowSymLinks
+       AllowOverride All
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/domain1.com-error.log
+    CustomLog ${APACHE_LOG_DIR}/domain1.com-access.log combined
+
+    RewriteEngine on
+    RewriteCond %{SERVER_NAME} =ribamar.net.br
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+sudo cp /etc/apache2/sites-available/000-default-le-ssl.conf /etc/apache2/sites-available/laravel-ssl.conf
+
+sudo nano /etc/apache2/sites-available/laravel-ssl.conf
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+    ServerAlias www.ribamar.net.br
+    ServerAdmin ribafs@gmail.com
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+            Options Indexes FollowSymLinks MultiViews
+            AllowOverride All
+            Order allow,deny
+            allow from all
+            Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    ServerName ribamar.net.br
+    SSLCertificateFile /etc/letsencrypt/live/ribamar.net.br/fullchain.pem
+    SSLCertificateKeyFile /etc/letsencrypt/live/ribamar.net.br/privkey.pem
+    Include /etc/letsencrypt/options-ssl-apache.conf
+</VirtualHost>
+</IfModule>
+
+
+sudo a2dissite 000-default.conf
+sudo a2dissite 000-default-le-ssl.conf
+sudo a2ensite laravel
+sudo a2ensite laravel-ssl
+
+sudo service apache2 restart
+
+
+
+

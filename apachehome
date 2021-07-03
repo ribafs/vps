@@ -1,0 +1,78 @@
+Apache no home dos users:
+
+sudo apt update
+sudo apt install apache2
+
+sudo nano /etc/apache2/apache2.conf
+
+ServerName localhost
+???
+Mudar /var/www/ apra /home/user1/www/
+
+<Directory /home/user1/www/>
+  Options Indexes FollowSymLinks
+  AllowOverride All
+  Require all granted
+</Directory>
+
+Opcional (caso existam arquivos em /var/www/html)
+
+sudo rsync -av /var/www/html /home/user1/web
+
+DocumentRoot
+
+/home/user1/web/dominio1.com
+/home/user2/web/dominio1.com
+/home/user3/web/dominio.com
+...
+
+script para setar as permissões
+
+sudo nano /etc/apache2/sites-available/dominio1.com.conf
+
+<VirtualHost *:80>
+    ServerName dominio1.com
+    ServerAlias www.dominio1.com
+    DocumentRoot /home/user1/web/dominio1.com
+
+    <Directory /home/user1/web/dominio1.com>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/dominio1.com-error.log
+    CustomLog ${APACHE_LOG_DIR}/dominio1.com-access.log combined
+</VirtualHost>
+
+    ServerName: This should be your domain name and match with virtual host configuration.
+    ServerAlias: All other domains or subdomains that should match for this virtual host as well, usually the www subdomain.
+    DocumentRoot: Path of virtual host directory that from which Apache will serve the domain files.
+    Options: This directive controls which server features are available in a specific directory.
+    -Indexes: It will prevent directory listings.
+    FollowSymLinks: Apache will follow the symbolic links if this option is enabled.
+    AllowOverride: Specifies which directives declared in the .htaccess file can override the configuration directives.
+    ErrorLog, CustomLog: Specifies the location for log files.
+
+sudo a2ensite dominio1.com
+
+sudo ln -s /etc/apache2/sites-available/dominio1.com.conf /etc/apache2/sites-enabled/
+
+Checar a sintaxe das configurações
+
+sudo apachectl configtest
+
+It will show below output if there are no errors:
+
+Syntax OK
+
+You must restart apache2 service to get changes effect by below command :
+
+sudo systemctl restart apache2
+
+https://tecnstuff.net/how-to-setup-apache-virtual-hosts-on-debian-10/
+
+
+Saber qual a apsta do DocumentRoot no Debian
+
+grep -i 'DocumentRoot' /etc/apache2/sites-available/000-default.conf
+

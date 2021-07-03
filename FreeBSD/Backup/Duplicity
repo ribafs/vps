@@ -1,0 +1,76 @@
+Duplicity
+
+Examples:
+
+Below are a few examples which illustrate how to execute duplicity. The manual page, included in the duplicity distribution, also has examples, and explains all the options.
+
+    Here is a basic backup command, which causes duplicity to use scp/ssh to 
+    - back up /home/me on the local system to /usr/backup on remote host other.host.
+
+    duplicity /home/me scp://uname@other.host//usr/backup
+
+    If the above command is run repeatedly, the first session will be a full backup, and subsequent ones will be incremental. The full option can be used to force a full backup. The next command also excludes the /tmp directory.
+
+    duplicity full --exclude /tmp /home/me scp://uname@other.host//usr/backup
+
+    Backup, writing archives via ftp with ftp password mypassword:
+
+    FTP_PASSWORD=mypassword duplicity /home/me ftp://uname@other.host/ftp_dir
+
+    Basic restore command---restore the /home/me directory backed up with scp above to directory restored_dir:
+
+    duplicity scp://uid@other.host//usr/backup restored_dir
+
+
+-------------
+
+
+AFAIK duplicity can't do a backup of a remote directory to a local directory. I solve the problem in two steps. On the backup server do:
+
+    Run rsync over ssh using ssh keys to sync the remote directory to a local directory
+
+    rsync -avz -e ssh user@remote:/remote/directory local_directory
+
+    Run duplicity from one directory to another. Use asymmetric GnuPG keys, so you don't need passphrases during encryption.
+
+    duplicity --encrypt-key=YOUR_KEYID local_directory file://backup_directory
+
+or without encrypting the backup:
+
+duplicity --no-encryption local_directory file://backup_directory
+
+-------------
+
+
+Why not just mount the remote path into your local filesystem tree using sshfs, cifs, nfs or some other facility of your choosing?
+
+If you do that, you can specify two local paths to duplicity and it shouldn't notice that one of the paths is actually on a remote node (make sure you choose the remote file system that exports attributes like permissions etc. in a way you want and also make sure you use correct mount options - which is especially important for samba/cifs, since its defaults are not very unix-ish).
+
+For a Debian or Debian derivatives (like Ubuntu):
+
+apt-get install sshfs
+
+Then:
+
+mkdir -p /mnt/remote &&
+sshfs username@remote:/home/username /mnt/remote
+
+After that succeeds, do your backup from /mnt/remote to your local backup path, then
+
+umount /mnt/remote
+
+Also check out man sshfs to see what options might apply to your use case.
+
+=--------------
+Duplicity doesn't support remote sources, so there is no way to do this without tricks like suggested by @blubberdiblub.
+
+-------------
+ 0
+down vote
+
+Looking at the documentation here: http://duplicity.nongnu.org/docs.html It looks like you should be issuing this:
+
+duplicity full ssh://username@remote:XXXX//home/username /media/removabledrive/
+
+Notice the double // after the host:port
+

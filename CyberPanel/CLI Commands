@@ -1,0 +1,58 @@
+Comandos disponíveis para o root
+
+    • db:show:credentials
+    • db:show:master-password
+    • user:disable:mfa
+    • user:reset:password
+    • vhost-templates:import
+
+Comandos disponíveis para outros usuários
+
+    • db:backup
+    • db:import
+    • system:permissions:reset
+
+Backup de todos os bancos
+
+clpctl db:backup --databases=all
+
+Ignorando os bancos db1,db2
+clpctl db:backup --databases=all --ignoreDatabases=db1,db2
+
+Backup de um único banco
+clpctl db:backup --databases=$databaseName
+
+Os scripts serão compactados com gzip e armazenados na pasgta
+/home/cloudpanel/backups/
+
+Importando bancos
+
+Importar ou restaurar um banco
+clpctl db:import --file=dump.sql.gz --database=database-name
+
+Tipos suportados:.sql e .sql.gz
+
+Credenciais dos bancos
+
+clpctl db:show:credentials
+
+Conectar a um banco como root
+
+Exibir a senha do root
+
+clpctl db:show:master-password
+
+
+Outros usuários
+
+Desabilitar a autenticação de 2 fatores para um usuário, execute como root:
+
+clpctl user:disable:mfa 'john.doe'
+
+Resetar senha
+clpctl user:reset:password 'john.doe' 'newPassword123'
+
+Resetar dono e eprmissão de arquivos e pastas
+clpctl system:permissions:reset $directoryOrFile 775
+
+

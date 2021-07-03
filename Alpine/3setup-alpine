@@ -1,0 +1,105 @@
+Configuração principal
+
+Dados abaixo colhidos com uma VM no VirtualBox usando rede Bridge
+
+O setup-alpine configura o sistema e também o instala, no caso de estar apenas no modo live em uma VM.
+
+sudo setup-alpine
+Available keyboard layouts:
+af     at     be     by     cn     dz     fi     ge     hu     in     it     kr     lk     md     mm     nl     pl     ru     sy     tr     uz
+al     az     bg     ca     cz     ee     fo     gh     id     iq     jp     kz     lt     me     mt     no     pt     se     th     tw     vn
+am     ba     br     ch     de     epo    fr     gr     ie     ir     ke     la     lv     mk     my     ph     ro     si     tj     ua
+ara    bd     brai   cm     dk     es     gb     hr     il     is     kg     latam  ma     ml     ng     pk     rs     sk     tm     us
+Select keyboard layout: [none] br
+
+Available variants: br-dvorak br-nativo-epo br-nativo-us br-nativo br-nodeadkeys br-thinkpad br 
+Select variant (or 'abort'): br
+
+ * WARNING: you are stopping a boot service
+ * Caching service dependencies ...                                                                                                                                [ ok ]
+ * Setting keymap ...                                                                                                                                              [ ok ]
+Enter system hostname (short form, e.g. 'foo') [alpine313.localdomain] alpine
+
+Available interfaces are: eth0 eth1.
+Enter '?' for help on bridges, bonding and vlans.
+Which one do you want to initialize? (or '?' or 'done') [eth0] 
+
+Ip address for eth0? (or 'dhcp', 'none', '?') [10.0.2.15] 
+
+Netmask? [255.0.0.0]
+
+Gateway? (or 'none') [10.0.2.2] 
+
+Configuration for eth0:
+  type=static
+  address=10.0.2.15
+  netmask=255.0.0.0
+  gateway=10.0.2.2
+Available interfaces are: eth1.
+Enter '?' for help on bridges, bonding and vlans.
+Which one do you want to initialize? (or '?' or 'done') [eth1] 
+
+Ip address for eth1? (or 'dhcp', 'none', '?') [dhcp]
+
+Do you want to do any manual network configuration? (y/n) [n]
+
+New password:
+
+Retype new password:
+
+passwd: password updated successfully
+Which timezone are you in? ('?' for list) [UTC] America/Fortaleza
+
+ * Stopping sshd ...                                                                                                                                               [ ok ]
+ * Stopping NTP Server ...                                                                                                                                         [ ok ]
+ * Stopping haveged ...                                                                                                                                            [ ok ]
+ * Stopping busybox crond ...                                                                                                                                      [ ok ]
+ * Stopping busybox acpid ...                                                                                                                                      [ ok ]
+ * Starting busybox acpid ...                                                                                                                                      [ ok ]
+ * Starting busybox crond ...                                                                                                                                      [ ok ]
+ * Starting haveged ...                                                                                                                                            [ ok ]
+ * Checking to see if the network is online ...                                                                                                                    [ ok ]
+ * Starting NTP Server ...                                                                                                                                         [ ok ]
+ * Starting sshd ...                                                                                                                                               [ ok ]
+HTTP/FTP proxy URL? (e.g. 'http://proxy:8080', or 'none') [none] 
+
+Which NTP client to run? ('busybox', 'openntpd', 'chrony' or 'none') [chrony]
+
+Mirror
+
+r) Add random from the above list
+f) Detect and add fastest mirror from above list
+e) Edit /etc/apk/repositories with text editor
+
+Enter mirror number (1-55) or URL to add (or r/f/e/done) [1] 
+
+Added mirror dl-cdn.alpinelinux.org
+Updating repository indexes... done.
+Which SSH server? ('openssh', 'dropbear' or 'none') [openssh] 
+
+ * rc-update: sshd already installed in runlevel `default'; skipping
+ * WARNING: sshd has already been started
+Enter where to store configs ('floppy', 'usb' or 'none') [none] 
+
+Enter apk cache directory (or '?' or 'none') [/var/cache/apk]
+
+Teste do teclado
+çãê
+
+Ver repositórios
+
+cat /etc/apk/repositories 
+http://dl-cdn.alpinelinux.org/alpine/v3.13/main
+http://dl-cdn.alpinelinux.org/alpine/v3.13/community
+#http://dl-cdn.alpinelinux.org/alpine/edge/main
+#http://dl-cdn.alpinelinux.org/alpine/edge/testing
+http://dl-cdn.alpinelinux.org/alpine/v3.13/main
+#http://dl-cdn.alpinelinux.org/alpine/v3.13/community
+#http://dl-cdn.alpinelinux.org/alpine/edge/main
+#http://dl-cdn.alpinelinux.org/alpine/edge/community
+#http://dl-cdn.alpinelinux.org/alpine/edge/testing
+
+Obs: recomenda-se não usar repositório edge
+
+Agora PosInstall
+

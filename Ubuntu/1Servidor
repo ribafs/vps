@@ -1,0 +1,42 @@
+Criação de um servidor/droplet no Digital Ocean
+
+- Acessar o painel administrativo
+	Create
+	Droplets
+
+Distribuitions - Ubuntu 20.04	Fedora 33x64
+
+Choose a plan - Basic com 5/mês
+
+Add block storage - nada
+
+Choose a datacenter region - New York (default)
+
+VPC Network - default
+
+Select additional options - nada
+
+Authentication - SSH keys (Se rpecisar de ajuda Dicas/SSH/ChaveSSH)
+
+Selecionar a chave, tendo a criada antes em seu desktop ou clique em New SSH key
+
+Finalize and create
+
+How many Droplets? - 1 Droplet
+
+Choose a hostname - ubuntu (recomenda-se aqui o domínio)
+
+Add tags
+
+ubuntu lamp php
+
+Select Project
+
+Selecione seu projeto. Caso tenha somente um único ele já aparece
+
+Add backups - nada
+
+Clique em Create Droplet e aguarde
+
+Agora o 2SO
+

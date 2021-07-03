@@ -1,0 +1,84 @@
+Instalar CentOS 7.4 no DigitalOcean
+
+Droplet Name: centos74
+IP Address: 192.81.211.51
+Username: root
+Password: 371c0e41f0ef7b6f4f629c37a7
+
+Dá trabalho de usar a senha enviada por e-mail.
+Então tive uma ideia: vou baixar uma box do vagrant para CentOS 7.4 e vou configurar como quero para testar:
+
+- CentOS 7.4
+- iptables
+- nginx
+- php 7.1
+- mariadb 10
+
+- ssl
+- modsecurity com evasive
+- outras ferramentas apra segurança
+
+Quando tudo ok crio um servidor na Vultr
+
+Desisti do vagrant por ser algo muito distinto e requerer muitos ajustes.
+
+Como a DO dá trabalho de digitar a senhona criei um servidor com CentOS 7 na Vultr e estou configurando.
+
+1024 MB Server - 144.202.38.148
+Has been successfully created!
+IP Address: 144.202.38.148
+OS: CentOS 7 x64
+RAM: 1024 MB
+Storage: 25 GB SSD
+Location: Miami
+Label: centos74
+
+Inicialmente não conseguia acessar via ssh usando root nem mesmo após configurar a rede para static e desabilitar o firewalld.
+
+Então criei um user comum e o adicionei ao SSH, mudando a porta e adicionando ao sudoers.
+Assim consegui acessar remotamente via ssh, mas somente com user comum.
+
+Mas após reiniciar não mais acessei via ssh.
+Havia esquecido a linha AllowUsers comentada.
+Mesmo descomentando e reiniciando o ssh não consigo acessar.
+Nem mesmo desabilitando o firewall. Nem assim.
+
+Estava para desistir mas resolvi colaborar com o suporte da Vultr relatando que configurei bem um Ubuntu, configurei com trabalho e não consegui com o CentOS:
+
+I create a server with Ubuntu 16.04 and access via SSH without problema from my desktop.
+
+I create a server with Debian 9 and dont access via ssh with root. Then I create a user and add to sudoers and to ssh and I access via ssh from my desktop with this user.
+
+I create a server with CentOS 7 but dont access via ssh from my desktop using roo.
+I setting network to statis. I create a user and add this to whell, to sudoers, to sshd_config but dont access via ssh.
+
+I change ssh port to 65522 and receive in my desktop:
+ssh: connect to host 144.202.38.148 port 65522: No route to host 
+
+Finalmente eu percebi que as primeiras linhas/regras do iptables estavam causando o problema.
+Bastou removê-las para que conectasse via ssh remotamente.
+
+Curioso é que a conexão via ssh do centos demora bem mais que no debian/ubuntu
+
+Mais um problema. Não acessava internet, nem mesmo pingava. Pedi ajuda do suporte e fui mexendo. Removi o link simbólico criado pelo comando mask do firewalld:
+rm /etc/systemd/system/firewalld.service
+
+E agora tá tudo bem.
+
+Depois de tudo configurado e o site instalado no Centos7 não podia alterar nada no administrator, nem atualizar o joomla pois não havia permissão de escrita.
+
+Depois de muita busca eu resolvi testar o Ubuntu 16.04 no DO com nginx, pois o que tinha lá após o reboot não mais usava swap.
+
+Vamos nessa.
+
+No DO, mesmo após acertar a senha e acessar comom root o console mas via ssh em meu desktop não acessa como root.
+Somente após adicionar o usuário ribafs, adicionar ao sudoers, configurar o ssh para a porta desejada e AllowUsers ribafs e root, restart então acesso do desktop.
+
+O interessante até agora é que o Debian mesmo com apache não gera swap.
+
+Até agora a distribuição que tem maior suporte às configurações e pacotes disponíveis para a segurança e outros é o Ubuntu.
+
+Impressionante, com o Ubuntu praticamente tudo funciona de acordo com o esperado.
+
+Mas como disse um colega do grupo "Não existe almoço grátis". Após ter tudo configurado com o site no ar o Ubuntu já está usando 1MB de swap. O preço a pagar.
+

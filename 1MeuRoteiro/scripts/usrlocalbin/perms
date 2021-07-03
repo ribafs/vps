@@ -1,0 +1,11 @@
+#!/bin/sh
+# sudo adduser ribafs www-data
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+find /var/www/html/$1/ -type d -exec chmod 775 {} \;
+find /var/www/html/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/html/$1/ -type f -exec chmod 664 {} \;
+chown -R ribafs:www-data /var/www/html/$1/
+echo "";
+echo "Concluído!";

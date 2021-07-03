@@ -1,0 +1,24 @@
+Instalação e Configuração de um Servidor com FreeBSD 11.1
+
+DigitalOcean
+
+Nome - ribafs
+IP - 167.99.175.44
+
+Mudei para 46.101.50.99
+Tamanho - $5/mês
+
+
+Este tutorial partirá deste:
+https://www.vultr.com/docs/how-to-install-silverstripe-cms-on-a-freebsd-11-famp-vps
+
+Install SilverStripe CMS
+
+Atualizar o sistema
+
+sudo freebsd-update fetch
+sudo freebsd-update install
+sudo pkg update
+sudo pkg upgrade -y
+reboot
+

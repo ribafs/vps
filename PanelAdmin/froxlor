@@ -1,0 +1,53 @@
+Floxlor
+
+Install froxlor on debian
+Michael Kaufmann edited this page on 7 May 2017 · 3 revisions
+Pages 10
+
+    Home
+    apache2 with fcgid
+    apache2 with php fpm
+    Domain import documenation
+    Install froxlor from git sources
+    Install froxlor from tarball
+    Install froxlor on debian
+    Install froxlor on gentoo
+    nginx with php fpm
+    Updating Froxlor
+
+Clone this wiki locally
+1. Edit apt sources
+
+In order to install Froxlor on Debian we need to add the repositories first:
+
+touch /etc/apt/sources.list.d/froxlor.list
+
+Next we will add the sources to froxlor.list.
+
+If you're on Debian Wheezy: echo 'deb http://debian.froxlor.org wheezy main' > /etc/apt/sources.list.d/froxlor.list
+
+If you're on Debian Jessie: echo 'deb http://debian.froxlor.org jessie main' > /etc/apt/sources.list.d/froxlor.list
+2. Approve key for Froxlor
+
+Now add and approve the key for the Froxlor packages:
+
+apt-key adv --keyserver pool.sks-keyservers.net --recv-key FD88018B6F2D5390D051343FF6B4A8704F9E9BBC
+
+3. Update package list
+
+To update your package list and upgrade your system to latest, enter the following command:
+
+apt-get update && apt-get upgrade
+
+4. Install Froxlor
+
+Install Froxlor together with all needed packages (e.g. webserver):
+
+apt-get install froxlor
+
+5. Proceed with installation and configuration
+
+Note: be sure your webserver's webroot is /var/www/. If not, just adjust the default-vhost config of the webserver to point to /var/www/, restart/reload webserver and keep reading :)
+
+Now follow the general installation documentation starting with step 3: Install froxlor from tarball
+

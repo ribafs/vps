@@ -1,0 +1,101 @@
+Testes de vulnerabilidade online
+
+https://geekflare.com/online-scan-website-security-vulnerabilities/
+
+Bons clientes de sftp
+
+FileZilla - http://filezilla.sourceforge.net/
+
+WinSCP - http://winscp.net/
+
+https://www.digitalocean.com/community/tutorials/an-introduction-to-securing-your-linux-vps
+
+https://www.serverwatch.com/server-trends/10-secure-linux-distributions-you-need-know-about.html
+
+https://www.linux.com/learn/how-make-your-linux-server-more-secure
+
+https://documentation.cpanel.net/display/68Docs/Configure+PHP+and+suEXEC
+
+http://www.alain.knaff.lu/howto/PhpSuexec/
+
+http://blog.stuartherbert.com/php/2008/01/18/using-suphp-to-secure-a-shared-server/
+
+https://linsider.wordpress.com/2009/11/21/how-to-suphp-an-alternative-to-phpsuexec/
+
+https://suphpexecute.wordpress.com/
+
+https://geekflare.com/nginx-webserver-security-hardening-guide/
+
+https://geekflare.com/install-modsecurity-on-nginx/
+
+https://geekflare.com/nginx-webserver-security-hardening-guide/
+
+https://geekflare.com/modsecurity-owasp-core-rule-set-nginx/
+
+https://www.vultr.com/docs/how-to-install-modsecurity-for-nginx-on-centos-7-debian-8-and-ubuntu-16-04
+
+https://www.howtoforge.com/tutorial/install-nginx-with-mod_security-on-ubuntu-15-04/
+
+https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04
+
+https://rikynity.wordpress.com/2012/05/30/installing-nginx-with-php5-and-php-fpm-and-mysql-support-on-ubuntu-11-04/
+
+https://www.binarytides.com/install-nginx-php-fpm-mariadb-debian/
+
+Tutorial: Nginx com PHP 7 e MySQL no Ubuntu 16.04 LTS
+https://pplware.sapo.pt/tutoriais/tutorial-nginx-php-7-mysql-no-ubuntu-16-04-lts/?format=pdf
+
+
+Programação
+
+Quando programando para Joomla devemos utilizar seu framework, em especial suas funções de filtragem para bancos de dados e para limpeza de arquivos no sistema de arquivos, entre outras.
+Não devemos esquecer as boas práticas de programação e manter o código bem organizado.
+
+Devemos ter cuidado especial com todas as entradas de usuários: URLs, campos de formulários devem ser filtrados por caracteres especiais, especialmente campos hidden, cookies, etc para isso usando as funções do Joomla.
+Devemos sempre usar criptografia em campos de senha, reforçar formulários com tokens.
+Devemos usar session para bloquear o acesso direto em todos os scripts.
+No caso do Joomla, devemos ativar o recurso de URLs amigáveis para maior proteção contra os ataques via URL.
+Nunca usar caminhos diretos em includes e sempre preferir require a include, pois os includes não param em erros nem disparam mensagens de erro.
+Preferir algo como:
+require_once( dirname( __FILE__ ) . '/../../../tiago.cfg' );
+Que ocultam o caminho real.
+
+Visitar frequentemente sites públicos de divulgação de vulnerabilidades como o
+Bons artigos e sites sobre vulnerabilidades no código:
+https://docs.joomla.org/Archived:Vulnerable_Extensions_List 
+http://www.owasp.org/index.php/Main_Page 
+http://www.owasp.org/index.php/Category:Vulnerability 
+http://www.owasp.org/index.php/Category:OWASP_Joomla_Vulnerability_Scanner_Project 
+http://www.invasao.com.br/2009/01/31/vulnerabilidades-em-aplicacoes-web/
+http://www.vivaolinux.com.br/dica/Explorando-vulnerabilidades-em-websites
+http://www.vivaolinux.com.br/artigo/Vulnerabilidade-em-formulario-PHP/
+http://www.portugal-a-programar.org/forum/index.php?topic=43795.0
+http://samurai.intelguardians.com/
+http://sectools.org/web-scanners.html
+http://wiki.locaweb.com.br/pt-br/Verificando_vulnerabilidades_em_aplica%C3%A7%C3%B5es_Web 
+http://code.google.com/p/websecurify/
+http://wiki.locaweb.com.br/pt-br/Joomla:_Aprenda_como_manter_o_seu_Website_seguro 
+http://www.criarweb.com/artigos/principais-vulnerabilidades-web.html
+ 
+Quem usa Debian ou derivado:
+apt-get install w3af
+
+Ferramentas para Firefox
+https://addons.mozilla.org/en-US/firefox/addon/161722/eula/88917?src=search (Acunetix)
+https://addons.mozilla.org/en-US/firefox/addon/7597/eula/88410?src=search
+https://addons.mozilla.org/firefox/downloads/file/77248/groundspeed-1.1-fx.xpi?src=search
+https://addons.mozilla.org/firefox/downloads/file/101322/x-forwarded-for_spoofer-10.0.2-fx.xpi?src=search
+https://addons.mozilla.org/en-US/firefox/addon/722/
+https://addons.mozilla.org/en-US/firefox/addon/7598/eula/88414?src=search
+https://addons.mozilla.org/en-US/firefox/addon/7595/eula/88415?src=search
+https://addons.mozilla.org/en-US/firefox/addon/14598/eula/65681?src=search
+https://addons.mozilla.org/en-US/firefox/addon/49858/eula/95600?src=search
+https://addons.mozilla.org/en-US/firefox/addon/45607/eula/67793?src=search
+https://addons.mozilla.org/en-US/firefox/addon/14600/eula/65683?src=search
+
+http://github.com/codebutler/firesheep/downloads - varre sites a procura de sites sem senha e mostra conexões wi-fi sem senha permite visualizar uma lista de contas online que estão compartilhando a rede wi-fi aberta e basta um clique para se logar como usuário da conta. Dessa forma, as contas são invadidas facilmente. 
+O Firesheep oferece cookies a sites como Facebook e Twitter, que os utilizam para permitir o acesso do usuário - em lugar de solicitar senhas. 
+O próprio desenvolvedor da extensão, Eric Butler, expôs o ponto fraco da web afirmando que qualquer pessoa que visite um site inseguro conhecido pelo Firesheep terá nome e foto exibido em uma nova janela para todos os usuários conectados à rede. 
+Na lista de sites que permitem acesso por cookies estão Amaxon, Flickr, Google, WordPress, Yahoo e muitos outros. 
+A vulnerabilidade não é específica do Firefox e mudar de browser não ajuda. A melhor opção, pelo menos por enquanto, é evitar o uso de redes Wi-Fi abertas para acessar esse tipo de conteúdo. 
+E muitas outras que pode encontrar no site de addons da mozilla.

@@ -1,0 +1,7 @@
+Proteger arquivos de configuração do apache, php e mysql contra escrita:
+
+/ussr/local/etc/php.ini
+/usr/local/etc/apache24/
+
+
+

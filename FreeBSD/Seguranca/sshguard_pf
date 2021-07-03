@@ -1,0 +1,93 @@
+Reforçar a segurança do SSH no FreeBSD com SSHGUARD
+
+Após a instalação e configuração com sucesso do PF
+
+pkg install sshguard
+
+2.0.0_1
+
+Após a instalação mostra:
+
+##########################################################################
+  Sshguard installed successfully.
+
+  You can start sshguard as a daemon by using the
+  rc.d script installed at /usr/local/etc/rc.d/sshguard .
+
+  See sshguard-setup(7) and http://www.sshguard.net/docs/setup for additional info.
+
+  Please note that a few rc script parameters have been renamed to better reflect the documentation:
+
+  sshguard_safety_thresh -> sshguard_danger_thresh
+  sshguard_pardon_min_interval -> sshguard_release_interval
+  sshguard_prescribe_interval -> sshguard_reset_interval
+##########################################################################
+
+
+nano /etc/rc.conf
+
+Adicione
+
+# sshguard
+sshguard_enable="YES"
+sshguard_danger_thresh="30"
+sshguard_release_interval="600"
+sshguard_reset_interval="7200"
+
+nano /etc/pf.conf
+
+table <sshguard> persist
+#...
+block in quick on bge0 from <sshguard> label "ssh bruteforce"
+
+# A ordem das linhas acima é importante, se alterada pode causar erro no pf
+
+service sshguard start
+
+pfctl -f /etc/pf.conf
+
+service pf start
+
+Após o comando acima travou meu terminal e saiu com:
+packet_write_wait: Connection to 46.101.50.99 port 65522: Broken pipe
+
+Então fui até a hospedagem e acessei pela console
+
+Ao efetuar o acesso pela console aparece a mensagem de que tenho e-mail
+
+Digito mail e teclo enter
+Aparecem 3. Digito 1 para ler o security
+
+Ele me avisa para checar o setuid de arquivos e dispositivos em:
+var/log/setuid.today
+
+Também para checar permissões negativas de grupos em:
+/var/log/mount.today
+
+Checar os uid 0
+root 0
+toor 0
+
+Checar contas sem senha:
+/etc/login.conf
+
+Depois de ler estes e-mails eu carreguei as regras do pf e o reiniciei
+
+Voltei ao meu desktop e acessei o servidor sem problema
+
+Testando
+
+pgrep -lfa ssh
+
+pfctl -t sshguard -T show
+
+pfctl -sr
+
+
+Questões
+https://forums.freebsd.org/threads/howto-set-up-and-configure-security-sshguard-pf.39196/
+
+
+https://blog.mwzhang.com/2016/02/20/secure-ssh-using-sshguard-and-pf-in-freebsd/
+https://gist.github.com/WillSquire/b0546bb8ab901f16555aba2e953767d9
+

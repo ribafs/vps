@@ -1,0 +1,42 @@
+Envio do banco e dos arquivos de backup do site do desktop para o servidor
+
+scp -P 55522 portal* ribafs@ribafs.org:/tmp
+
+Importação do sql para o banco portal
+
+cd /tmp
+
+mysql -uroot -p portal < portal.sql
+
+Descompactação do zip para /usr/share/www/apache24/data
+
+unzip portal.zip -d /usr/share/www/apache24/data
+
+
+Reiniciei o Apache e o MySQL
+
+service apache24 restart
+
+service mysql-server restart
+
+Criar o arquivo
+
+nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /usr/local/www/apache24/data/$1";
+echo "";
+chown -R www:www /usr/local/www/apache24/data/$1;
+find /usr/local/www/apache24/data/$1 -type d -exec chmod 755 {} \;
+find /usr/local/www/apache24/data/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+
+chmod +x /usr/local/bin/perms
+
+pkg install freecolor
+
+freecolor -om
+
+

@@ -1,0 +1,40 @@
+Diretórios e Permissões
+
+nano /usr/local/etc/www/apache24/data
+
+<Directory />
+    AllowOverride None
+    Order deny,allow
+    Deny from all
+</Directory>
+
+Política default deny
+Depois permitir todos os hosts acessarem o site com Allow
+
+Order allow,deny
+Allow from all
+
+Bloquear um IP específico também podemos usar nomes de hosts
+
+Order allow,deny
+    Deny from 192.168.0.0/16
+    Allow from all
+
+Order allow,deny
+    Deny from *.absolutefreebsd.com
+    Allow from all
+
+Permitir somente certo IP
+
+Order deny,allow
+    Allow from 192.168.0.0/16
+    Deny from all
+
+
+Habilitar as opções ExecCGI e MultiViews num certo diretório
+
+<Directory /usr/share/www/apache24/data/site2/cgi-bin>
+    Options ExecCGI, MultiViews
+</Directory>
+
+

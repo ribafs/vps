@@ -1,0 +1,22 @@
+# Criar dois bancos e para cada um criar um usuário com todos os poderes mas somente sobre o seu banco
+
+Impostante. O usuário deve ter este formato:
+'nome'@'host'
+
+Laravel
+
+mysql -uroot -p
+create database demodb CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'demous'@'localhost' IDENTIFIED BY 'senhaforte';
+grant all privileges on demodb.* to 'demous'@'localhost';
+FLUSH PRIVILEGES;
+
+Joomla
+
+create database portaldb CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'portalus'@'localhost' IDENTIFIED BY 'senhaforte';
+grant all privileges on portaldb.* to 'portalus'@'localhost';
+FLUSH PRIVILEGES;
+\q
+
+

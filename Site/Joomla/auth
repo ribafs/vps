@@ -1,0 +1,87 @@
+Autenticação do Apache para proteger o administrator do Joomla
+
+https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-16-04
+
+ssh -p porta user@IP
+
+apt update
+apt-get install apache2-utils
+
+htpasswd -c /etc/apache2/.htpasswd ribafs
+cat /etc/apache2/.htpasswd
+
+nano /etc/apache2/sites-enabled/000-default.conf
+
+Mudar para fique mais ou mennos assim, ao final a autenticação
+
+<VirtualHost *:80>
+  ServerAdmin webmaster@localhost
+  DocumentRoot /var/www/html
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+  <Directory "/var/www/html/administrator">
+      AuthType Basic
+      AuthName "Restricted Content"
+      AuthUserFile /etc/apache2/.htpasswd
+      Require valid-user
+  </Directory>
+</VirtualHost>
+
+Checar sintaxe
+apache2ctl configtest
+
+systemctl restart apache2
+systemctl status apache2
+
+
+Para sites com SSL
+
+nano /etc/apache2/sites-enabled/default-ssl.conf
+
+Mudar para fique mais ou mennos assim, ao final a autenticação
+
+<IfModule mod_ssl.c>
+        <VirtualHost _default_:443>
+                # AJUSTE AS DUAS LINHAS ABAIXO PARA SEUS DADOS
+                ServerAdmin ribafs@gmail.com
+                ServerName ribafs.org
+
+                DocumentRoot /var/www/html
+
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+                SSLEngine on
+
+                SSLCertificateFile      /etc/ssl/certs/apache-selfsigned.crt
+                SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+
+                <FilesMatch "\.(cgi|shtml|phtml|php)$">
+                                SSLOptions +StdEnvVars
+                </FilesMatch>
+                <Directory /usr/lib/cgi-bin>
+                                SSLOptions +StdEnvVars
+                </Directory>
+
+                BrowserMatch "MSIE [2-6]" \
+                               nokeepalive ssl-unclean-shutdown \
+                               downgrade-1.0 force-response-1.0
+
+                <Directory "/var/www/html/administrator">
+                      AuthType Basic
+                      AuthName "Restricted Content"
+                      AuthUserFile /etc/apache2/.htpasswd
+                      Require valid-user
+                </Directory>
+        </VirtualHost>
+</IfModule>
+
+Checar sintaxe
+apache2ctl configtest
+
+systemctl restart apache2
+systemctl status apache2
+
+Testar
+https://IP/administrator

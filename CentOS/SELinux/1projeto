@@ -1,0 +1,31 @@
+Servidor com CentOS 7 64
+
+207.246.78.135
+
+
+1024 MB Server - 207.246.78.135
+Has been successfully created!
+IP Address: 207.246.78.135
+OS: CentOS 7 x64
+RAM: 1024 MB
+Storage: 25 GB SSD
+Location: Miami
+Label: ribafs.org
+
+
+Com:
+
+1) SELinux - ajustes iniciais (2iniciais)
+2) Nginx (3centos_nginx) + SSL (nginx-sslCentos) + proteção do administrator (senha_diretorio) + mod_security ()
+- PHP 7.2 (centos_nginx)
+- MySQL 5.7 (centos_nginx)
+- iptables (4iptables) com sshguard (sshguard_centos7)
+- SSH e SFTP enjaulados e salvando senha no servidor e conectando sem senha (2.1ssh_key)
+- Bastille
+- fail2ban
+- denyhosts
+- evasive
+- lynis
+- ...
+
+

@@ -1,0 +1,158 @@
+Redes
+
+A pilha do clássico protocolo OSI de redes tem sete camadas:
+- física
+- datalink (enlace de dados)
+- network (rede)
+- transporte
+- sessão
+- apresentação
+- aplicação
+
+Cada camada somene enxerga a camada superior e a inferior
+
+O conhecimento de matemática é importante para entender redes. Ele distingue um amador de um profissional.
+
+Para um computador tudo é zero (equena voltagem) e um (voltagem maior) e zero e um são bits.
+
+Os seres humanos usam a notação na base 10, decimal, mas os computadores usam a binária, base 2 e a hexadecimal, base 16.
+
+Uma máscara de rede usa um número de 48 bits, sendo formado por 48 uns e zeros, mas para facilitar a memorização e leitura geralmente são representados por números em hexadecimal
+
+Decimais sãoo representados pelos algarismos 0,1,2,3,4,5,6,7,8 e 9
+Binários são representados por 0 e 1
+Hexadecimais são representados por 0,1,2,3,4,5,6,7,8,9, A, B, C, D, E e F
+
+Binários
+
+Decimal Binary
+0        0
+1        1
+2        10
+3        11
+4        100
+5        101
+6        110
+7        111
+8        1000
+
+IP representado em algarismos decimais:
+
+192.168.1.1
+
+E em binários
+
+11000000.10101000.00000001.00000001
+
+Ou apenas
+11000000101010000000000100000001
+
+Classes de Rede
+
+A - 10.x.x.x (fixa a primeira parte) - suporta 16 milhões de computadores, para grandes corporações
+
+B - 172.16.x.x (fixa as duas primeiras) - suporta 65.000 computadores, para empresas médias
+
+C - 192.168.10.x (fixa as três primeiras) - suporta apenas 256 computadores, para pequenas empresas
+
+
+Máscaras de rede
+
+Para calcular a quantidade de compuutadores que uma rede deve suportar encontre a respectiva máscara na tabela abaixo
+
+Prefix Binary Mask Decimal   Mask Hex   Mask Available IPs
+
+/24 00000000 255.255.255.0   0xffffff00 256
+/25 10000000 255.255.255.128 0xffffff80 128
+/26 11000000 255.255.255.192 0xffffffc0 64
+/27 11100000 255.255.255.224 0xffffffe0 32
+/28 11110000 255.255.255.240 0xfffffff0 16
+/29 11111000 255.255.255.248 0xfffffff8 8
+/30 11111100 255.255.255.252 0xfffffffc 4
+/31 11111110 255.255.255.254 0xfffffffe 2
+/32 11111111 255.255.255.255 0xffffffff 1
+
+Lembre que a quantidade de IPs sempre é subtraída de 2, pois o primeiro é usado internamente pela rede e o último número é usado como broadcast
+
+ICMP é oo protocolo responsável pelas mensagens que trafegam na rede, usado pelo ping(8) e traceroute(8)
+
+UDP - protocolo qu não tem controle de erros nemd e estado. Usado para grandes quantidades de dados, como tráfelo de vídeos.
+
+TCP - Tem controle de erros e de estado. Usado por aplicativos.
+
+
+Portas
+
+Portas reservadas - Abaixo de 1024, usadas pelos serviços mais importantes
+
+MAC address - quando um sistema transmite dados para outro a primeira pergunta é pelo MAC
+
+Ver MAC
+arp -a
+
+ifconfig
+
+Adicionando IP para uma interface
+
+ifconfig interface-name IP-address netmask
+ifconfig fxp0 192.168.1.250 255.255.255.0
+ifconfig fxp0 192.168.1.250/24
+ifconfig fxp0 192.168.1.250/24 media 1000baseTX mediaopt full-duplex
+ifconfig_re0="192.168.1.250 255.255.255.0 media 1000baseTX mediaopt full-duplex"
+
+ping 192.168.1.1
+
+
+Configurar a rota default
+
+route add default 192.168.1.1
+
+nano /etc/rc.conf
+
+defaultrouter="192.168.1.1"
+
+ifconfig fpx0
+
+netstat -w 5 -d
+
+Que portas estão sendo escutadas
+
+sockstat -4
+
+netstat -na -f inet
+
+Memória do kernel
+netstat -m
+
+
+
+
+O FreeBSD usa o script
+
+/etc/rc.conf
+
+Para armazenar as configurações das placas de rede
+
+nano /etc/rc.conf:
+
+ifconfig_em0="inet 192.168.0.254 netmask 255.255.255.0"
+defaultrouter="192.168.0.1"
+
+
+
+192.168.0.254 -- the machine IP, 192.168.0.1 -- gateway
+These settings in rc.conf are looked up in the boot process.
+
+Para configurar manualmente:
+
+ifconfig em0 inet 192.168.0.254 netmask 255.255.255.0
+route delete default
+route add default 192.168.0.1
+
+
+hostname="server1.example.com"
+ifconfig_em0="DHCP"
+
+Listar todas as configurações do sistema
+
+sysctl -a

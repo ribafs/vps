@@ -1,0 +1,88 @@
+https://www.digitalocean.com/community/tutorials/how-to-install-an-apache-mysql-and-php-famp-stack-on-freebsd-10-1
+
+Em Linux temos o LAMP, com FreeBSD é lógico que é FAMP: FreeBSD, Apache, MySQL e PHP.
+
+== Apache
+
+Instalar
+sudo pkg install apache24
+
+sudo sysrc apache24_enable=yes
+sudo service apache24 start
+
+Testar
+
+http://IP
+
+
+== MySQL
+
+Instalar
+
+sudo pkg install mysql56-server
+
+sudo sysrc mysql_enable=yes
+sudo service mysql-server start
+
+sudo mysql_secure_installation
+
+
+== PHP
+
+Instalar
+
+sudo pkg install mod_php56 php56-mysql php56-mysqli
+
+sudo cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+rehash
+
+pkg search php56
+
+Selecione e instale outros desejados
+
+Procurando um específico
+pkg search -f package_name
+
+pkg search -f php56-calendar
+
+sudo pkg install php56-calendar
+
+Configurar apache
+
+cp /usr/local/etc/apache24/Includes/php.conf /root/backup
+
+nano /usr/local/etc/apache24/Includes/php.conf
+
+index.php
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+
+Carregar php
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    <FilesMatch "\.phps$">
+        SetHandler application/x-httpd-php-source
+    </FilesMatch>
+</IfModule>
+
+sudo service apache24 restart
+
+Testar php
+
+nano /usr/local/www/apache24/data/info.php
+
+<?php
+phpinfo();
+
+http://IP/info.php
+
+sudo rm /usr/local/www/apache24/data/info.php
+
+

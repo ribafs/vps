@@ -1,0 +1,9 @@
+Get an SSL Certificate
+
+In Applications list you can require a main domain SSL free certificate just clicking on lock icon:
+of desidered application and waiting for a "green check" response. Before require a certificate, double check that the domain / subdomain DNS are setted on application server IP and that there is not any proxy in the middle (such as Cloudflare proxy for e.g. because of Let's Encrypt requires DNS validation). You can use Cloudflare or other proxy after Let's Encrypt DNS validation or you can directly use SSL certificate provided by WAF/CDN service (such as Cloudflare cert). 
+
+Get an SSL Certificate
+
+In Alises list you can require a domain SSL free certificate just clicking on lock icon:
+of desidered alias and waiting for a "green check" response. Before require a certificate, double check that the domain / subdomain DNS are setted on application server IP and that there is not any proxy in the middle (such as Cloudflare proxy for e.g. because of Let's Encrypt requires DNS validation). You can use Cloudflare or other proxy after Let's Encrypt DNS validation or you can directly use SSL certificate provided by WAF/CDN service (such as Cloudflare cert). No worry to work with Cipi proxed by Cloudflare! 

@@ -1,0 +1,25 @@
+ssh root@194.195.212.165
+
+cat keyhelp_login_data_2021-05-21_12-34-10 
+
+ Login details
+===============
+
+KeyHelp
+    URL:           https://ribamar.net.br/
+                   https://194.195.212.165/
+    Username:      ribafs
+    Password:      zmxn1029asd123R@
+
+MariaDB/MySQL database
+    Username:      root               | For command line access only
+                   mysqladmin         | For web access
+    Password:      4vuU0uX0QLfCpz7m
+
+ssh root@194.195.212.165
+
+https://kb.keyhelp.de/category/administrator-area/78/
+
+https://kb.keyhelp.de/category/user-area/58/
+
+

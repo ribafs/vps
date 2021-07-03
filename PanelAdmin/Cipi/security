@@ -1,0 +1,27 @@
+Security Tips
+
+Default Cipi username and password are: admin@admin.com / 12345678.
+After first login, you could change them into "settings" area.
+Into Settings Area is possible setup an STMP account useful to receive passoword recovery mails too.
+Another useful tip to keep safe your Cipi Panel, is to let it works under an SSL protocol.
+If you installed Cipi via Autoinstall script you can obtain a free SSL certificate following these steps:
+
+    Configure a domain/subdomain A DNS record to your Cipi VPS IP
+    Login as suder user into Cipi VPS (cipi default user)
+    Run sudo nano /etc/nginx/sites-enabled/default
+    Add server_name <your-domain/subdomain> directive into "server" group
+    Run sudo systemctl restart nginx.service
+    Run sudo certbot --nginx -d <your-domain/subdomain> --non-interactive --agree-tos --register-unsafely-without-email
+    Run sudo systemctl restart nginx.service
+    Run sudo nano /var/www/html/.env
+    Change APP_URL= variable content with your https://your-domain/subdomain
+    Run cd /var/www/html/
+    Run php artisan config:cache
+
+Reset main user
+
+For security reasons, Cipi disables "root" SSH access but generate a new "cipi" sudo main user into your server to let you to login into it and to grant root access using "sudo su" or "sudo -s" (in AWS) commands.
+To reset "cipi" user password, click on the key icon:
+of the desidered server and confirm reset action. 
+
+

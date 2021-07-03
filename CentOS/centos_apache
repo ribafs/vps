@@ -1,0 +1,133 @@
+Instalar o AMP
+
+Apache 2.4
+Mysql 5.6
+PHP 7.2
+
+yum update
+reboot
+
+yum install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-7.noarch.rpm
+
+PHP
+yum --enablerepo=remi-php72 install php
+
+yum --enablerepo=remi-php72 search php
+
+yum --enablerepo=remi-php72 install mod_php php-cli php-fpm php-common \
+php-gd php-pear php-mcrypt php-mysqlnd php-xml php-xmlrpc php-eaccelerator \
+php-json php-pecl-apcu php-opcache
+
+Apache
+yum --enablerepo=epel,remi install httpd
+
+systemctl start httpd.service
+systemctl enable httpd.service
+
+MySQL
+yum install mysql-server
+
+systemctl start mysqld.service
+mysql_secure_installation
+
+systemctl restart mysqld.service
+systemctl enable mysqld.service
+
+Abrir portas no firewalld
+firewall-cmd --permanent --zone=public --add-service=http
+firewall-cmd --permanent --zone=public --add-service=https
+firewall-cmd --reload
+
+Checar versões instaladas
+
+php -v
+httpd -v
+mysql -V
+
+https://tecadmin.net/install-php-7-apache-2-4-mysql-on-centos-rhel/
+
+Segurança
+
+Arquivos de configuração
+
+Apache: /etc/httpd/conf/httpd.conf
+PHP: /etc/php.ini
+MySQL: /etc/my.cnf
+
+No apache alterar
+
+cp /etc/httpd/conf/httpd.conf /root/backup
+
+ ServerTokens Prod
+ ServerSignature Off
+
+Adicionar para o arquivo de virtualhost
+
+<Directory "/home/user/public_html">
+   Options -Includes -ExecCGI
+</Directory>
+
+No php.ini ocultar informações
+
+cp /etc/php.ini /root/backup
+
+Implementar cada uma destas alterações separamente e restartar o apache, pois pode derrubar o site
+e pode ser que derrube ou bloqueie futuramente quando executar alguma atividade
+
+Mude
+expose_php = Off
+allow_url_fopen=Off
+allow_url_include=Off
+
+disable_functions =exec,shell_exec,passthru,system,popen,curl_exec,curl_multi_exec,\parse_ini_file,show_source,proc_open,pcntl_exec
+
+open_basedir="/var/www/html"
+
+Desabilitar módulos não usados
+
+cd /etc/php.d/
+mv oci8.ini oci8.ini.disable
+
+upload_max_filesize = 2M  #Maximum 2Mb of file user can upload
+
+max_execution_time = 30  # seconds
+
+max_input_time = 60 # seconds
+
+MySQL
+
+cp /etc/my.cnf /root/backup
+
+Caso queira que o mysql seja acessado remotamente
+
+bind-address=127.0.0.1
+
+[mysqld]
+local-infile=0
+
+Criar usuários com privilégios restritos para cada aplicação/site
+
+root@tecadmin:~# mysql -u root -p 
+
+mysql> CREATE USER 'myusr'@'localhost' IDENTIFIED BY 'password';
+mysql> GRANT SELECT,INSERT,UPDATE,DELETE ON mydb.* TO 'myusr'@'localhost' IDENTIFIED BY 'password';
+mysql> FLUSH PRIVILEGES;
+
+Melhorar segurança com
+mysql_secure_installation
+
+Proteger script contra escrita
+
+chattr +i /etc/php.ini
+chattr +i /etc/php.d/*
+chattr +i /etc/my.cnf
+chattr +i /etc/httpd/conf/httpd.conf
+
+Para tirar a proteção
+chattr -i filename
+
+https://tecadmin.net/security-tips-for-lamp-stack-on-linux/
+
+

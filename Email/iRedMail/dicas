@@ -1,0 +1,82 @@
+Recebe normalmente
+
+Depois de muito procurar e quebrar a cabeça para enviar e-mail, uma sugestão encontrada foi procurar
+o suporte da DO.
+Entrei em contato e faleique não estava conseguindo enviar email.
+Eles disseram que era uma medida anti spam e que eu esperasse 60 dias e contasse a contactálos,
+ou seja em 17/04/2018 voltar a contactá-los.
+Menos mal. Assim sei que o problema é com eles.
+
+Não consigo enviar email para fora pelo roundcube nem pela linha de comando com:
+
+echo "MENSAGEM DE TESTE" | mailx -a "From: ola@ribafs.org" -s "ASSUNTO" ribafs@gmail.com
+
+
+
+
+Try to change inet_protocol option in postfix settings. Go to /etc/postfix/main.cf and change from:
+
+inet_protocols = all
+
+to:
+
+inet_protocols = ipv4
+
+Then
+
+service postfix reload
+service postfix flush
+
+----------
+
+Testando e-mail
+
+De uma máquina desktop
+
+telnet mail.ribafs.org 25
+
+traceroute -T -p 25 mailserver.example.com
+
+nmap -p25 -sTU mailserver.example.com
+
+ping alt2.gmail-smtp-in.l.google.com
+
+host ribafs.org
+
+dig ribafs.org
+
+dig @localhost example.com
+dig@localhost MX example.com
+dig @localhost ANY example.com
+
+dig +noall +answer -x 75.126.153.206
+
+dig -x ip-address-here
+dig -x 75.126.153.206
+
+tail -n100 /var/log/syslog
+
+
+Outras soluções alternativas ao iredmail
+
+https://modoboa.org/en/
+
+git clone https://github.com/modoboa/modoboa-installer
+cd modoboa-installer
+sudo ./run.py <your domain>
+
+DMARC
+
+Adicionar 3 registros TXT:
+
+_dmarc	v=DMARC1; p=none; rua=mailto: dmarc@meudominio.com
+_dmarc	v=DMARC1; p=quarantine; rua=mailto: dmarc@meudominio.com
+_dmarc.ribafs.org	v=DMARC1; p=reject; rua=mailto: dmarc@meudominio.com, mailto:infra@meudominio.com
+
+https://www.dinamize.com.br/blog/dmarc-email/
+
+Outros
+
+v=DMARC1; p=none; fo=1; rua=mailto:dmarc_agg@auth.example.com;ruf=mailto:dmarc_afrf@auth.example.com
+
+

@@ -1,0 +1,131 @@
+Implementar o SSL no apache
+
+Implementação do SSL no Apache 2 do Ubuntu 16.04
+
+Referência
+https://www.digitalocean.com/community/tutorials/how-to-create-a-self-signed-ssl-certificate-for-apache-in-ubuntu-16-04 
+
+Executar os comandos
+
+# O comando abaixo deve ser digitado ou colado em apenas uma única linha
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/apache-selfsigned.key -out /etc/ssl/certs/apache-selfsigned.crt
+
+Entre com algo como:
+
+Country Name (2 letter code) [AU]:BR
+State or Province Name (full name) [Some-State]:Ceará
+Locality Name (eg, city) []:Fortaleza
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:FreeLancer
+Organizational Unit Name (eg, section) []:Casa
+Common Name (e.g. server FQDN or YOUR name) []:ribafs.org
+Email Address []:ribafs@gmail.com
+
+sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+
+ nano /etc/apache2/conf-available/ssl-params.conf
+
+Cole o conteúdo abaixo
+
+# INÍCIO
+# from https://cipherli.st/
+# and https://raymii.org/s/tutorials/Strong_SSL_Security_On_Apache2.html
+
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH
+SSLProtocol All -SSLv2 -SSLv3
+SSLHonorCipherOrder On
+# Disable preloading HSTS for now.  You can use the commented out header line that includes
+# the "preload" directive if you understand the implications.
+#Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains; preload"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubdomains"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+# Requires Apache >= 2.4
+SSLCompression off 
+SSLSessionTickets Off
+SSLUseStapling on 
+SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+SSLOpenSSLConfCmd DHParameters "/etc/ssl/certs/dhparam.pem"
+#FINAL
+
+sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/default-ssl.conf.bak
+
+sudo nano /etc/apache2/sites-available/default-ssl.conf
+
+Remover todo o conteúdo existente e inserir este abaixo:
+
+<IfModule mod_ssl.c>
+        <VirtualHost _default_:443>
+				# AJUSTE AS DUAS LINHAS ABAIXO PARA SEUS DADOS
+                ServerAdmin ribafs@gmail.com
+                ServerName ribafs.org
+
+                DocumentRoot /var/www/html
+
+                ErrorLog ${APACHE_LOG_DIR}/error.log
+                CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+                SSLEngine on
+
+                SSLCertificateFile      /etc/ssl/certs/apache-selfsigned.crt
+                SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+
+                <FilesMatch "\.(cgi|shtml|phtml|php)$">
+                                SSLOptions +StdEnvVars
+                </FilesMatch>
+                <Directory /usr/lib/cgi-bin>
+                                SSLOptions +StdEnvVars
+                </Directory>
+
+                BrowserMatch "MSIE [2-6]" \
+                               nokeepalive ssl-unclean-shutdown \
+                               downgrade-1.0 force-response-1.0
+
+        </VirtualHost>
+</IfModule>
+
+
+Caso queira redirecionar tudo para HTTPS
+Eu gosto de redirecionar somente o administrator do site
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+
+Adicionar para redirecionar tudo para htpps
+Redirect "/" "https://ribafs.org/"
+
+Lembrando que assim irá redirecionar tudo para HTTPS
+
+Para redirecionar apenas os acesso ao portal/administrator:
+Redirect "/portal/administrator" "https://ribafs.org/portal/administrator/"
+
+Execute os comandos
+
+sudo a2enmod ssl
+sudo a2enmod headers
+sudo service apache2 restart
+
+sudo a2ensite default-ssl
+sudo a2enconf ssl-params
+
+Testar sintaxe
+sudo apache2ctl configtest
+
+Mudar para redirecionar permanentemente
+sudo nano /etc/apache2/sites-available/000-default.conf
+
+Inserir
+Redirect permanent "/" "https://ribafs.org/"
+
+
+Como os protocolos v2 e v3 são inseguros serão desabilitados:
+
+sudo nano /etc/apache2/mods-available/ssl.conf
+
+Mudar a linha
+SSLProtocol all -SSLv3
+
+Para
+SSLProtocol all -SSLv2 -SSLv3
+
+Salvar e reiniciar o apache
+
+

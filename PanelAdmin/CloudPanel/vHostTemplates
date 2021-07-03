@@ -1,0 +1,43 @@
+https://github.com/cloudpanel-io/vhost-templates/tree/master/v1/
+
+O que fazem os templates Vhost?
+
+Eles criam scripts de configuração básicos para cada domínio:
+
+Exemplo de Document Root: /home/cloudpanel/htdocs/dominio.com
+    Vhost file for NGINX: /etc/nginx/sites-enabled/dominio.com.conf
+    NGINX Access and Error Log file:
+        /home/cloudpanel/logs/dominio.com/nginx/access.log
+        /home/cloudpanel/logs/dominio.com/nginx/error.log
+    PHP-FPM Error Log file:
+        /home/cloudpanel/logs/dominio.com/php/error.log
+    A self-signed TLS certificate
+
+The right Vhost Template for your Application is essential. For managing the CloudPanel Vhost Templates we are using GitHub. Vhost Templates for all popular PHP Applications can be found there.
+
+O tempalte Vhost correto para seu aplicativo é essencial. Para gerenciar os templates Vhost do CloudPanel, usamos o GitHub. Os tempaltes Vhost para todos os aplicativos PHP populares podem ser encontrados aqui https://vhost-templates.cloudpanel.io/v1/.
+
+
+Adding an Application#
+
+The Vhost Templates are organized within Applications. The Vhost Template for newer application versions may be different than for an older one.
+
+Para adicionar novos tempaltes de Aplicativos siga os passos:
+
+1) Login into the CloudPanel as User with admin rights.
+
+2) Go to the Admin Area by clicking on Admin Area top right.
+
+3) In the left menu, click on Vhost Templates and click on the button Add Application.
+
+Enter the Application Name and click on the button Add New Application to save.
+
+https://www.cloudpanel.io/docs/cloudpanel-ce/admin-area/vhost-templates
+
+Atualizar os tempaltes VJHost
+
+Faça login no servidor como root e execute
+
+clpctl vhost-templates:import
+
+

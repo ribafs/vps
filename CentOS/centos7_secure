@@ -1,0 +1,19 @@
+https://www.rayheffer.com/essential-linux-skills-with-centos-7-managing-services-with-systemd/
+
+Nos Linux com SystemV os serviços ficam em /etc/init.d e usam os comandos chkconfig.
+
+O Centos 7 usa o systemd como sistema de inicialização.
+
+O systemd usa o diretório
+/etc/systemd/system
+
+Listar destinos carregados
+systemctl list-units -t target
+
+Listar serviços habilitados
+systemctl list-unit-files --type=service | grep enabled
+
+cd /etc/systemd/system/multi-user.target.wants
+ls -al
+
+

@@ -1,0 +1,73 @@
+Níveis de Segurança
+
+Existem 5 níveis, -1, 0, 1, 2, 3.
+O -1 é o mais baixo e o 3 o mais alto.
+
+Para aprender sobre o siistema é recomendado o nível -1
+Para um sistema em produção com segurança reforçada o nível 3. Lembrando que ao usar o nívell 3 o firewall do host é imutável.
+Nos níveis 1 e 2 não se pode ajustar os filtros de pacotes.
+
+Em fases de manutenção configure como -1 e finalmente ajuste para 3:
+
+sysctl kern.securelevel=3
+
+
+Uma vez que você tenha apenas as portas de rede necessárias abertas, e você sabe quais programas estão usando essas portas, você sabe quais programas você deve estar
+mais preocupado em garantir. Se a equipe de segurança do FreeBSD enviar um anúncio de um problema com um serviço que você não executa, você pode seguramente atrasar a implementação de uma correção até a próxima manutenção. Se, no entanto, a equipe de segurança anuncia um buraco nos programas que você está usando, você sabe que tem que implementar uma correção o mais rápido possível. Se eles anunciam uma correção para um sério problema de segurança com um software de rede que você está usando, você sabe que deve ajir rapidamente. Simplesmente sendo capaz de responder de forma inteligente e rápida ao real riscos ajuda a protegê-lo contra a maioria dos intrusos. Ferramentas como sinalizadores de arquivo e securelevels minimizam o dano que intrusos bem-sucedidos podem fazer. Finalmente, usando grupos para restringir seus próprios administradores de sistema a determinados seções do sistema podem proteger seus computadores de ambos os e danos deliberados.
+
+Níveis de Segurança
+
+securelevel is a security mechanism implemented in the kernel. When the securelevel is positive, the kernel restricts certain tasks; not even the superuser (root) is allowed to do them. The securelevel mechanism limits the ability to:
+
+    Unset certain file flags, such as schg (the system immutable flag).
+
+    Write to kernel memory via /dev/mem and /dev/kmem.
+
+    Load kernel modules.
+
+    Alter firewall rules.
+
+To check the status of the securelevel on a running system:
+
+sysctl -n kern.securelevel
+
+Existem 5 níveis, -1, 0, 1, 2, 3.
+O -1 é o mais baixo e o 3 o mais alto.
+
+-1 não tem nenhuma segurança implementada, destina-se apenas ao estudo.
+
+Maior que 0 tem alguma segurança implementada.
+
+Checar o status do nível de segurança atual
+
+sysctl -n kern.securelevel
+
+Para aprender sobre o sistema é recomendado o nível -1
+Para um sistema em produção com segurança reforçada o nível 3. Lembrando que ao usar o nívell 3 o firewall do host é imutável.
+Nos níveis 1 e 2 não se pode ajustar os filtros de pacotes.
+
+The securelevel of a running system cannot be lowered as this would defeat its purpose. If a task requires that the securelevel be non-positive, change the kern_securelevel and kern_securelevel_enable variables in /etc/rc.conf and reboot.
+
+Em fases de manutenção configure como -1 e finalmente, após tudo pronto ajuste para 3:
+
+kern_securelevel_enable="YES" # kernel security level
+kern_securelevel="3" # range: -1..3 as above
+
+sysctl kern.securelevel=3
+
+
+Uma vez que você tenha apenas as portas de rede necessárias abertas, e você sabe quais programas estão usando essas portas, você sabe quais programas você deve estar
+mais preocupado em garantir. 
+
+Se a equipe de segurança do FreeBSD enviar um anúncio de um problema com um serviço que você não executa, você pode seguramente atrasar a implementação de uma correção até a próxima manutenção. 
+
+Se, no entanto, a equipe de segurança anuncia um buraco nos programas que você está usando, você sabe que tem que implementar uma correção o mais rápido possível. 
+
+Se eles anunciam uma correção para um sério problema de segurança com um software de rede que você está usando, você sabe que deve ajir rapidamente. 
+
+Simplesmente sendo capaz de responder de forma inteligente e rápida ao real risco ajuda a protegê-lo contra a maioria dos intrusos. 
+
+Ferramentas como sinalizadores de arquivo e securelevels minimizam o dano que intrusos bem-sucedidos podem fazer. 
+
+Finalmente, usando grupos para restringir seus próprios administradores de sistema a determinados seções do sistema podem proteger seus computadores de ambos os e danos deliberados.
+

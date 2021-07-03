@@ -1,0 +1,16 @@
+Após setar os nameservers aparece
+
+No momento, os servidores DNS do domínio se encontram em transição.
+Por favor, aguarde alguns instantes até que se possa alterar os servidores DNS. 
+
+Agora é esperar algumas horas. Umas duas.
+
+Testar com
+
+dominio.ext
+
+host dominio.ext
+
+http://www.intodns.com/
+
+

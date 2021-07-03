@@ -1,0 +1,36 @@
+server "owncloud.example.com" {
+        listen on $ext_if port 80
+        listen on $ext_if tls port 443
+        directory index "index.php"
+        root "/owncloud"
+
+        # Set max upload size to 513M (in bytes)
+        connection max request body 537919488
+
+        # First deny access to the specified files
+        location "/db_structure.xml" { block }
+        location "/.ht*"             { block }
+        location "/README"           { block }
+        location "/data*"            { block }
+        location "/config*"          { block }
+
+        location "/*.php*" {
+                fastcgi socket "/run/php-fpm.sock"
+        }
+}
+
+
+SSL
+
+server "owncloud.example.com" {
+        listen on $ext_if port 80
+        listen on $ext_if tls port 443
+
+        tls {
+            certificate "/etc/ssl/example.crt"
+            key "/etc/ssl/private/example.key"
+        }
+        
+        # ...
+}
+

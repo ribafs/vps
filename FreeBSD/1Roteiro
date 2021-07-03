@@ -1,0 +1,455 @@
+Criação de VM com FreeBSD
+09/10/2020 - 07:53
+
+- FreeBSD 12.1 ZFS x64
+- 8GB RAM
+- 4 vCPU
+- 160 GB disco
+- 5 TB transf
+
+Datacenter - Frankfurt
+
+SSH Key
+
+Hostname - ribafb
+
+IP - 159.89.96.243
+
+freebsd-version
+
+freebsd-update fetch install
+pkg update && pkg upgrade -y
+
+pkg -vv
+
+Instalar
+pkg install -y sudo bash curl nano
+
+Problema?
+pkg autoremove -n
+então
+pkg autoremove
+
+Acessar como root pelo desktop
+ssh root@159.89.96.243
+
+Adicionar
+adduser
+
+Ficará em /home/ribafs
+
+Add ribafs ao sudo
+
+chmod 700 /usr/local/etc/sudoers
+nano /usr/local/etc/sudoers
+
+root ALL=(ALL) ALL
+ribafs  ALL=(ALL)       NOPASSWD:ALL
+
+nano /etc/ssh/sshd_config
+
+Port 65522
+LoginGraceTime 30
+PermitRootLogin without-password
+AllowUsers ribafs root
+
+service sshd restart
+
+Sincronizar chaves SSH do root com ribafs
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+Acessar pelo desktop como ribafs
+
+exit
+ssh -p 65522 ribafs@159.89.96.243
+
+whoami
+
+sudo su
+
+Atualizar
+
+pkg update
+pkg upgrade
+
+Instalar pacotes básicos
+
+pkg install -y unzip wget
+
+Para que o shell os encontre
+
+Mudar (se desejar)
+setenv  EDITOR  vi
+
+para
+setenv  EDITOR  nano
+
+Caso queira Alterando o shell default
+pkg install bash
+
+Execute para atualizar o shell
+bash
+
+Para mudar para um usuário
+
+chsh -s /usr/local/bin/bash ribafs
+
+Mudar o paginador default:
+
+nano ~/.bash_profile
+
+Mudar
+
+export PAGER=less
+export EDITOR=nano
+
+
+== Ativar o firewall IPFW
+
+nano /etc/rc.conf
+
+Adicione ao final
+
+firewall_enable="YES"
+firewall_quiet="YES"
+
+Configurar o firewall. 
+Adicionar abaixo das 2 linhas:
+
+firewall_type="workstation"
+firewall_myservices="65522 80 443"
+firewall_allowservices="any"
+firewall_logdeny="YES"
+
+Inicie o firewall
+
+service ipfw start
+
+
+== Configurar os IPs negados
+
+nano /etc/sysctl.conf
+
+Limitar a apenas 3 tentativas. Adicionar ao início do arquivo
+
+net.inet.ip.fw.verbose_limit=3
+
+Isso será efetivado no próximo boot
+
+Para implementar na atual sessão, execute:
+sysctl net.inet.ip.fw.verbose_limit=3
+
+
+== Ajustar o fuso horário
+
+tzsetup
+
+America
+Brazil
+Brazil
+
+
+== Adicionar swap de 1GB
+
+Ver o swap existente em GB, caso exista
+swapinfo -g
+
+truncate -s 2G /swapfile
+chmod 0600 /swapfile
+sh -c 'echo "md99 none swap sw,file=/swapfile,late 0 0" >> /etc/fstab'
+swapon -aqL
+swapinfo -g
+
+Criar script
+sudo nano /usr/local/bin/free
+swapinfo -g
+sudo chmod +x /usr/local/bin/free
+
+
+== Limpar cache da Memória RAM
+
+pkg install freecolor
+
+freecolor
+
+freecolor -m -o
+
+Caramba: zero de cache
+
+
+== Instalar htop
+Monitorar recursos
+
+pkg install htop
+
+htop
+
+Sair - q
+
+Monitorar em tempo real
+top d1
+
+
+== Procurar atualizações e instalar
+
+/usr/sbin/freebsd-update fetch
+q
+freebsd-update fetch install
+q
+
+Reiniciar agora
+shutdown -r now
+
+
+== Desabilitando soft-updates
+
+Verificar atualizações automáticas
+nano /etc/crontab
+
+Adicione non início do arquivo
+@daily root freebsd-update -t freebsd cron
+
+
+== Checar vulnerabilidades em softwares
+pkg audit -F
+
+Criar script
+
+nano /usr/local/bin/vuln
+pkg audit -F
+chmod +x /usr/local/bin/vuln
+
+
+== Instalar o FAMP
+
+Serviços
+
+=== Apache
+
+pkg search apache24
+pkg install apache24
+vuln
+sysrc apache24_enable=yes
+service apache24 configtest
+service apache24 start
+service apache24 status
+
+httpd -v
+
+Configurar o apache
+ServerName localhost
+Trocar os None por All
+nano /usr/local/etc/apache24/httpd.conf
+
+Abrir no navegador
+http://159.89.96.243
+
+=== PostgreSQL
+
+pkg search postgresqlsql
+pkg install postgresql13-server
+vuln
+Add ao final do /etc/rc.conf
+postgresql_enable="yes"
+
+
+=== MySQL
+
+Instalar ao invés o
+mariadb-server  
+mariadb105-server
+
+pkg search mysql8
+pkg install mysql80-server
+vuln
+sysrc mysql_enable=yes
+service mysql-server start
+mysql --version
+service mysql-server status
+service mysql-server onestart
+mysql_secure_installation
+
+VALIDATE PASSWORD COMPONENT can be used to test passwords
+and improve security. It checks the strength of password
+and allows the users to set only those passwords which are
+secure enough. Would you like to setup VALIDATE PASSWORD component?
+
+Press y|Y for Yes, any other key for No: y
+y
+There are three levels of password validation policy:
+
+LOW    Length >= 8
+MEDIUM Length >= 8, numeric, mixed case, and special characters
+STRONG Length >= 8, numeric, mixed case, special characters and dictionary                  file
+
+Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG: 
+2
+
+New password: 
+
+Re-enter new password: 
+
+Estimated strength of the password: 100 
+Do you wish to continue with the password provided?(Press y|Y for Yes, any other key for No) :
+y
+
+Remove anonymous users? (Press y|Y for Yes, any other key for No) :
+y
+Disallow root login remotely? (Press y|Y for Yes, any other key for No) :
+y
+Remove test database and access to it? (Press y|Y for Yes, any other key for No) :
+y
+Reload privilege tables now? (Press y|Y for Yes, any other key for No) :
+y
+
+
+== PHP
+
+pkg search php7
+
+pkg install php74 mod_php74 php74-gd php74-pdo php74-mbstring php74-xml php74-zip php74-bcmath php74-pdo_mysql php74-pdo_pgsql php74-json php74-simplexml php74-curl php74-opcache php74-simplexml php74-mysqli
+
+php -v
+php -m
+
+Procurar módulos
+pkg search php74
+
+Criar
+nano /usr/local/etc/apache24/modules.d/001_mod-php.conf
+
+<IfModule dir_module>
+  DirectoryIndex index.php index.html
+  <FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+  </FilesMatch>
+  <FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+  </FilesMatch>
+</IfModule>
+
+Adicionar ao conf do Apache
+nano /usr/local/etc/apache24/httpd.conf
+
+ServerName localhost
+
+Add index.php abaixo
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+</IfModule>
+
+# Descomentar a linha abaixo
+LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+
+Checar conf
+apachectl configtest
+
+apachectl restart
+
+Criar
+nano /usr/local/www/apache24/data/i.php
+
+<php phpinfo(); ?>
+
+service apache24 restart
+
+== Instalar Joomla
+
+Na pasta portal
+/usr/local/www/apache24/data/portal
+
+Adicionar ribafs ao grupo www do Apache
+sudo pw usermod ribafs -G www
+
+Criar script perms
+
+cd /usr/local/www/apache24/data
+mkdir portal
+
+nano /usr/local/etc/apache24/httpd.conf
+
+<Directory /usr/local/www/apache22/data/portal>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+</Directory>
+
+service apache24 restart
+
+Da documentação
+<VirtualHost *>
+    ServerName www.domain.tld
+    DocumentRoot /www/domain.tld
+</VirtualHost>
+
+<VirtualHost *>
+    ServerName www.someotherdomain.tld
+    DocumentRoot /www/someotherdomain.tld
+</VirtualHost>
+
+Diretório web
+/usr/local/www/apache24/data
+
+group - www
+user - www
+
+cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+nano /usr/local/etc/php.ini
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+allow_url_fopen = On
+
+service apache24 restart
+
+nano /usr/local/www/apache24/data/info.php
+
+<?php
+phpinfo();
+
+http://138.197.169.181/info.php
+
+rm /usr/local/www/apache24/data/info.php
+
+Informações sobre pacotes
+
+pkg info package_name
+
+Excluindo pacote
+
+pkg delete package_name
+
+Remover dependências usadas
+pkg autoremove
+
+Busca
+pkg search package_name
+
+Para busca com detalhes
+pkg search -f package_name
+
+Com descrição
+pkg search -D pattern
+
+pkg help subcommand
+
+
+Ativar o daemon do rsysc
+rsyncd_enable="YES"
+
+sudo sh -c "echo 'rsyncd_enable="YES"' >> /etc/rc.conf"
+
+sudo service rsyncd start
+
+
+Segurança
+
+/usr/bin/netstat plunt
+
+
+== Observação
+As operações em disco geralmente demoram mais no FreeBAS que nos linux.
+
+
+
+https://www.digitalocean.com/community/tutorials/how-to-install-an-apache-mysql-and-php-famp-stack-on-freebsd-10-1

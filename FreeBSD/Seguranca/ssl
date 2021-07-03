@@ -1,0 +1,91 @@
+Instalação do SSL no Apache 2.4 do FreeBSD 11.1
+
+Criar o certificado:
+
+Criar o script abaixo
+
+nano ssl.sh
+
+#!/bin/sh
+mkdir -p /root/mycert
+cd /root/mycert
+mkdir -p /usr/local/etc/apache24/ssl.key
+mkdir -p /usr/local/etc/apache24/ssl.crt
+chmod 0400 /usr/local/etc/apache24/ssl.key
+chmod 0400 /usr/local/etc/apache24/ssl.crt
+openssl genrsa -des3 -out $1.key 1024
+openssl req -new -x509 -nodes -sha256 -days 365 -key $1.key -out $1.crt
+cp $1.key $1.key.orig
+openssl rsa -in $1.key.orig -out $1.key
+cp $1.key /usr/local/etc/apache24/ssl.key/
+cp $1.crt /usr/local/etc/apache24/ssl.crt/
+chmod 0400 /usr/local/etc/apache24/ssl.key/$1.key
+chmod 0400 /usr/local/etc/apache24/ssl.crt/$1.crt
+### Final
+
+/usr/local/etc/apache24/ssl.crt/ribafs
+chmod +x ssl.sh
+
+Executar:
+
+./ssl.sh ribafs
+
+
+nano /usr/local/etc/apache24/httpd.conf
+
+Descomentar a linha
+Include etc/apache24/extra/httpd-ssl.conf
+
+E esta
+LoadModule ssl_module libexec/apache24/mod_ssl.so
+
+cp nano /usr/local/etc/apache24/extra/httpd-ssl.conf nano /usr/local/etc/apache24/extra/httpd-ssl.conf.BAK
+
+Remova todo o conteúdo e adicione este
+Mais prático
+
+rm /usr/local/etc/apache24/extra/httpd-ssl.conf
+
+nano /usr/local/etc/apache24/extra/httpd-ssl.conf
+
+Listen 443
+AddType application/x-x509-ca-cert .crt
+AddType application/x-pkcs7-crl    .crl
+<VirtualHost _default_:443>
+  DocumentRoot "/usr/local/www/apache24/data"
+  ServerName www.ribafs.org:443
+  ServerAdmin ribafs@gmail.com
+  ErrorLog "/var/log/httpd-error.log"
+  TransferLog "/var/log/httpd-access.log"
+
+  SSLEngine on
+
+  SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
+
+  SSLCertificateFile "/usr/local/etc/apache24/ssl.crt/ribafs.crt"
+
+  SSLCertificateKeyFile "/usr/local/etc/apache24/ssl.key/ribafs.key"
+
+  <FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+  </FilesMatch>
+  <Directory "/usr/local/www/apache24/cgi-bin">
+    SSLOptions +StdEnvVars
+  </Directory>
+
+  BrowserMatch ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+
+  CustomLog "/var/log/httpd-ssl_request.log" "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>
+
+Dica: Cuidado com caracteres malucos criados com copiar e colar. Se precisar digite tudo.
+
+service apache24 restart
+
+Testar:
+
+https://www.ribafs.org/info.php
+
+https://www.rhyous.com/2009/11/06/installing-an-apache-ssl-on-freebsd-using-the-ports-tree/

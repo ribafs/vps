@@ -1,0 +1,9 @@
+alias c='clear'
+alias meuip='ip r'
+alias cw='clear;cd /var/www/html;ls'
+alias aptes='apachectl configtest'
+alias apres='sudo service apache2 restart'
+alias aprel='sudo service apache2 reload'
+alias mrel='sudo service mysql reload'
+alias mres='sudo service mysql restart'
+

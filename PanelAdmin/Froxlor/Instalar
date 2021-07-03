@@ -1,0 +1,5 @@
+https://froxlor.org/download.php
+
+wget https://raw.githubusercontent.com/Froxlor/Froxlor-Installer/master/bin/froxlor-install.phar
+php froxlor-install.phar
+

@@ -1,0 +1,77 @@
+Até esta fase executar ainda como root
+
+Criar usuário comum e add ao sudo
+
+adduser ribafs
+    Senha - xA@
+
+apk add sudo
+nano /etc/sudoers.d/wheel
+
+%wheel ALL=(ALL) ALL
+
+adduser ribafs wheel
+
+su - ribafs
+sudo clear
+
+exit
+
+Criar swap
+
+create partition with type "linux swap" (82) (If you're going to use an LVM logical volume for swap, skip this step and lvcreate that instead.)
+
+Swap file
+
+dd if=/dev/zero of=/swapfile bs=1M count=512
+chmod 600 /swapfile
+mkswap /swapfile
+echo '/swapfile none swap sw 0 0' >> /etc/fstab
+
+rc-service swap start
+
+Then
+
+free -m
+
+
+SSH
+
+cd
+cp /etc/ssh/sshd_config backup/sshd_configBK
+
+sudo nano /etc/ssh/sshd_config
+
+Porta 55522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+X11Forwarding no
+AllowTcpForwarding no
+AllowUsers ribafs
+
+# AllowGroups administradores
+# DenyUsers amos mibey
+
+MaxAuthTries 3
+Isso significa que após 3 tentativas incorretas de senha, a sessão será encerrada. Isso é útil, especialmente quando você deseja bloquear scripts / programas robóticos que tentam obter acesso ao seu sistema.
+
+
+sudo service sshd restart
+
+cp /etc/ssh/sshd_config backup/sshd_config
+
+Referências
+https://kifarunix.com/allow-deny-specific-users-to-login-via-ssh-on-ubuntu-18-04/
+
+
+== Sincronizar a chave do ssh do desktop para o servidor
+
+Sair do ribafs e voltar para o root
+
+exit
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+

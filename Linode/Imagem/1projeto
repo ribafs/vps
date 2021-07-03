@@ -1,0 +1,146 @@
+Imagem tempalte de criação de servidores
+
+Preparar um template de servidor, instalando e configurando tudo que sempre instalo em todos os servidores que crio.
+Depois crio uma imagem partindo deste servidor e aguardo
+Agora todos os servidores que criar partirão da imagem acima e minah vida estará bem mais facilitada.
+
+Isso funciona bem quando temos ums distribição básica, que usamos com frequê ncia.
+
+Criar uma imagem genérica que já vem com tudo que praticamente todos os servidores usados terão:
+
+- update/upgrade/reboot
+    apt update
+    apt upgrade -y
+    reboot
+- User comum com sudo e no grupo www-data
+- SSH otimizado
+- ufw com as portas 80, 443 e 65522 e habilitado
+- Swap
+- Scripts no /usr/local/bin
+- Aliases em txt em /root
+- AMP instalado. Laravel instalado globalmente e configurado o mysql e composer atualizado
+- Alguns tutoriais básicos em txt em /root/tutoriais
+    - Recomendações para sites com joomla
+    - Laravel
+- Timezone: dpkg-reconfigure tzdata, America, Fortaleza
+- alguns softwares em /root/tools:
+    - generic-backup
+- adicionar o domínio ribamar.net.br com certbot, usando o virtualhost default
+
+Criar um servidor usando a imagem atual, adicionar o domínio e quando concluído criar uma nova imagem e remover a atual.
+
+
+SSL criado somente no servidor, pois é amarrado ao domínio
+
+Ao criar um servidor partindo deste template acessará com:
+
+ssh -p 65522 ribafs@IP/Dominio
+
+Agora temos um servidor com o LAMP instalado e configurado
+MySQL com senha de root habilitada para uso sem sudo
+nodejs instalado
+Scripts customizados instalados e aliases do user também
+Além de dicas e ferramentas úteis em /root
+
+
+A primeira imagem que criei,s eguindo os passos acima, ficou com 5.4GB
+
+## Atualização
+
+Para atualizações e correções
+
+Criar um novo servidor partindo da imagem atual
+Adicionar algo que esteja faltando
+Atualizar o servidor ou efetuar correções
+Remover a imagem atual
+Criar nova imagem (template1.1) partindo do servidor criado e atualizado
+
+Senha do root - zmxn1029xxxxD@
+
+Ao acessar o linode indica
+ssh root@50.116.58.34
+
+Mas não, precisa acessar com o user e a porta configuradas na imagem:
+
+ssh -p 65522 ribafs@50.116.58.34
+
+Configurar apache
+
+sudo nano /etc/apache2/apache2.conf
+
+ServerName localhost
+
+Mudar as ocorrenciasn de 
+
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+</Directory>
+
+E no virtualhost do site (exemplo)
+
+<VirtualHost *:80>
+    ServerName ribamar.net.br
+    ServerAlias www.ribamar.net.br
+    ServerAdmin ribafs@gmail.com
+    DocumentRoot /var/www/html/public
+
+    <Directory /var/www/html/public>
+       Order allow,deny
+       Allow from all
+       Require all granted
+       Options +Indexes +FollowSymLinks
+       AllowOverride All
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/domain1.com-error.log
+    CustomLog ${APACHE_LOG_DIR}/domain1.com-access.log combined
+
+    RewriteEngine on
+    RewriteCond %{SERVER_NAME} =ribamar.net.br
+    RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [END,NE,R=permanent]
+</VirtualHost>
+
+
+
+sudo service apache2 restart
+
+ou apenas
+apres
+
+
+Ajustar o prompt do user
+
+.bashrc
+
+if [ "$color_prompt" = yes ]; then
+#    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='Sv ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\W\[\033[00m\] '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+fi
+
+Sv de server para diferenciar do meu desktop, que é limpo, nada
+
+
+Está assim
+
+Sv ~ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/root       5.2G  3.6G  1.4G  74% /
+devtmpfs        476M     0  476M   0% /dev
+tmpfs           480M     0  480M   0% /dev/shm
+tmpfs           480M  6.7M  474M   2% /run
+tmpfs           5.0M     0  5.0M   0% /run/lock
+tmpfs           480M     0  480M   0% /sys/fs/cgroup
+tmpfs            96M     0   96M   0% /run/user/1000
+Sv ~ free -m
+              total        used        free      shared  buff/cache   available
+Mem:            959         181         590           9         187         628
+Swap:          2559           0        2559
+
+
+Descrição
+
+Imagem de servidor ideal. Tipo os de 1 clique ou o ambiente oferecido pelo Laragon, com tudo que preciso num servidor, com vantagem sobre qualquer outro, que este foi criado para as minhas encessidades e já vem com todas as configurações básicas

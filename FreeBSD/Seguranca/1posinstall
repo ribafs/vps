@@ -1,0 +1,18 @@
+
+Ocultar do index.php do template
+
+Como a primeira linha do arquivo
+template/seutemplate/index.php
+
+<?php $this->setGenerator('RibaFS Portal'); ?>
+
+Mover o configuration.php para 2 diretórios antes
+
+Mover o configuration.php para o /usr/local/www/apache24, que fica dois diretórios abaixo do atual
+Recomear para confportal.php
+
+Criar o configuration.php contendo
+
+<?php
+require_once( dirname( __FILE__ ) . '/../../confportal.php' );
+

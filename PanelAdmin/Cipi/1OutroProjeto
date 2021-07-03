@@ -1,0 +1,93 @@
+- Criar o servidor com Ubuntu 20.04
+Servidor - CIPI
+IP - 74.207.234.244
+- Atribuir a ele o domínio ribamar.net.br
+- Aguardar que o domínio propague
+- Após a propagação instalar o CIPI neste servidor
+- Após a instalação do CIPI, acessar e adicionar ribamar.net.br e www.ribamar.net.br na conf default do Nginx, em server_name
+- Instalar o Certbot no ribaamr.net.br
+- Abriro CIPI no https://ribamar.net.br
+
+ssh root@74.207.234.244
+
+apt update && apt upgrade -y && reboot
+
+wget -O - https://cipi.sh/go.sh | bash
+
+SETUP COMPLETE
+
+ SSH root user: cipi
+ SSH root pass: zmfloteznzkymmmynwfjnza0zwq3ntbj
+ MySQL root user: cipi
+ MySQL root pass: mjkymwq3yzu5njk0otm4mmzkywzjyzaw
+
+ To manage your server visit: http://74.207.234.244
+ Default credentials are: administrator / 12345678
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+ssh cipi@74.207.234.244
+Mudei a senha do cipi
+
+Acessei
+http://74.207.234.244
+
+E alterei login e senha do administrator
+
+Editei
+
+sudo nano /etc/nginx/sites-available/default
+
+server {
+    root /var/www/html/public;
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Content-Type-Options "nosniff";
+    client_body_timeout 10s;
+    client_header_timeout 10s;
+    client_max_body_size 256M;
+    index index.html index.php;
+    charset utf-8;
+    server_tokens off;
+    server_name ribamar.net.br www.ribamar.net.br;
+    location / {
+        try_files   $uri     $uri/  /index.php?$query_string;
+    }
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+    error_page 404 /index.php;
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.0-fpm.sock;
+    }
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+
+    listen [::]:443 ssl ipv6only=on; # managed by Certbot
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/ribamar.net.br/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/ribamar.net.br/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+Apenas adicionei a linha
+
+server_name ribamar.net.br www.ribamar.net.br;
+
+sudo service nginx restart
+
+Instalei o SSL com o Certbot
+
+sudo snap install core; sudo snap refresh core
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo certbot --nginx
+    ribafs@gmail.com
+    y
+    y
+    1,2
+sudo certbot renew --dry-run
+
+Testar mas somente após o domínio propagar

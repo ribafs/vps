@@ -1,0 +1,42 @@
+# Copiar arquivos do desktop para o servidor
+
+## SCP
+
+scp -P 65522 arquivo ribafs@159.89.10.166:/home/ribafs
+
+## Usando o gerenciador de arquivos da distribuição Linux
+
+No meu caso, que uso o Linux Mint, uso o nemo ou o Nautilus no Ubuntu
+
+- Abrir nemo
+- Arquivo
+- Conectar a um servidor
+- Veja a captura
+Idealmente conectar com um user com o mesmo nome do user do servidor, meu caso ribafs aqui e lá.
+
+## Usando o FileZilla
+
+sudo apt install filezilla
+
+- Abrir o FileZilla
+- Arquivo
+- Gerenciador de Sites
+- New Site
+    - Dar um nome. Exemplo: ribafs-do
+    Aba Geral
+    - Protocolo - SFTP
+    - Host - 159.89.10.166
+    - Porta - 65522
+    - Tipo de login - pedir a senha
+    - Usuário - ribafs
+    Aba Avançado
+    - Pasta local padrão - /backup/www
+    - Pasta remota padrão - /var/www/html
+
+## Download da internet para o servidor
+
+Minha alternativa preferida é usando o wget
+
+wget https://URL/arquivo.ext
+
+

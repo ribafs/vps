@@ -1,0 +1,37 @@
+sudo nano /etc/hosts
+127.0.0.1   laravel
+
+ping laravel
+
+Criar
+
+mkdir /var/www/html/laravel
+
+Criar
+
+sudo nano /etc/apache2/sites-available/laravel.conf
+
+<VirtualHost *:80>
+    ServerName laravel
+    ServerAlias www.laravel
+    ServerAdmin ribafs@gmail.com
+    DocumentRoot /var/www/html/laravel/public
+
+    <Directory /var/www/html/laravel/public>
+        Options FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/domain1.com-error.log
+    CustomLog ${APACHE_LOG_DIR}/domain1.com-access.log combined
+</VirtualHost>
+
+sudo a2dissite 000-default
+sudo a2ensite laravel
+sudo service apache2 reload
+
+sudo apachectl -S
+
+https://www.binarytides.com/create-localhost-sub-domains-apache-ubuntu/

@@ -1,0 +1,112 @@
+Install SilverStripe CMS
+
+Atualizar o sistema
+
+sudo freebsd-update fetch
+sudo freebsd-update install
+sudo pkg update
+sudo pkg upgrade
+
+sudo pkg install apache24
+
+sudo sysrc apache24_enable=yes
+
+sudo service apache24 start
+
+Testar
+
+http://ip
+
+Configurações
+
+sudo nano /usr/local/etc/apache24/httpd.conf
+
+mod_rewrite, descomentar a linha
+LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+
+Mudar none para All
+
+<Directory "/var/www/html">
+    Options Indexes FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
+
+Adicionar
+ServerName localhost
+
+Checar
+DocumentRoot "/usr/local/www/apache24/data"
+
+sudo service apache24 restart
+
+Instalar php7.1
+
+sudo pkg install php71 mod_php71 php71-gd php71-mbstring php71-mysqli php71-xml php71-curl php71-tidy php71-ctype php71-tokenizer php71-simplexml php71-dom php71-session php71-iconv php71-hash php71-json php71-fileinfo
+
+sudo cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini-production.bakup
+
+sudo ln -s /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+sudo nano /usr/local/etc/php.ini
+
+date.timezone = America/Fortaleza
+
+Criar
+
+sudo nano /usr/local/etc/apache24/Includes/php.conf
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    <FilesMatch "\.phps$">
+        SetHandler application/x-httpd-php-source
+    </FilesMatch>
+</IfModule>
+
+sudo service apache24 restart
+
+sudo pkg install mariadb102-server mariadb102-client
+
+sudo sysrc mysql_enable="yes"
+sudo service mysql-server start
+
+sudo mysql_secure_installation
+
+mysql -u root -p
+
+CREATE DATABASE silverstripe_data CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'silverstripe_user'@'localhost' IDENTIFIED BY 'UltraSecurePassword';
+GRANT ALL PRIVILEGES ON silverstripe_data.* TO 'silverstripe_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+
+Instalação do CMS
+
+cd /usr/local/www/apache24/data
+
+sudo wget https://silverstripe-ssorg-releases.s3.amazonaws.com/sssites-ssorg-prod/assets/releases/SilverStripe-cms-v3.6.2.tar.gz
+
+ls -la
+
+sudo tar xvzf SilverStripe-cms-v3.6.2.tar.gz
+
+sudo chown -R www:www * .htaccess
+
+sudo service apache24 restart
+
+Database server: localhost
+Database username: silverstripe_user
+Database password: UltraSecurePassword
+Database name: silverstripe_data
+
+Email: my_email@example.net
+Password: AnotherUltraSecurePassword
+Default language: English UK
+
+sudo rm install.php index.html
+
+https://www.vultr.com/docs/how-to-install-silverstripe-cms-on-a-freebsd-11-famp-vps
+

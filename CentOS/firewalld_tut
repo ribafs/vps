@@ -1,0 +1,95 @@
+FirewallD
+
+sudo su
+
+yum install firewalld
+
+systemctl enable firewalld
+reboot
+
+systemctl start firewalld.service
+
+Consultando estado
+firewall-cmd --state
+
+Consultar zonas ativas
+firewall-cmd --get-active-zones
+
+Consultar todas as zonas
+firewall-cmd --list-all
+
+Listar a configuração da zona public
+firewall-cmd --zone=public --list-all
+
+Configurando a zona default
+firewall-cmd --set-default-zone=public
+
+Listando todos os serviços
+firewall-cmd --get-services
+
+Novos serviços podem ser criados. Uma forma simples é copiar um dos xml existentes em /usr/lib/firewalld/services
+
+Remover rule
+firewall-cmd --zone=public --remove-port=12345/tcp --permanent
+firewall-cmd --reload
+
+Para que seja salvo usar --permanent
+
+firewall-cmd --permanent --new-service=myservice
+
+Abrir o serviço http apenas nesta seção
+firewall-cmd --zone=public --add-service=http
+
+Listar serviços abertos
+firewall-cmd --zone=public --list-services
+
+Abrir serviço http de forma permanente (ficará salvo)
+firewall-cmd --zone=public --permanent --add-service=http
+	
+Listar serviços permanentes abertos
+firewall-cmd --zone=public --permanent --list-services
+
+Abrir https
+firewall-cmd --zone=public --add-service=https
+firewall-cmd --zone=public --permanent --add-service=https
+
+Abrir porta ou serviço
+
+firewall-cmd --zone=public --add-port=80/tcp
+
+firewall-cmd --zone=public --add-port=5000/tcp
+
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+
+Listar portas abertas
+firewall-cmd --zone=public --list-ports
+
+Abrir faixas de portas
+firewall-cmd --zone=public --add-port=4990-4999/udp
+
+firewall-cmd --zone=public --permanent --add-port=5000/tcp
+firewall-cmd --zone=public --permanent --add-port=4990-4999/udp
+firewall-cmd --zone=public --permanent --list-ports
+
+firewall-cmd --zone=public --add-service=http
+
+firewall-cmd --permanent --zone=public --add-service=http
+
+firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="177.130.209.185" port port="65522" protocol="tcp" accept'
+firewall-cmd --zone=public --add-rich-rule='rule family="ipv4" source address="177.14.224.187" port port="65522" protocol="tcp" accept'
+
+firewall-cmd --permanent --zone=public --add-rich-rule='rule family="ipv4" source address="10.0.3.0/24" port protocol="udp" port="2003" accept'
+
+Efetuando backup manual dos serviços
+
+cp /usr/lib/firewalld/services/ssh.xml /etc/firewalld/services/example.xml
+
+Também podemos criar zonas
+
+Referências
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-7
+
+Para migrar do FirewallD para o iptables
+https://www.digitalocean.com/community/tutorials/how-to-migrate-from-firewalld-to-iptables-on-centos-7
+
+

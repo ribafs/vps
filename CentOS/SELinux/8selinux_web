@@ -1,0 +1,64 @@
+Confirando o SELinux com o Nginx para um site com Joomla
+
+nano /etc/selinux/config
+enforcing
+reboot
+
+Caso o site tenha sido criado no diretório web default, no caso, /usr/share/nginx/html, após habilitar o SELinux o site continua funcionando mas o acesso do servidor web é de somente leitura.
+
+Agora preciso avisar ao SELinux que mudei a porta do SSH
+
+Acessar pela console pois pelo desktop tá bloqueado
+semanage port -a -t ssh_port_t -p tcp 65522
+service sshd restart
+
+ssh -p porta ribafs@IP
+
+restorecon -Rv /usr/share/nginx/html
+
+Criar as políticas
+semanage fcontext -a -t httpd_sys_content_t "/usr/share/nginx/html(/.*)?"
+semanage fcontext -a -t httpd_log_t "/usr/share/nginx/html/administrator/logs(/.*)?"
+semanage fcontext -a -t httpd_cache_t "/usr/share/nginx/html/tmp(/.*)?"
+
+semanage fcontext -a -t httpd_sys_rw_content_t "/usr/share/nginx/html/tmp(/.*)?"
+semanage fcontext -a -t httpd_sys_rw_content_t "/usr/share/nginx/html/images(/.*)?"
+semanage fcontext -a -t httpd_sys_rw_content_t "/usr/share/nginx/html/configuration.php"
+
+semanage fcontext -a -t httpd_sys_rw_content_t "/usr/share/nginx/html/libraries(/.*)?"
+
+restorecon -Rv /usr/share/nginx/html
+
+ls -lZ /var/www/html
+
+
+Testar agora
+
+http://IP/administrator
+
+Alterar algo e clicar em Salvar.
+
+
+Criei um snapshot na Vultr deste servidor para ter um backup deste estado dele.
+
+
+Caso queira deixar o diretório web fora do selinux
+semanage permissive -a httpd_t
+
+Referências
+Shane Rainville em
+http://www.serverlab.ca/tutorials/linux/web-servers-linux/configuring-selinux-policies-for-apache-web-servers/
+
+
+Agora instalar e configurar demais softwares que reforçam a segurança:
+
+9security
+
+
+
+
+I am facing problems with PHP interface that calls perl and shell scripts. These enable uploading of a file to a folder and execute them with some input while storing output into some other files. Now it appears that I can either give read-write access or execute using one of the following:
+
+chcon -Rv --type=httpd_sys_rw_content_t user_dir/
+chcon -Rv --type=httpd_fastcgi_script_exec_t user_dir/
+

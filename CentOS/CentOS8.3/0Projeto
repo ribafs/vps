@@ -1,0 +1,26 @@
+Servidor com CentOS 8.3
+
+Este servidor abrigará o domínio:
+
+ribafs.me
+
+Criei um servidor com 
+
+CentOS 8.3 x64
+
+1 GB de RAM
+Basic 6/mês
+New York
+SSH Keys
+Hostname - testsec
+Tags - centos emp security
+
+Com:
+
+Nginx
+PostgreSQL
+PHP
+Joomla com PG
+SELinux
+ModSecurity
+Honeypot

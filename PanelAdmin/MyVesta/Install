@@ -1,0 +1,93 @@
+Somente Debian é suportado
+
+Debian 10 (recomendado, mas suporta versões anteriores), servidor limpo, recem instalado
+Nginx
+Várias versões do PHP
+Envio de e-mail, podendo limitar quantos/hora. Podemos ver o script que envia, quando e para quem
+Podemos bloquear completamenteo o myvestacp de forma que seja acessado somente com a secret URL. Exemplo: http://debian-10:8083/?zmxnmyvpan
+Caso não tenha definido uma URL segura na instalção pode criar assim:
+echo "<?php \$login_url='MY-SECRET-URL';" > /usr/local/vesta/web/inc/login_url.php
+Funções perigosas do php foram desabilitadas
+
+Auto-generating LetsEncrypt SSL for server hostname (signed SSL for Vesta 8083 port, for dovecot (IMAP & POP3) and for Exim (SMTP))
+
+You can change Vesta port during installation or later using one command line: v-change-vesta-port [number]
+
+ClamAV is configured to block zip/rar/7z archives that contains executable files (just like GMail)
+
+Backup will run with lowest priority (to avoid load on server), and can be configured to run only by night (and to stop on the morning and continue next night)
+
+You can compile Vesta binaries by yourself - src/deb/vesta_compile.sh
+
+    You can even create your own APT repository in a minute
+    We are using latest nginx version for vesta-nginx package
+    With your own APT infrastructure you can take security of Vesta-installer infrastructure in your own hands. You will have full control of your Vesta code (this way you can rest assured that there's 0% chance that you'll install malicious packages from repositories that may get hacked)
+    Binaries that you compile are 100% compatible with official VestaCP from vestacp.com, so you can run official VestaCP code with your own binaries (in case you don't want the source code from this fork)
+
+
+Useful scripts
+
+    Script that will convert Vesta to myVesta
+    WordPress installer in one second
+    Script for importing cPanel backups to Vesta (thanks to Maks Usmanov - Skamasle)
+    Cloning script that will copy the whole site from one (sub)domain to another (sub)domain
+    Script that will migrate your site from http to https, replacing http to https URLs in database
+    Script that will install multiple PHP versions on your server
+    Script that will install nginx templates that can prevent denial-of-service on your server
+    Official Vesta Softaculous installer
+
+root - zmxnxxxxzzzyyyM@
+
+ssh root@45.79.195.21
+
+Download the installation script:
+
+curl -O http://c.myvestacp.com/vst-install-debian.sh
+
+Então:
+
+bash vst-install-debian.sh
+
+Following software will be installed on your system:
+   - nginx Web server
+   - Apache web server (in very fast mpm_event mode)
+   - PHP-FPM service for PHP processing
+   - Bind9 DNS service
+   - Exim4 mail server
+   - Dovecot POP3/IMAP service
+   - MySQL Database server
+   - ProFTPD FTP service
+   - iptables firewall + Fail2Ban service
+
+
+Would you like to continue [y/n]: 
+
+Please enter admin email address: ribafs@gmail.com
+Please enter secret URL address for hosting panel (or press enter for none).
+Secret URL must be without special characters, just letters and numbers. Example: mysecret8205
+Enter secret URL address: zmxn1029myvesta
+
+80
+
+despertai.net.br (debian-10)
+
+Congratulations, you have just successfully installed myVesta Control Panel
+
+https://ribafs.cf:80/?zmxn1029myvesta
+https://45.79.195.21/?zmxn1029myvesta
+username: admin
+password: 1wpRwbbXgYoVTKsqWwnlBgPHOhyCypiL
+
+We hope that you enjoy your installation of myVesta. Please feel free to contact us anytime if you have any questions.
+Thank you.
+
+Não sei como acessar admin
+
+If you faced this issue after upgrade you can run following commands to fix it:
+
+Code: Select all
+
+mkdir -p /etc/sudoers.d
+/usr/local/vesta/upd/add_sudo.sh 
+
+v-change-user-password admin your_new_password

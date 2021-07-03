@@ -1,0 +1,14 @@
+Nesta fase fazei backup:
+
+- Dos scripts originais e alterados
+- Dos bancos de dados dos sites
+
+mysqldump -uroot -p blog > blog_09032018.sql
+mysqldump -uroot -p portal > portal_09032018.sql
+
+- Dos arquivos e diretórios do site
+
+tar zcpvf blog_09032018.tar.gz /var/www/html/blog
+tar zcpvf portal_09032018.tar.gz /var/www/html/portal
+
+A guardarei com cuidado.

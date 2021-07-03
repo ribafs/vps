@@ -1,0 +1,184 @@
+nginx freebsd
+
+I've two (I hope) simple problem with nginx and php. I've installed www/nginx and lang/php5 with FPM support.
+If I create a simple /usr/local/www/test/index.php file ( phpinfo()), and I open localhost/test works well.
+
+I want similar in user directories (/home/zsolt/public_html) but it doesn't work: it prints "404 not found" when I try localhost/~zsolt/ (the index.php is same with /usr/local/www/test/index.php). What am I doing wrong?
+
+Second: I've installed databases/adminer and its index.php placed into /usr/local/www/adminer/adminer/index.php. If I open localhost/adminer/adminer, works well but I want a simple localhost/adminer.
+
+/usr/local/etc/nginx/nginx.conf
+Code:
+
+user  www www;
+worker_processes 1;
+worker_priority 15;
+ 
+pid /var/run/nginx.pid;
+ 
+events {
+  worker_connections  512;
+  accept_mutex on;
+  use kqueue;
+}
+ 
+http {
+  include       conf.d/options;
+  include       mime.types;
+  default_type  application/octet-stream;
+  include sites/*.site;
+}
+
+/usr/local/etc/nginx/conf.d/options
+Code:
+
+client_body_timeout  5s;
+client_header_timeout  5s;
+keepalive_timeout  75s;
+send_timeout  15s;
+charset  utf-8;
+gzip  off;
+gzip_proxied  any;
+ignore_invalid_headers  on;
+keepalive_requests  50;
+keepalive_disable  none;
+max_ranges  1;
+msie_padding  off;
+open_file_cache  max=1000 inactive=2h;
+open_file_cache_errors  on;
+open_file_cache_min_uses  1;
+open_file_cache_valid  1h;
+output_buffers  1 512;
+postpone_output  1440;
+read_ahead  512K;
+recursive_error_pages  on;
+reset_timedout_connection  on;
+sendfile  on;
+server_tokens  off;
+server_name_in_redirect  off;
+source_charset  utf-8;
+tcp_nodelay  on;
+tcp_nopush  off;
+gzip_disable  "MSIE [1-6]\.(?!.*SV1)";
+limit_req_zone  $binary_remote_addr  zone=gulag:1m   rate=60r/m;
+
+/usr/local/etc/nginx/sites/default.site
+Code:
+
+server {
+    server_name domain.tld www.domain.tld;
+    add_header  Cache-Control "public";
+    add_header  X-Frame-Options "DENY";
+    limit_req   zone=gulag burst=200 nodelay;
+    expires     max;
+
+    listen 80;
+
+    root /usr/local/www;
+    index index.php index.html index.htm ;
+
+    location ~ \.php$ { include conf.d/php-fpm; }
+
+    location = /favicon.ico { return 204; }
+
+    location ~* \.(engine|inc|info|install|make|module|profile|test|po|sh|.*sql|theme|tpl(\.php)?|xtmpl)$|^(\..*|Entries.*|Repository|Root|Tag|Template)$|\.php_ { deny all; }
+
+
+    location ~ /\. {
+            deny all;
+            access_log off;
+            log_not_found off;
+    }
+
+    location ~ ^/~(.+?)(/.*)?$ {
+         alias /home/$1/public_html$2;
+         index  index.html index.htm index.php;
+         autoindex on;
+          location ~ \.php$ {
+        fastcgi_split_path_info ^(.+?\.php)(/.*)?$;
+        fastcgi_pass unix:/var/run/php5-fpm.sock;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        }
+    }
+
+}
+
+/usr/local/etc/nginx/fastcgi_params
+Code:
+
+fastcgi_param  QUERY_STRING       $query_string;
+fastcgi_param  REQUEST_METHOD     $request_method;
+fastcgi_param  CONTENT_TYPE       $content_type;
+fastcgi_param  CONTENT_LENGTH     $content_length;
+
+fastcgi_param  SCRIPT_NAME        $fastcgi_script_name;
+fastcgi_param  REQUEST_URI        $request_uri;
+fastcgi_param  DOCUMENT_URI       $document_uri;
+fastcgi_param  DOCUMENT_ROOT      $document_root;
+fastcgi_param  SERVER_PROTOCOL    $server_protocol;
+fastcgi_param  HTTPS              $https if_not_empty;
+
+fastcgi_param  GATEWAY_INTERFACE  CGI/1.1;
+fastcgi_param  SERVER_SOFTWARE    nginx/$nginx_version;
+
+fastcgi_param  REMOTE_ADDR        $remote_addr;
+fastcgi_param  REMOTE_PORT        $remote_port;
+fastcgi_param  SERVER_ADDR        $server_addr;
+fastcgi_param  SERVER_PORT        $server_port;
+fastcgi_param  SERVER_NAME        $server_name;
+
+fastcgi_param  REDIRECT_STATUS    200;
+
+Thanks for helping.
+ 
+uzsolt
+uzsolt
+Well-Known Member
+
+Thanks: 46
+Messages: 251
+Mar 30, 2014
+#2
+Re: nginx + php
+
+The userdir and php works now:
+Code:
+
+location ~* ^/~(.+?)(/.*\.php)$
+{
+	alias /home/$1/public_html$2;
+	fastcgi_pass  127.0.0.1:9001;
+	include fastcgi_params;
+	fastcgi_param SCRIPT_FILENAME $request_filename;
+}
+
+location ~ ^/~(.+?)(/.*)?$ {
+	alias /home/$1/public_html$2;
+	index  index.html index.htm index.php;
+	autoindex on;
+}
+
+Important: the userdir-php should be the first! Idea from here.
+
+The second question is open
+ 
+uzsolt
+uzsolt
+Well-Known Member
+
+Thanks: 46
+Messages: 251
+Apr 11, 2014
+#3
+Re: nginx + php
+
+The adminer-problem is very simple:
+
+Code:
+
+location /adminer {
+    index adminer/index.php;
+}
+
+

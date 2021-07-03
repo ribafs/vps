@@ -1,0 +1,27 @@
+Add a new site
+
+Your site is ready!
+
+Domain:
+despertai.net.br
+
+Server IP:
+139.177.202.148
+
+SSH Username:
+cp593b7dec9
+
+SSH Password:
+SjWNWDubPIoZiph3DvkCMeAX
+
+MySQL database:
+cp593b7dec9
+
+MySQL username:
+cp593b7dec9
+
+MySQL password:
+YZ6UH4ltNUb50bYFa5yozPEc
+
+ssh -p 65522 cp593b7dec9@139.177.202.148
+SjWNWDubPIoZiph3DvkCMeAX

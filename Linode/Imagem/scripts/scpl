@@ -1,0 +1,13 @@
+#!/bin/bash
+if [ ! $1 ]
+    then
+    echo "Sintaxe: $0 arquivo IP pasta"
+elif [ ! $2 ]
+    then
+    echo "Sintaxe: $0 arquivo IP pasta"
+elif [ ! $3 ]
+    then
+    echo "Sintaxe: $0 arquivo IP pasta"
+else
+  scp -P 65522 $1 ribafs@$2:$3
+fi

@@ -1,0 +1,16 @@
+Configuração da rede através do /etc/rc.conf
+
+# DigitalOcean Dynamic Configuration lines and the immediate line below it, are removed each boot.
+
+# DigitalOcean Dynamic Configuration
+defaultrouter="46.101.0.1"
+
+# DigitalOcean Dynamic Configuration
+ifconfig_vtnet0="inet 46.101.50.99 netmask 255.255.192.0"
+
+# DigitalOcean Dynamic Configuration
+ifconfig_vtnet0_alias0="inet 10.16.0.5 netmask 255.255.0.0"
+
+# DigitalOcean Dynamic Configuration
+ifconfig_vtnet0_ipv6="inet6  prefixlen 0"
+

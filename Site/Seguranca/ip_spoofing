@@ -1,0 +1,12 @@
+Prevenir IP Spoofing
+
+Edite
+nano /etc/host.conf
+
+E deixe seu conteúdo assim:
+
+order bind,hosts
+multi on
+nospoof on
+
+

@@ -1,0 +1,131 @@
+Roteiro de instalação e configurações
+
+IP - 159.89.10.166
+
+- Acessar do desktop
+ssh root@159.89.10.166
+
+- Enviar o script ubuntu2004.sh para o servidor
+
+Do desktop execute
+scp ubuntu2004.sh root@159.89.10.166:/root
+
+- Criar novo user ribafs e add para sudo
+
+adduser ribafs
+usermod -aG sudo ribafs
+
+mkdir /root/backup
+
+- Configurar para ribafs usar SSH
+
+cp /etc/ssh/sshd_config /root/backup
+
+nano /etc/ssh/sshd_config
+
+Alterar/descomentar:
+
+Port 65522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+
+Adicionar ao final
+AllowUsers ribafs
+
+service ssh restart
+
+- Copiar a chave pública do SSH do meu desktop que está no root para o ribafs
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+
+- Configurando o UFW
+
+Como o ufw está limpo
+
+ufw allow 65522
+ufw allow http
+ufw allow https
+ufw enable
+ufw status verbose
+
+ufw verbose numbered
+
+ufw delete 3 (22)
+
+ufw verbose numbered
+
+ufw delete 6
+
+
+reboot
+
+- Acessar do desktop com ribafs
+
+Criar o script e tornar executável
+sudo nano /usr/local/bin/docean
+
+ssh -p 65522 ribafs@ribafs.me
+
+Para acessar use
+
+docean
+
+sudo su
+cd
+
+apt update
+apt upgrade
+reboot
+
+- Instalar o LAMP com o script ubuntu2004.sh
+
+sudo su
+
+cd /root
+sh ubuntu2004.sh
+
+- Impedir browser de arquivos
+Criar um .htaccess em /var/www/html contendo
+Options -Indexes
+
+- Uso do mariadb
+
+Usar somente com sudo
+
+mysql_secure_installation
+
+Enter current password for root (enter for none): 
+Enter
+
+sudo mysql -uroot
+
+- Criar dois bancos no mariadb com respectivos users e privilégios usando o arquivo: mariadb
+    laraveldb e user laravelus
+    joomladb e user joomlaus
+
+- Criar aliases no user ribafs
+  source .bashrc após sair do arquivo, para atualizá-lo sem necessidade de fechar o terminal e voltar
+- Criar scripts no /usr/local/bin
+- Também os scripts perms e permsl para configurar as permissões do /var/www/html para laravel (permsl) e para os demais (perms)
+
+- Adicionar ribafs ao www-data
+adduser ribafs www-data
+
+- Atualização dos repositórios, upgrade e reboot
+apt update
+apt upgrade -y
+reboot
+
+- Criar swap e limpar cache e RAM com o swap-ram
+
+== Snapshot - efetuar um backup da VM, que pode ser restaurado em caso de problema
+https://cloud.digitalocean.com/images/snapshots/droplets?i=c48e1a
+
+Exemplo:
+
+ribafs_ub2004_11102020_1516
+
+= Instalar e configurar Joomla com o arquivo Joomla/joomla
+

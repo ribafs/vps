@@ -1,0 +1,92 @@
+Instalar um site em Joomla na pasta /var/www/html/portal
+
+
+== Enviar os arquivos portalxxx.zip e o portalxxx.sql do desktop para a pasta /tmp do servidor
+
+Este site será instalado no raiz /var/www/html
+
+No desktop copiar os dois arquivos para a pasta /home/ribafs
+scp -P porta portal* ribafs@IP:/tmp
+
+No servidor
+cd /tmp
+
+
+== Criar o banco e um usuário dono dele
+
+mysql -uroot -p
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+\q
+
+mysql -uroot -p portal < portalxxx.sql
+
+
+== Descompactar o arquivo
+
+cd /tmp
+
+unzip portalxxx.zip -d /var/www/html
+
+Ajustar permissões permissões do /var/www/html
+
+perms
+
+Efetuar ajustes no /var/www/html/configuration.php se necessário.
+
+
+== Instalar o site em
+
+http://167.99.80.172
+
+Ajustar para o Joomla
+
+nano /etc/nginx/sites-available/default
+
+Altere o location / para
+
+       location / {
+                autoindex on;
+                try_files $uri $uri/ /index.php?$args;
+       }
+
+service nginx restart
+
+nano /etc/php/7.0/fpm/php.ini
+
+Mudar
+output_buffering = Off
+
+service php7.0-fpm restart
+service nginx restart
+
+
+== Redirecionar acesso ao raiz para /portal
+
+Removi index.html e info.php do raiz
+
+nano /var/www/html/index.php
+
+<?php
+header('location: portal');
+
+
+Depois de testado o site e configurado novamente para proteger o administrator com SSL
+então efetuar um backup full para guardar. Usarei o componente SimpleBackup
+
+
+== Backup e Restore
+
+Agora faça um backup completo com o akeeba e quando terminar restaure por exemplo para a pasta
+/var/www/html/portal2
+
+Crie o banco portal2, pode ser o mesmo user e senha
+
+Restaure pela web:
+
+http://167.99.80.172/portal2
+
+== Agora vou implementar o SSL para usar no administrator usando o arquivo
+
+3ssl_nginx
+

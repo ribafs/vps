@@ -1,0 +1,43 @@
+Create testsite.local virtual host file
+Add following content to /etc/nginx/sites-available/testsite.local file. This is very basic virtual host config.
+
+server {
+    server_name testsite.local;
+    access_log /srv/www/testsite.local/logs/access.log;
+    error_log /srv/www/testsite.local/logs/error.log;
+    root /srv/www/testsite.local/public_html;
+
+    location / {
+        index index.html index.htm index.php;
+    }
+
+    location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass  127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+}
+Link your virtual host to /etc/nginx/sites-enabled
+
+cd /etc/nginx/sites-enabled/
+ln -s /etc/nginx/sites-available/testsite.local
+
+## Fedora 27/26/25 and CentOS/RHEL 7.4 ##
+systemctl restart nginx.service ## or reload
+
+## CentOS/RHEL 6.9 ##
+/etc/init.d/nginx restart ## or reload
+## OR ##
+service nginx restart ## or reload
+Add your testsite.local “domain” to /etc/hosts file
+/etc/hosts file Nginx on same machine
+127.0.0.1 … row should look like example following:
+
+127.0.0.1               localhost.localdomain localhost testsite.local
+And if you use another machine where you are running your Nginx server, then add it’s public IP as following:
+
+10.0.2.19               wordpress
+Note: This is just very simple basic configuration, but if you want configure and optimize Nginx and PHP-FPM more then check following guide, Nginx and PHP-FPM Configuration and Optimizing Tips and Tricks
+
+https://www.if-not-true-then-false.com/2011/install-nginx-php-fpm-on-fedora-centos-red-hat-rhel/

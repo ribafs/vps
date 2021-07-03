@@ -1,0 +1,201 @@
+Como usar os 100 $ nos dois meses?
+
+- Criar um projeto, para dentro dele adicionas as VMs
+- Selecione uma droplet/vm adequada
+    Em distributions selecionaria Ubuntu 20.04
+    - Mas em Marketplace seleciono LAMP on Ubuntu 20.04
+    - Plano
+    Aceitar a sugestão default do DO: 
+    Básico
+        - 8 GB de RAM   
+        - 4 vCPU
+        - 160 GB disco SSD
+        - 5 TB transferência
+        - 40 $/mês
+    - Aceito o datacenter de Frankfurt
+    - Authentication
+        SSH Keys
+    - Choose a hostname. Quando adicionamos um domínio no DNS do DO, é bom usar o domínio no hostname. Podemos mudar depois
+    - Add backup. Tá bom, aqui são mais 8$, então resta apenas 2 no mês.
+
+IP - 207.154.227.98
+
+Criar equipe para gerenciar o servidor no DO
+https://www.digitalocean.com/docs/accounts/teams/
+
+Suporte e Ticket
+https://www.digitalocean.com/support/
+
+Alertar se o consumo do mês chegar a certo valor
+Account
+Billing
+Billing Allerts
+
+Status dos servidores
+https://status.digitalocean.com/
+
+Avatar - My profile - Referrals
+Give $100, Get $35
+
+Everyone you refer gets $100 in credit over 60 days. Once they’ve spent $35 with us, you'll get $35. There is no limit to the amount of credit you can earn through referrals.
+Refer by email
+
+Import your contacts from Gmail – or enter your contacts manually – and we’ll invite them for you.
+
+Snapshot - efetuar um backup da VM, que pode ser restaurado em caso de problema
+https://cloud.digitalocean.com/images/snapshots/droplets?i=c48e1a
+
+Adicionar cahve SSH
+Avatar
+My Profile
+Security
+SSH Keys
+
+LAMP 20.04
+
+In less than a minute, spin up a cloud server with Apache, MySQL, and PHP installed.
+
+- Apache 2.4.41
+- MySQL server 8.0.21
+- PHP 7.4
+- Fail2ban 0.11.1
+- Postfix 3.4.10
+- Certbot 0.39.0
+
+Getting started after deploying LAMP
+
+In addition to the package installation, the One-Click also:
+
+    Enables the UFW firewall to allow only SSH (port 22, rate limited), HTTP (port 80), and HTTPS (port 443) access.
+    Sets the MySQL root password and runs mysql_secure_installation.
+    Sets up the debian-sys-maint user in MySQL so the system’s init scripts for MySQL will work without requiring the MySQL root user password.
+
+After you create a LAMP One-Click Droplet:
+
+    You can view the LAMP instance immediately by visiting the Droplet’s IP address in your browser.
+    You can log into the Droplet as root using either the password emailed to you or with an SSH key, if you added one during creation.
+    The MySQL root password is in /root/.digitalocean_password.
+    The web root is /var/www/html.
+    You can get information about the PHP installation by logging into the Droplet and running php -i.
+
+In addition, there are a few customized setup steps that we recommend you take.
+
+Creating an Apache virtual hosts file for each site maintains the default configuration as the fallback, as intended, and makes it easier to manage changes when hosting multiple sites.
+
+To do so, you’ll need to create two things for each domain: a new directory in /var/www for that domain’s content, and a new virtual host file in /etc/apache2/sites-available for that domain’s configuration. For a detailed walkthrough, you can follow How to Set Up Apache Virtual Hosts.
+
+Setting up an SSL certificate enables HTTPS on the web server, which secures the traffic between the server and the clients connecting to it. Certbot is a free and automated way to set up SSL certificates on a server. It’s included as part of the LAMP One-Click to make securing the Droplet easier.
+
+To use Certbot, you’ll need a registered domain name and two DNS records:
+
+    An A record from a domain (e.g., example.com) to the server’s IP address
+    An A record from a domain prefaced with www (e.g., www.example.com) to the server’s IP address
+
+Additionally, if you’re using a virtual hosts file, you’ll need to make sure the server name directive in the VirtualHost block (e.g., ServerName example.com) is correctly set to the domain.
+
+Once the DNS records and, optionally, the virtual hosts files are set up, you can generate the SSL certificate. Make sure to substitute the domain in the command.
+
+certbot --apache -d example.com -d www.example.com
+
+HTTPS traffic on port 443 is already allowed through the firewall. After you set up HTTPS, you can optionally deny HTTP traffic on port 80:
+
+ufw delete allow 80/tcp
+
+For a more detailed walkthrough, you can follow How to Secure Apache with Let’s Encrypt or view Certbot’s official documentation.
+
+You can serve files from the web server by adding them to the web root (/var/www/html) using SFTP or other tools.
+
+A newly-created LAMP Droplet includes an index.html web page. You can change this by uploading a custom index.html file or remove it.
+
+----------
+LAMP
+by DigitalOcean
+
+Version Latest
+
+OS Ubuntu 20.04
+STAFF PICKFRAMEWORKS
+Create LAMP Droplet
+Description
+
+In less than a minute, spin up a cloud server with Apache, MySQL, and PHP installed.
+Software Included
+Package
+Version
+License
+Apache
+2.4.41
+Apache 2
+MySQL server
+8.0.21
+GPL 2 with modifications
+PHP
+7.4
+PHP v3.01
+Fail2ban
+0.11.1
+GPL 2 with modifications
+Postfix
+3.4.10
+IBM Public
+Certbot
+0.39.0
+Apache 2
+Getting started after deploying LAMP
+
+In addition to the package installation, the One-Click also:
+
+    Enables the UFW firewall to allow only SSH (port 22, rate limited), HTTP (port 80), and HTTPS (port 443) access.
+    Sets the MySQL root password and runs mysql_secure_installation.
+    Sets up the debian-sys-maint user in MySQL so the system’s init scripts for MySQL will work without requiring the MySQL root user password.
+
+After you create a LAMP One-Click Droplet:
+
+    You can view the LAMP instance immediately by visiting the Droplet’s IP address in your browser.
+    You can log into the Droplet as root using either the password emailed to you or with an SSH key, if you added one during creation.
+    The MySQL root password is in /root/.digitalocean_password.
+    The web root is /var/www/html.
+    You can get information about the PHP installation by logging into the Droplet and running php -i.
+
+In addition, there are a few customized setup steps that we recommend you take.
+
+Creating an Apache virtual hosts file for each site maintains the default configuration as the fallback, as intended, and makes it easier to manage changes when hosting multiple sites.
+
+To do so, you’ll need to create two things for each domain: a new directory in /var/www for that domain’s content, and a new virtual host file in /etc/apache2/sites-available for that domain’s configuration. For a detailed walkthrough, you can follow How to Set Up Apache Virtual Hosts.
+
+Setting up an SSL certificate enables HTTPS on the web server, which secures the traffic between the server and the clients connecting to it. Certbot is a free and automated way to set up SSL certificates on a server. It’s included as part of the LAMP One-Click to make securing the Droplet easier.
+
+To use Certbot, you’ll need a registered domain name and two DNS records:
+
+    An A record from a domain (e.g., example.com) to the server’s IP address
+    An A record from a domain prefaced with www (e.g., www.example.com) to the server’s IP address
+
+Additionally, if you’re using a virtual hosts file, you’ll need to make sure the server name directive in the VirtualHost block (e.g., ServerName example.com) is correctly set to the domain.
+
+Once the DNS records and, optionally, the virtual hosts files are set up, you can generate the SSL certificate. Make sure to substitute the domain in the command.
+
+certbot --apache -d example.com -d www.example.com
+
+HTTPS traffic on port 443 is already allowed through the firewall. After you set up HTTPS, you can optionally deny HTTP traffic on port 80:
+
+ufw delete allow 80/tcp
+
+For a more detailed walkthrough, you can follow How to Secure Apache with Let’s Encrypt or view Certbot’s official documentation.
+
+You can serve files from the web server by adding them to the web root (/var/www/html) using SFTP or other tools.
+
+A newly-created LAMP Droplet includes an index.html web page. You can change this by uploading a custom index.html file or remove it.
+API Creation
+
+In addition to creating a Droplet from the LAMP 1-Click App via the control panel, you can also use the DigitalOcean API
+.
+
+As an example, to create a 4GB LAMP Droplet in the SFO2 region, you can use the following curl command. You’ll need to either save your API access token
+to an environment variable or substitute it into the command below.
+
+curl -X POST -H 'Content-Type: application/json' \
+     -H 'Authorization: Bearer '$TOKEN'' -d \
+    '{"name":"choose_a_name","region":"sfo2","size":"s-2vcpu-4gb","image":"lamp-20-04"}' \
+    "https://api.digitalocean.com/v2/droplets"
+
+Copy

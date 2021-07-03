@@ -1,0 +1,122 @@
+Reforçar a segurança do PHP
+
+Uma boa forma de melhorar a segurança do php é instalando o phpsecinfo:
+https://github.com/funkatron/phpsecinfo 
+http://phpsec.org/projects/phpsecinfo/
+
+E corrigir os erros apontados com as respectivas recomendações.
+
+Algumas sugestões para reforçar a segurança do PHP:
+
+edite o php.ini e faça as alterações:
+
+nano /etc/php.ini
+
+ALERTA – ao efetuar as alterações abaixo faça uma a uma, sempre reiniciando o apache e abrindo o site e efetuando um refresh para testar. Caso tenha problema desfaça ou ajuste o parâmetro com problema.
+
+disable_functions = exec,system,shell_exec,passthru,
+html_errors = Off
+mail.add_x_header = Off
+session.name = NEWSESSID
+
+Na linha com disable_functions já existem várias funções por padrão que são desabilitadas. Não as remova, apenas adicione as recomendações acima ao início, separadas por vírgula.
+Com a ajuda do PHPsecinfo também ajustei estes abaixo:
+
+allow_url_fopen = Off
+upload_tmp_dir = /usr/share/nginx/html/phpup
+
+Criei o diretório /usr/share/nginx/html/phpup
+Estes dois últimos parâmetros devem ser adotados com cuidado, de acordo com a sua necessidade. Abaixo são os valores default na versão 7 do php:
+post_max_size = 8M
+upload_max_filesize = 2M
+
+
+service nginx restart
+Depois dos ajustes acima alguma coisa pode não funcionar. Então efetue os ajustes devidos, sem exagerar.
+
+Proteger arquivos de configuração do apache, php e mysql contra escrita:
+
+/etc/php//php.ini
+/etc/nginx/conf.d/default.conf e demais
+/etc/mysql/my.cnf
+
+
+Configurações do PHP
+php.ini e ini_set()
+
+display_errors 
+Estes só devem estar ativos quando estamos em ambiente de testes, criando ou programando, antes de enviar para o servidor devemos desativar. Se alguma extensão ou aplicativo precisa dessas extensões ativas o prudente é não usar essas extensões. Aliás, para quando estamos instalando, testando e programando, devemos exibir ao máximo os erros. Idealmente o php.ini deve estar com:
+error_reporting = E_ALL & ~E_DEPRECATED
+
+Quando usar php.ini, ini_set() ou .htaccess
+Isso vai depender de como o servidor está configurado.
+- Algumas configurações do PHP podem ser alteradas usando a função ini_set(), sendo que as alterações são válidas somente enquanto o script estiver em execução.
+- Outras configurações devem ser adicionadas num script php.ini ou no .htaccess.
+- Outras em qualquer uma das formas acima. 
+- E algumas configurações não podem ser alteradas, como é o caso de memory_limit e execution_time. Caso alteremos essas podemos prejudicar a performance do site.
+Quando e onde usar cada um vai depender de como o PHP está instalado no servidor, que pode ser como módulo CGI ou como um módulo do Apache. 
+
+PHP como Módulo do Apache ou como CGI
+Para saber como foi instalado o PHP no seu servidor poderá consultar o help desk. Alguns servidores armazenam as respostas do suporte numa área chamada de Knowledge Base até com busca.
+A instalação como módulo CGI é mais segura, portanto preferível. Alguns servidores oferecem as duas modalidades e geralmente para servidores compartilhados é oferecido como módulo CGI, mas para ter certeza pergunte ou faça testes para identificar. Veja detalhes abaixo.
+Como CGI - mais segura, portanto mais restritiva para alterar as configurações do PHP. Não podemos criar um php.ini no raiz e ele valer recursivamente para todos os sub-diretórios. Temos que criar um php.ini para cada diretório. 
+Também não podemos adicionar configurações do PHP nos scripts .htaccess. Se o fizermos receberemos um erro e o script não funcionará. Temos que remover o que adicionamos para o site voltar.  Podemos usar a função ini_set().
+Como módulo do Apache - Aqui podemos criar um php.ini no raiz do domínio e ele valerá para todos os sites, ou seja, tem efeito global. Também podemos usar as configurações do PHP em scripts .htaccess e podemos usar a função ini_set().
+
+
+Como Configurar o PHP 
+ini_set() - Esta função é muito útil para efetuar configurações em servidores onde o PHP foi instalado como CGI, especialmente para sites com Joomla. No caso entramos com as linhas da ini_set() no configuration.php, que é visto por todos os scripts.
+
+Exemplo usando ini_set()
+ini_set('extension', 'sourceguardian.so'); 
+ini_set('session.save_path', '/home/joao/public_html/tmp'); 
+ini_set('cgi.force_redirect', 1); 
+ini_set('allow_url_fopen', 0); 
+ini_set('display_errors', 0); 
+ini_set('allow_url_include', 0); 
+ini_set('expose_php', 0); 
+ini_set('magic_quotes_gpc', 0); 
+ini_set('post_max_size', 262144); 
+ini_set('upload_max_filesize', 262144); 
+ini_set('upload_tmp_dir','/home/joao/public_html/tmp'); 
+$disfunctions = 'proc_open, popen, disk_free_space, set_time_limit, leak, tempfile, exec, system, shell_exec, passthru, curl_exec, curl_multi_exec, parse_ini_file, show_source, apache_get_modules, apache_get_version, apache_getenv, apache_note, apache_setenv, disk_free_space, diskfreespace, dl, highlight_file, ini_alter, ini_restore, openlog, proc_nice, symlink, phpinfo'; 
+ini_set('disable_functions', $disfunctions); 
+
+// Verifique se pode usar estes abaixo em seu servidor
+ini_set('zend_extension', '/usr/local/php52/lib/php/extensions/ioncube.so'); 
+ini_set('zend_extension_manager.optimizer=', '/usr/local/Zend/lib/Optimizer-3.3.3'); 
+ini_set('zend_extension_manager.optimizer_ts', '/usr/local/Zend/lib/Optimizer_TS-3.3.3'); 
+ini_set('zend_optimizer.version', '3.3.3'); 
+ini_set('zend_extension', '/usr/local/Zend/lib/ZendExtensionManager.so'); 
+ini_set('zend_extension_ts', '/usr/local/Zend/lib/ZendExtensionManager_TS.so');
+
+
+php.ini - Quando criamos um php.ini e adcionamos a um certo diretório, as diretivas dele sobrescreverão as existentes no script php.ini do servidor, mudando o valor das diretivas, mas perdendo alguns recursos importantes, como é o caso do ionCube. Veja exemplo abaixo para contornar isso.
+
+Exemplo de php.ini para reforçar a segurança 
+extension=sourceguardian.so 
+session.save_path = "/home/ribafs03/public_html/tmp" 
+cgi.force_redirect = 1 
+allow_url_fopen= 0 
+display_errors = 0 
+expose_php = 0 
+magic_quotes_gpc = 0 
+memory_limit = 8388608 
+#open_basedir = 1 
+post_max_size = 262144 
+upload_max_filesize = 262144 
+upload_tmp_dir = "/home/ribafs03/public_html/tmp" 
+disable_functions = proc_open, popen, disk_free_space, set_time_limit, leak, tempfile, exec, system, shell_exec, passthru, curl_exec, curl_multi_exec, parse_ini_file, show_source, apache_get_modules,apache_get_version,apache_getenv,apache_note, apache_setenv, disk_free_space, diskfreespace, dl, highlight_file, ini_alter, ini_restore, openlog, proc_nice, symlink, phpinfo 
+
+// Checar se seu servidor suporta os abaixo e as versões
+zend_extension=/usr/local/php56/lib/php/extensions/ioncube.so 
+zend_extension_manager.optimizer=/usr/local/Zend/lib/Optimizer-3.3.3 
+zend_extension_manager.optimizer_ts=/usr/local/Zend/lib/Optimizer_TS-3.3.3 
+zend_optimizer.version=3.3.3 
+zend_extension=/usr/local/Zend/lib/ZendExtensionManager.so 
+zend_extension_ts=/usr/local/Zend/lib/ZendExtensionManager_TS.so
+
+Lista de todas as diretivas só php.ini
+http://www.php.net/manual/pt_BR/ini.list.php
+Descrição das diretivas do principais do arquivo php.ini
+http://www.php.net/manual/pt_BR/ini.core.php 

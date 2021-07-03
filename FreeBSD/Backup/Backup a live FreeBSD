@@ -1,0 +1,95 @@
+Backup a live FreeBSD filesystem and remotely migrate to another server. April 14, 2010
+
+Lately we’ve been all about live migrations / backups here at *.hosting. And why not? with the advent of such concepts as “self healing blade cloud environment” , we have made a point to testing / scripting live migration scenarios.
+
+Following on our last post of backing up LVM volumes, we have decided to make a simple post for ‘dumping’ a live freebsd filesystem, compressing it mid-stream, and over the network (encrpyted through ssh of course) , before being saved as a file (or restored to a waiting live-cd mounted system).
+
+By default in FreeBSD, it partitions your var, usr, root
+Filesystem     Size    Used   Avail Capacity  Mounted on
+/dev/sd0s1a    989M    445M    465M    49%    /
+/dev/sd0s1f    9.7G    5.2G    3.7G    59%    /usr
+/dev/sd0s1e     19G    1.5G     16G     9%    /var
+1
+2
+3
+4
+	
+Filesystem     Size    Used   Avail Capacity  Mounted on
+/dev/sd0s1a    989M    445M    465M    49%    /
+/dev/sd0s1f    9.7G    5.2G    3.7G    59%    /usr
+/dev/sd0s1e     19G    1.5G     16G     9%    /var
+
+So lets dump the root partition since its the smallest :
+dump -0uanL -f - /dev/sd0s1a | bzip2 | ssh user@0.0.0.0 "dd of=dump-root.bzip2"
+1
+	
+dump -0uanL -f - /dev/sd0s1a | bzip2 | ssh user@0.0.0.0 "dd of=dump-root.bzip2"
+
+Lets break down the options so you can fully understand what its doing : -0 // dump level 0 = full backup
+-u // update the dumpdates file after a successful dump
+-a // bypass all tape length considerations; autosize
+-n // notify if attention is required
+-L // tell dump that it is a live filesystem for a consistent dump; it will take a snapshot
+
+Alternatively you could dump the filesystem to a local file :
+
+dump -0uanL -f - /dev/sd0s1a | bzip2 | dd of=/home/backups/dump-root.bzip2
+1
+	
+dump -0uanL -f - /dev/sd0s1a | bzip2 | dd of=/home/backups/dump-root.bzip2
+
+If you wanted to dump from server1 and restore on server2 :
+
+dump -0uanL -f - /dev/sd0s1a | ssh user@0.0.0.0 "restore rf -"
+1
+	
+dump -0uanL -f - /dev/sd0s1a | ssh user@0.0.0.0 "restore rf -"
+
+Again , this is a straightforward command. It is typically fast (within reason). You could script this for automated dumps/snapshots of your filesystem for full restores in a disaster scenario.
+
+========================
+
+
+Full System Backups using dump/restore in FreeBSD
+7 Replies	
+
+This is useful to keep identical copies of your data on a 2nd disk.  It’s NOT a replacement for using RAID1 mirroring – but it can be useful.  e.g. you can access data from the previous backup on a per-file basis.  You could also use it to mirror a current disk to a new disk to go into a seperate server (disk cloning).
+
+What it is REALLY useful for is to copy your data from a smaller disk to a larger disk – but you should do that offline not live.  The examples here are all done using a live filesystem.  To do a non-live filesystem, boot into single user mode, mount the old drives as readonly with mount -o ro -a, then mount the new drive as normal and run the same commands to dump/restore.
+
+Ok, so i’m going to assume that you want to dump the /usr filesystem into /mnt/usr (a filesystem mounted on a seperate disk)…
+
+    cd /mnt/usr
+
+    dump -L -0 -f- /usr | restore -r -f-
+
+This will dump ALL files in /usr into /mnt/usr.  Status updates are written to the screen every 5 minutes.
+
+As this can be run on a live filesystem, you can run backups during normal operation (although the disk performance hit should be taken into account)
+
+What is really useful is that you can pipe the restore command via ssh to restore to a remote server anywhere on the internet… an example would be…
+
+    dump -L -0 -f- /usr | ssh -2 -C -l remoteuser 10.0.0.1 restore -r -f-
+
+That would restore the files into the home directory of ‘remoteuser’ on the remote server.
+
+===================
+Backup your hard drive over the network with dd and ssh 
+
+ I've never used dd before to copy disks. It's a unix tool that copies files bit by bit. Since hard disks on unix systems are just represented as files you can do exact copies of them with it. It's strength is really it's weakness. It copies all the data on the disk if you tell it to copy your harddrive. That means everything. Even data that is was on the disk before but was not written over. Unless you wipe the disk with a disk wiping program (writing zero's across it) the previous data (if there was any) is still there. Copying every bit means it takes a very long time. We are talking hours to copy a disk. But your copy is exact. Partition info, boot sector info, everything.
+
+I wanted to copy everything off the disk and send it over the network. So we can do it with ssh. First zero out the non used space on the running disk to make compressing the image much eaiser. Using the command:
+
+dd if=/dev/zero of=0bits bs=20M; rm 0bits
+
+Then boot knoppix (or any other bootable linux distro like sysrescuecd) from the machine you want to image and give the command:
+
+dd if=/dev/sda | gzip -1 - | ssh user@hostname dd of=image.gz
+
+Assuming sda is your hard drive. This sends the local disks data to the remote machine. To restore the image boot knoppix on the machine to restore and pull the image that you created and dump it back with the command:
+
+ssh user@hostname dd if=image.gz | gunzip -1 - | dd of=/dev/sda
+
+This will usually take a few hours so be prepared. A good site that has some info on using ssh this way is here.
+
+

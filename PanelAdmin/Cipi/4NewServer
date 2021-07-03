@@ -1,0 +1,67 @@
+Novo Servidor
+
+Este novo servidor deve ser criado na hospedagem (DO, Linode, etc) e então cadastrado no cipi
+
+Servidor1
+Também precisa ser com Ubuntu 20.04
+Atlanta, GA
+IP - 23.92.28.125
+root - zmxnxxxxzzzyyyS@
+Usar a chave ssh
+
+Acessar o servidor CIPI
+
+Server Setup
+
+Neste novo servidor (Servidor1) será instalado também o cipi, então na criação dos sites pooderemos escolher que versão do PHP usar.
+
+Add a new server
+
+To install your server:
+
+
+
+To install your server:
+
+    Use a clean Ubuntu Server 20.04 LTS fresh installation VPS
+    Login into your VPS via SSH (as root):
+
+    ssh root@74.207.234.244
+
+    Run this command:
+
+    wget -O - https://45.56.116.13/sh/setup/bb8fdbf5-45b1-4d6d-ab5c-49d443842a7d | bash
+
+    Use a clean Ubuntu Server 20.04 LTS fresh installation VPS
+
+ssh root@74.207.234.244
+
+1) Atualizar
+
+apt update && apt upgrade -y && reboot
+
+wget -O - https://45.56.116.13/sh/setup/bb8fdbf5-45b1-4d6d-ab5c-49d443842a7d | bash
+
+***********************************************************
+                    SETUP COMPLETE
+***********************************************************
+
+ SSH root user: cipi
+ SSH root pass: WAqBTwHhibe6SM4sgUkPeHyf
+ MySQL root user: cipi
+ MySQL root pass: OosL7N4KeR4cTCo8fPMVLKvr
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+***********************************************************
+
+ssh cipi@50.116.43.86
+
+Acessar e mudar a senha do cipi
+
+Customizar o prompt
+
+
+Se voltar ao site verá que este servidor já está liberado para gerenciamento. Anes a direita aparecia um botão Install e agora, após instalar o server o botão automaticamente mudou para manager.
+
+

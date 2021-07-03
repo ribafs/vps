@@ -1,0 +1,135 @@
+
+
+freebsd-update fetch
+freebsd-update install
+shutdown -r now
+
+Lista com avisos de segurança
+FreeBSD-security-notifications@FreeBSD.org
+
+https://lists.freebsd.org/mailman/listinfo/freebsd-announce
+
+https://lists.freebsd.org/mailman/listinfo
+
+Criar usuário
+
+adduser
+Username: ribafs
+Full name: Ribamar FS
+Uid (Leave empty for default):
+
+Login group [ribafs]:
+Login group is ribafs. Invite ribafs into other groups? []: webmasters
+Login class [default]:
+Shell (sh csh tcsh nologin) [sh]: tcsh
+Home directory [/home/ribafs]:
+
+Use password-based authentication? [yes]:
+Use an empty password? (yes/no) [no]:
+Use a random password? (yes/no) [no]: y
+Lock out the account after creation? [no]: n
+
+Configurar adduser
+/etc/adduser.conf
+
+Removendo usuário
+
+rmuser login
+
+Shell
+
+/etc/shells
+
+Grupo do root
+wheel
+
+/etc/group
+/etc/passwd
+
+/etc/login.conf
+
+Após alterações no login execute
+cap_mkdb /etc/login.conf
+
+Resource Limits
+Resource limits allow you to control how much of the system any one user
+can monopolize at any one time. If you have several hundred users logged in
+to one machine and one of those users decides to compile OpenOffice.org,
+that person will consume far more than his fair share of processor time,
+memory, and I/O. By limiting the resources one user can monopolize, you
+can make the system more responsive for all users.
+
+Table 7-3 defines the resource-limiting login.conf variables.
+
+Variable    Description
+cputime     The maximum CPU time any one process may use
+filesize    The maximum size of any one file
+datasize    The maximum memory size of data that can be consumed by one process
+stacksize   The maximum amount of stack memory usable by a process
+coredumpsize The maximum size of a core dump
+memoryuse   The maximum amount of memory a process can lock
+maxproc     The maximum number of processes the user can have running
+openfiles   The maximum number of open files per process
+sbsize      The maximum socket buffer size a user’s application can set
+
+Corrente e máximo limites
+
+...
+:maxproc-cur: 30:\
+:maxproc-max: 60:\
+...
+
+Which Securelevel Do You Need?
+
+The securelevel appropriate for your environment depends entirely upon
+your situation. For example, if you’ve just put a FreeBSD machine into
+production and are still fine-tuning it, leave the securelevel at −1. Once
+your system is tuned, however, you can raise the securelevel. Most production
+systems run just fine at securelevel 2.
+If you use one of FreeBSD’s packet filtering or firewall packages,
+securelevel 3 might look tempting. Be very sure of your firewall rules before
+you enable this, however! Securelevel 3 makes it impossible to change your
+firewall without disrupting your connection. Are you 100 percent certain
+that none of your customers will ever call in to say, “Here’s a check, double
+my bandwidth”?
+
+
+Discos e partições
+
+ls /dev/ad*
+/dev/ad0 /dev/ad0s1a /dev/ad0s1b /dev/ad0s1c
+/dev/ad0s1 /dev/ad0s1d /dev/ad0s1e /dev/ad0s1f
+
+O disco ad0 tem uma fatia ad0s1
+
+
+/etc/fstab
+# Device    Mount point FSType  Options         Dump    Pass
+/dev/ad4s2a /           ufs     rw              1       1
+
+/dev/ad4s1b none        swap    sw              0       0
+/dev/acd0   /cdrom      cd9660  ro,noauto       0       0
+data:/mp3   /mp3        nfs     rw,noauto,soft  0       0
+
+Listar pontos de montagem
+mount
+
+mount -a
+
+mount /usr
+
+umount /usr
+
+df -H
+
+fsck - evitar usar a opção -y
+
+
+Formatando pendrive
+
+Montando ISO
+mdconfig -a -t vnode -f /home/mwlucas/7.0-CURRENT-snap.iso md0
+
+mount -t cd9660 /dev/md0 /mnt
+
+

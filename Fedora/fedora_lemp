@@ -1,0 +1,202 @@
+https://www.itzgeek.com/how-tos/linux/fedora-how-tos/nginx-php-fpm-mariadb-on-fedora-21.html
+https://www.if-not-true-then-false.com/2011/install-nginx-php-fpm-on-fedora-centos-red-hat-rhel/
+
+Criar o servidor
+
+Acessar via ssh
+ssh root@IP
+
+Adicionar usuário comum ribafs
+
+Sair e logar como ribafs
+
+sudo -i
+ou
+su
+
+dnf update
+
+Dependências para Fedora 27/26/25
+
+rpm -Uvh http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-stable.noarch.rpm 
+rpm -Uvh http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-stable.noarch.rpm
+
+Fedora 27
+rpm -Uvh http://rpms.famillecollet.com/fedora/remi-release-27.rpm
+
+dnf --enablerepo=remi --enablerepo=remi-php72 install nginx php-fpm php-common
+
+mkdir /root/back
+
+== MariaDB
+
+Instalar
+dnf -y install mariadb mariadb-server
+systemctl start mariadb
+systemctl enable mariadb
+
+== Nginx
+
+Instalar
+dnf -y install nginx
+systemctl start nginx
+
+== Firewall
+
+firewall-cmd --permanent --add-service=http
+firewall-cmd --reload
+
+== SELinux
+
+Caso receba algum erro do SELinux no log veja:
+http://axilleas.me/en/blog/2013/selinux-policy-for-nginx-and-gitlab-unix-socket-in-fedora-19/
+
+setenforce 0
+
+Testando
+
+http://IP
+
+O diretório web default do nginx no Fedora é
+/usr/share/nginx/html
+
+E o diretório de configurações é:
+/etc/nginx
+
+systemctl enable nginx
+
+
+== PHP-FPM
+
+Instalar os seguintes módulos do php
+
+OPcache (php-opcache) – The Zend OPcache provides faster PHP execution through opcode caching and optimization. 
+APCu (php-pecl-apcu) – APCu userland caching 
+CLI (php-cli) – Command-line interface for PHP 
+PEAR (php-pear) – PHP Extension and Application Repository framework 
+PDO (php-pdo) – A database access abstraction module for PHP applications 
+MySQL (php-mysqlnd) – A module for PHP applications that use MySQL databases 
+PostgreSQL (php-pgsql) – A PostgreSQL database module for PHP 
+MongoDB (php-pecl-mongodb) – PHP MongoDB database driver 
+Redis (php-pecl-redis) – Extension for communicating with the Redis key-value store 
+Memcache (php-pecl-memcache) – Extension to work with the Memcached caching daemon 
+Memcached (php-pecl-memcached) – Extension to work with the Memcached caching daemon 
+GD (php-gd) – A module for PHP applications for using the gd graphics library 
+XML (php-xml) – A module for PHP applications which use XML 
+MBString (php-mbstring) – A module for PHP applications which need multi-byte string handling 
+MCrypt (php-mcrypt) – Standard PHP module provides mcrypt library support 
+
+Instalar
+
+dnf --enablerepo=remi --enablerepo=remi-php72 install php-opcache php-pecl-apcu php-cli php-pear php-pdo php-mysqlnd php-pecl-redis php-pecl-memcache php-pecl-memcached php-gd php-mbstring php-mcrypt php-xml php-fpm
+
+systemctl stop httpd.service
+systemctl disable httpd.service
+
+systemctl start nginx.service
+systemctl enable nginx.service
+
+systemctl start php-fpm.service
+systemctl enable php-fpm.service
+
+Configurar
+
+cp /etc/php.ini /root/back
+
+nano /etc/php.ini
+
+Mudar
+
+cgi.fix_pathinfo=0
+
+cp /etc/php-fpm.d/www.conf /root/back
+
+nano /etc/php-fpm.d/www.conf
+
+Mudar
+
+listen = /run/php-fpm/www.sock
+para
+listen = 9000
+
+Garanta que as duas linhas abaixo estão descomentadas
+
+pm.min_spare_servers = 5
+...
+pm.max_spare_servers = 35
+
+systemctl enable php-fpm
+
+== Criar um virtualHost
+
+ServerName: server.ribafs.local
+DocumentRoot: /usr/share/nginx/html/ribafs.local
+
+Criar o arquivo
+
+nano /etc/nginx/conf.d/virtual.conf
+
+Adicione:
+
+server {
+	server_name server.ribafs.local;
+	root /usr/share/nginx/html/ribafs.local;
+
+	location / {
+		index index.html index.htm index.php;
+	}
+
+	location ~ \.php$ {
+		include /etc/nginx/fastcgi_params;
+		fastcgi_pass 127.0.0.1:9000;
+		fastcgi_index index.php;
+		fastcgi_param SCRIPT_FILENAME /usr/share/nginx/html/ribafs.local$fastcgi_script_name;
+	}
+}
+
+Adicionar ao hosts
+
+cp /etc/hosts /root/back
+
+nano /etc/hosts
+
+127.0.0.1	localhost.localdomain localhost server.ribafs.local
+
+mkdir /usr/share/nginx/html/ribafs.local
+
+nano /usr/share/nginx/html/ribafs.local/index.php
+
+<?php
+phpinfo();
+
+systemctl restart nginx
+systemctl restart php-fpm
+
+http://server.ribafs.local
+
+Caso receba erro 403 forbiden
+
+chcon -R -t httpd_sys_content_t /usr/share/nginx/html/ribafs.local
+
+ou algum aplicativo foi negado
+
+chcon -R -t httpd_sys_rw_content_t /usr/share/nginx/html/ribafs.local
+
+Habilitar porta 80
+
+nano -w /etc/sysconfig/iptables
+
+Adicionar
+-A INPUT -m state --state NEW -m tcp -p tcp --dport 80 -j ACCEPT
+
+iptables-service save
+service iptables restart
+
+Ou para o caso de usar o firewalld
+firewall-cmd --permanent --zone=public --add-port=80/tcp
+
+systemctl restart firewalld.service
+Testar conexão remota
+
+
+

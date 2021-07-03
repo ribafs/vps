@@ -1,0 +1,190 @@
+Criação de um Servidor com Ubuntu 16.04 64 e LEMP no DigitalOcean
+
+ 46.101.58.212
+
+- Após criar o servidor/droplet
+- Abra a droplet criada
+- Clique em Access - Reset Root Password
+
+- O acesso pelo terminal do desktop é bloqueado pelo ufw
+- Acessar pela console com root e a senha recebida por e-mail
+- Parar o ufw
+	ufw disable
+- Acesse pelo terminal do seu desktop
+	ssh root@IP
+
+== Criar diretório de backup
+mkdir /root/backup
+
+É importante se acostumar a fazer sempre backup de scripts ou do site (banco e arquivos) antes de efetuar alterações, pois perder informações é bem ruim.
+
+Ao acessar recebe-se o aviso alterado pela DigitalOcean
+
+Welcome to Ubuntu 16.04.3 LTS (GNU/Linux 4.4.0-109-generic x86_64)
+
+Thank you for using DigitalOcean's LEMP Application.
+
+Your web root is located at /var/www/html and can be seen from
+    http://46.101.58.212
+
+The details of your PHP installation can be seen at
+    http://46.101.58.212/info.php
+
+The "ufw" firewall is enabled. All ports except for 22, 80, and 443 are BLOCKED
+
+You are encouraged to run mysql_secure_installation to ready your server for
+production. The passwords for MySQL have been saved to:
+    /root/.digitalocean_password
+
+Let's Encrypt has been pre-installed for you. If you have a domain name, and
+you will be using it with this 1-Click app, please see: http://do.co/le-nginx
+
+You can learn more about using this image here: http://do.co/lemp
+
+To delete this message of the day: rm -rf /etc/update-motd.d/99-one-click
+Last login: Tue Mar  6 18:32:29 2018 from 177.14.224.187
+ribafs@lempub16:~$ 
+
+Para remover esta mensagem execute:
+rm -rf /etc/update-motd.d/99-one-click
+
+
+== Atualizar
+
+apt update
+apt upgrade
+reboot
+
+
+== Instalar pacotes básicos
+
+apt install unzip mc aptitude
+
+
+== Criar um usuário comum
+adduser ribafs
+
+- Adicionar ao sudoers
+
+cp /etc/sudoers /root/backup
+nano /etc/sudoers
+
+Adicione abaixo da linha com root esta linha:
+
+ribafs	ALL=(ALL)	NOPASSWD:ALL
+
+- Adicionar o ribafs ao ssh e efetuar ajustes
+
+cp /etc/ssh/sshd_config  /root/backup
+nano /etc/ssh/sshd_config
+
+Altere as linhas:
+
+Port 55522
+LoginGraceTime 30
+PermitRootLogin no
+
+Adicione ao final:
+
+AllowUsers ribafs
+
+Reiniciar o SSH
+service ssh restart
+
+Acessar pelo terminal do desktop
+
+ssh -p 55522 ribafs@46.101.58.212
+
+
+==Ajustes no UFW
+
+ufw enable
+
+ufw delete allow 22
+ufw allow 55522
+ufw allow http
+ufw allow https
+
+ufw status verbose
+
+
+== Adicionar partição de swap com 2GB
+
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+mkswap /swapfile
+chmod 600 /swapfile
+swapon /swapfile
+
+nano /etc/fstab
+/swapfile	swap	swap	defaults	0	0
+
+Testar
+free -m
+
+
+== Exportar a chave do ssh do desktop para o servidor
+
+Acessar o servidor como ribafs e execute:
+
+mkdir .ssh
+chmod 700 .ssh
+cd .ssh
+ssh-keygen -b 1024 -f id_ribafs -t dsa (Enter 2 vezes)
+cat ../.ssh/id_ribafs*.pub > ../.ssh/authorized_keys
+chmod 600 ../.ssh/*
+exit
+
+Acessar o desktop
+
+ssh-copy-id ribafs@ip -p porta
+
+
+== Criar script para limpar o cache da RAM
+
+nano /usr/local/bin/m
+
+sysctl -w vm.drop_caches=3
+swapoff -a
+swapon -a
+
+chmod +x /usr/local/bin/m
+
+Rodar como root
+
+m
+
+Antes de rodar o "m" havia 64 MB free
+Após ficou com 709 MB.
+
+
+== Criar um script para configurar as permissões do /var/www/html
+
+Adicionar ribafs ao www-data
+adduser ribafs www-data
+
+nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+chown -R www-data:www-data /var/www/html/$1;
+find /var/www/html/$1 -type d -exec chmod 755 {} \;
+find /var/www/html/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+	
+chmod +x /usr/local/bin/perms
+
+Executando no diretório /var/www/html/portal
+perms portal
+
+Executando no diretório /var/www/html
+perms
+
+Executo sempre que faço alguma alteração como root no /var/www/html
+
+Agora vou criar o banco e instalar um site em Joomla com o arquivo
+2joomla
+
+

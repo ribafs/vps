@@ -1,0 +1,14 @@
+Froxlor is also available as packages for Debian and Gentoo.
+
+    Debian: deb https://deb.froxlor.org/debian [stretch|buster] main
+    Ubuntu: deb https://deb.froxlor.org/ubuntu [xenial|bionic] main
+    Gentoo: Ebuild via Froxlor-Repository (Layman)
+
+
+Alternatively, use the shell-installer
+
+You can also download our shell installer which downloads the tarball, extracts it and sets up the basics as our web-installer would do.
+
+# wget https://raw.githubusercontent.com/Froxlor/Froxlor-Installer/master/bin/froxlor-install.phar
+# php froxlor-install.phar
+

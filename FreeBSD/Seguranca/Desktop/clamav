@@ -1,0 +1,31 @@
+sudo su
+pkg update
+
+pkg search clamav
+
+pkg install clamav clamav-daemon
+freshclam
+
+Checando
+clamscan -r /home/ribafs
+clamscan -r /
+
+Todo o computador
+clamscan -r --bell -i /
+
+Criar lista de arquivos infectados
+clamscan -r /home/ribafs/ | grep FOUND >> report.txt
+
+Versão
+clamdscan -V
+
+Adicionando ao cron
+
+crontab -e
+
+00 00 * * * clamscan -r /home
+
+Instalar gui
+apt-get install ClamTK
+
+https://www.unixmen.com/installing-scanning-clamav-ubuntu-14-04-linux/

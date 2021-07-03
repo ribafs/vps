@@ -1,0 +1,103 @@
+UFW
+
+Resumo
+
+ufw status verbose
+ufw enable
+
+ufw allow 65522
+ufw logging on
+ufw allow http
+ufw allow https
+
+ufw status verbose
+
+O ufw é um firewall nativo do Ubuntu, que é bem simples de implementar que é uma interface para o IPTables.
+Tutorial - https://help.ubuntu.com/community/UFW 
+
+Verificando seu status:
+sudo ufw status		# Estado: inativo
+
+Não requer instalação, pois ele já vem instalado por padrão no Ubuntu. Apenas precisamos habilitá-lo.
+
+sudo ufw enable
+
+Ao habilitar ele fecha todas as entradas e abre todas as saídas e habilita na inicialização do sistema:
+
+sudo ufw status verbose
+
+ufw allow from 177.14.224.188 to any port 65522
+
+Veja o que diz:
+Estado: ativo
+Logando: on (low)
+Predefinido: deny (entrada), allow (saída), disabled (roteado)
+Novos perfis: skip
+
+Assim ninguém tem acesso a este servidor através da rede, nem pela web (porta 80), nem via ssh, nem ao banco de dados. Somente eu poderia acessar se fosse diretamente/fisicamente frente a ele ou então através do console, no caso do DigitalOcean.
+Então precisamos abrir inicialmente a porta 22 para garantir o acesso. Depois trocaremos esta porta para que fique mais trabalhoso o acesso.
+
+Como liberar uma portas ou serviços?
+sudo ufw allow ssh
+ou
+sudo ufw allow 22
+Vejamos:
+sudo ufw status verbose:
+nomeuser@ribaln ~ $ sudo ufw status verbose
+Para                       Ação        De
+----                       ----        --
+22                         ALLOW IN    Anywhere                  
+22 (v6)                    ALLOW IN    Anywhere (v6)     
+Ele liberou a porta 22.
+
+E se quisermos bloquear a porta 22?
+sudo ufw deny 22
+
+E se quiser remover esta regra deny que sempre aparece no status:
+sudo ufw delete deny 22
+
+Habilitando logs
+ufw logging on
+
+Agora eu quero que somente certo IP possa se conectar ao meu servidor
+sudo ufw allow from 207.46.232.182
+
+Agora que somente uma certe rede possa se conectar:
+sudo ufw allow from 192.168.1.0/24
+
+Agora que seja aberta a todos mas que via ssh somente para certo IP:
+ufw allow from 192.168.0.4 to any port 22
+
+Esta regra é indicada para maior segurança. Mesmo que use um desktop com internet ADSL, que muda o IP, mesmo assim. Quando seu IP mudar e você perder o acesso vá até o console da hospedagem e atualiza seu IP. Melhor ter um pouco mais de trabalho e manter seu servidor no ar.
+
+Não devo ter uma regra permitindo que todos acessem a porta 22
+E em seguida uma dizendo que somente um IP pode acessar a porta 22
+Não vai funcionar pois a primeira regra está liberando todos.
+Negar acesso a certo IP
+sudo ufw deny from <ip address>
+
+Exemplificando um servidor LAMP na sua DMZ:
+# ufw allow proto tcp from 192.168.5.0/24 to 192.168.100.2 port 22
+# ufw allow proto tcp from any to any port 80
+# ufw enable
+
+Onde:
+
+192.168.5.0/24 é sua rede interna.
+
+192.168.100.2 é o IP interno do seu LAMP server
+
+Ou um servidor de DNS apenas com ip válido:
+
+# ufw allow proto tcp from 200.200.200.201 to 200.200.200.10 port 22
+# ufw allow proto udp from any to 200.200.200.10 port 53
+# ufw allow proto tcp from 200.1.1.200 to 200.200.200.10 port 53
+# ufw enable
+
+Onde:
+
+200.200.200.201 é o IP nateado da sua rede
+200.200.200.10 é o IP do seu servidor de DNS
+200.1.1.200 é o seu DNS Slave
+
+

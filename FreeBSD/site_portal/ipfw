@@ -1,0 +1,75 @@
+== Ativar o firewall IPFW
+
+nano /etc/rc.conf
+
+Adicione ao final
+
+firewall_enable="YES"
+firewall_quiet="YES"
+
+Configurar o firewall. Adicionar abaixo das 2 linhas:
+
+firewall_type="workstation"
+firewall_myservices="65522 80 443"
+firewall_allowservices="any"
+firewall_logdeny="YES"
+
+Pode ser assim também:
+firewall_myservices="ssh http"
+
+Edite
+
+nano /etc/rc.firewall
+
+Após este código
+
+...
+        for i in ${firewall_allowservices} ; do
+          for j in ${firewall_myservices} ; do
+            case $j in
+            [0-9A-Za-z]*/[Pp][Rr][Oo][Tt][Oo])
+              ${fwcmd} add pass ${j%/[Pp][Rr][Oo][Tt][Oo]} from $i to me
+            ;;
+            [0-9A-Za-z]*/[Tt][Cc][Pp])
+              ${fwcmd} add pass tcp from $i to me ${j%/[Tt][Cc][Pp]}
+            ;;
+            [0-9A-Za-z]*/[Uu][Dd][Pp])
+              ${fwcmd} add pass udp from $i to me ${j%/[Uu][Dd][Pp]}
+            ;;
+            *[0-9A-Za-z])
+              echo "Consider using ${j}/tcp in firewall_myservices." \
+                > /dev/stderr
+              ${fwcmd} add pass tcp from $i to me $j
+            ;;
+            *)
+              echo "Invalid port in firewall_myservices: $j" > /dev/stderr
+            ;;
+            esac
+          done
+        done
+...
+
+Adicione a linha
+
+${fwcmd} add pass udp from any to me 65522
+
+Salve e feche. Inicie o firewall
+
+service ipfw start
+
+
+Configurar os IPs negados - somente para instalação multiuser com ipfw
+
+nano /etc/sysctl.conf
+
+Limitar a apenas 3 tentativas. Adicionar ao final do arquivo
+
+
+# Adicionei
+net.inet.ip.fw.verbose_limit=3
+
+Isso será efetivado no próximo boot
+
+Para implementar na atual sessão, execute:
+sysctl net.inet.ip.fw.verbose_limit=3
+

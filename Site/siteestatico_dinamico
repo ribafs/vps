@@ -1,0 +1,27 @@
+Convertendo um site dinâmico em site estático
+
+wget --mirror --convert-links --adjust-extension --page-requisites --no-parent http://ribafs.org/portal
+
+Alternativa:
+
+The command line, in short…
+
+wget -k -K -E -r -l 10 -p -N -F --restrict-file-names=windows -nH http://ribafs.org/portal/
+
+…and the options explained
+
+    -k : convert links to relative
+    -K : keep an original versions of files without the conversions made by wget
+    -E : rename html files to .html (if they don’t already have an htm(l) extension)
+    -r : recursive… of course we want to make a recursive copy
+    -l 10 : the maximum level of recursion. if you have a really big website you may need to put a higher number, but 10 levels should be enough.
+    -p : download all necessary files for each page (css, js, images)
+    -N : Turn on time-stamping.
+    -F : When input is read from a file, force it to be treated as an HTML file.
+    -nH : By default, wget put files in a directory named after the site’s hostname. This will disabled creating of those hostname directories and put everything in the current directory.
+    –restrict-file-names=windows : may be useful if you want to copy the files to a Windows PC.
+
+source: http://blog.jphoude.qc.ca/2007/10/16/creating-static-copy-of-a-dynamic-website/
+
+
+Outra alternativa boa é usar o HTTTrack for windows

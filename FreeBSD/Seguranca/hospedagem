@@ -1,0 +1,20 @@
+Hospedagem do Site
+
+A hospedagem, o servidor que guarda os arquivos do site, é um dos itens mais importantes para a segurança do mesmo. Afinal de contas ele têm o controle sobre os servidores e assim pode implementar os mais diversos filtros de segurança que deixarão seu site em ambiente menos vulnerável ou o contrário, caso não implementem. Antes de contratar colha a maior quantidade possível de informações sobre o serviço. Contate amigos que têm sites hospedados nele, questione sobre como é o serviço que recebem, suas características, para ver se atendem ao que planeja (sempre deixe uma folga em espaço, banda e quantidade de bancos). Existem muitas características sobre uma boa hospedagem que devemos considerar: espaço em disco, banda, quantidade de bancos, de domínios, suporte, suporte a conexões via SSH, segurança (vários itens relacionados), etc. Nunca contrate somente pelo menor preço. Pesquise antes.
+Uma boa hospedagem tem um suporte rápido e competente, cuja equipe conhece bem suas funções e pode ajudar a resolver problemas e a detectá-los de forma ágil.
+Uma boa hospedagem adota procedimentos que tornam seguro o seu site como:
+Apache chrooted
+PHP instalado como CGI
+Apache modSecurity
+Ativa a extensão Source Guardian no PHP
+
+Seleção da Hospedagem
+Escolha criteriosamente o servidor de hospedagem e o tipo. Tenha como um dos fatores de decisão a importância que o servidor dá à segurança. 
+Escolher um servidor para o site que seja da sua confiança, ou pelo menos que não desconfie dele. 
+Se possível evite servidores compartilhados. 
+Caso use um VPS ou servidor dedicado fique atento à monitoração de ataques, TripWire e SAMHAIN são boas ferramentas para isso. 
+Cheque os logs regularmente. 
+Use .htaccess
+
+Conexões ao cPanel
+Use somente conexões seguras ao conectar ao servidor. Se não conectar assim sua senha poderá ser interceptada. Evite ftp, ao invés use o gerenciador de arquivos o próprio cPanel.

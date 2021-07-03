@@ -1,0 +1,100 @@
+CloudPanel
+
+Instalação em uma box do Vagrant com Debian 10.8 atualizado para o 10.9
+
+https://www.cloudpanel.io/
+Debian 10 com root
+ssh root@serverIP
+sudo su
+apt update && apt -y upgrade && apt -y install curl wget sudo
+curl -sSL https://installer.cloudpanel.io/ce/v1/install.sh | sudo bash
+The installation of CloudPanel is complete!
+
+Após concluir a instalação no Linode (ribafs.cf) ele mostra:
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The installation of CloudPanel is complete!
+
+CloudPanel can be accessed now: https://74.207.234.244:8443/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+########################################################
+###            Welcome to CloudPanel                 ###
+########################################################
+
+* Website:         https://www.cloudpanel.io
+* Documentation:   https://www.cloudpanel.io/docs/cloudpanel-ce/v1/
+* CloudPanel:      https://74.207.234.244:8443/
+* CloudPanel CLI:  clpctl list
+
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The installation of CloudPanel is complete!
+
+CloudPanel can be accessed now: https://138.122.83.79:8443/
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Troquei pelo ID da box
+
+https://192.168.33.10:8443/admin/user/creation
+
+E ele acessou
+
+Aviso:
+E-Mail is needed for password reset
+
+Cliquei no botão abaixo e criei meu user, que é administrador
+
+
+
+    Easy to use Control Panel
+    Up and running within 60 seconds
+    Supports all common PHP Apps
+    One-Click Let's Encrypt Certificates
+    Multiple PHP Versions
+    NGINX Support
+    Support for all big clouds
+    Cloud Functionalities
+    Supports > 10 languages
+
+It just takes 60 seconds!
+
+Suporta AWS, DO, Google Cloud, Microsoft Azure e outros VPS
+
+ CloudPanel is a modern server control panel that makes it easier
+and more enjoyable to run your PHP Apps in the cloud.
+Free
+
+CloudPanel is free - forever!
+No Contract, hidden costs, limitations, or restrictions.
+High Performance
+
+Ultra-fast lightweight components like NGINX, PHP-FPM and MySQL for maximum performance.
+Free SSL Certificates
+
+Free SSL Certificates for all of your domains, with one-click, automatically renewed.
+Multiple PHP-Versions
+
+Shipped with multiple PHP Versions. Running or changing the PHP Version for an App is just a click.
+Easy to Use
+
+A clean and easy to use server control panel to get the things done in no time.
+Cloud Functionalities
+
+Cloud Functionalities for all common clouds: Amazon Web Services, Digital Ocean, or Google Cloud.
+CloudPanel CLI
+
+Commandline-Application that provides commands for backing up and restoring databases, disabling two-factor authentification and many more.
+Two-Factor Authentication
+
+An additional layer of security is provided with Two-Factor Authentication for secure CloudPanel login.
+Ready localized
+
+Supports more than ten languages: English, German, Spanish, Chinese, Italian and many more.
+
+Não oferece:
+- Email (usar gmail free ou Zoom)
+- GerArquivos (tinyFileManager)
+- Banco de dados (criar pelo terminal). Adicionar script
+
+

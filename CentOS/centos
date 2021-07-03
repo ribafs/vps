@@ -1,0 +1,57 @@
+Instalar CentOS 7
+
+Saber versão
+cat /etc/redhat-release
+
+adduser ribafs
+passwd ribafs
+
+groupadd admin
+
+Adicionar user a grupo
+usermod -a -G admin ribafs
+
+Remover usuário
+userdel ribafs
+
+Básicos
+
+Ver permissões em diretórios
+namei -om /usr/share/nginx/html/portal
+
+chgrp -R nginx /var/www/html
+
+/mnt/ssh /etc/auto.sshfs        uid=ngin,gid=nginx,--timeout=30,--ghost
+
+
+Ajustar permissões
+restorecon -r /usr/share/nginx/html
+x
+SELinux
+nano /etc/selinux/config
+
+Status
+sestatus
+
+Atualizar repositórios
+yum update
+
+yum install unzip
+yum install net-tools  (ifconfig e outros)
+
+nmcli
+nmtui
+
+Após atualizar kernel reiniciar
+
+Configurar timezone
+
+timedatectl set-timezone America/Fortaleza
+
+Verificar timezone
+timedatectl ou timedatectl list-timezones
+
+ou
+ln -sf /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+

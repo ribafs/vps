@@ -1,0 +1,32 @@
+Projeto de um servidor web seguro
+
+E-mail para uso
+
+testsecvps@gmail.com
+senha grande xS@
+
+A conta do Facebook, que me identificou com uma segunda conta
+
+precisa ser enxuta, com bastante segurança e privacidade ao máximo
+
+
+- Criar droplet com Debian 10 x64
+- Converter para Alpine
+- Atualizar para Alpine 3.13.2
+- Configurações:
+    - Instalar e configurar LAMP localmente no desktop
+    - Instalar Joomla com as extensões:
+        - pensamento do dia
+        - backupsimple
+        - Criar as categorias:
+            - Infraestrutura
+            - Sistema oepracional
+            - LAMP
+            - CMS
+        - Alimentar conteúdo: artigos e menus
+    - Após concluir exportar via wget para o desktop
+    - Instalar ufw e fechar todas as portas, execeto a 80 no ufw
+- Enviar o site estático do desktop para o DO
+- Acessar logs somente via console do DO
+
+- Enviar Pedido de Ajuda para o grupo Hackers Brasil para ajudar a roteger o site https://IP e um desafio ao grupo Etical Hacker para que invadam o site: https://IP

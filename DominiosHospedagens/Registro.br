@@ -1,0 +1,27 @@
+Setar os nameservers de uma hospedagem no Registro.br
+
+No caso o linode
+
+Acessar o registro.br
+
+Selecionar o domínio
+
+Alterar Servidores de DNOCS
+
+ns1.linode.com
+ns2.linode.com
+    Clicar em +DNS e adicionar mais 3 caixas de texto
+ns3.linode.com
+ns4.linode.com
+ns5.linode.com
+
+Salvar alterações
+
+Aguardar a propagação
+
+Uma boa ferramenta que mostra em quer egiões o domínoio já propagou
+
+https://www.whatsmydns.net/
+
+Inclusive os registros adicionados
+

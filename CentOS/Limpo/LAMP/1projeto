@@ -1,0 +1,50 @@
+Servidor com CentOS 7.4 no DO
+
+IP - 159.65.103.147
+1CPU, 1GB de RAM e 25GB de disco
+
+San Francisco
+
+Precisei acessar o servidor
+
+Recebi a senha de root por e-mail mas não conecta em meu desktop pois uso conexão ADSL e a porta 22 é bloqueada.
+
+Entãoo acessei o servidor do meu site e lá conectei para a DO com a senha recebida e o IP:
+
+ssh root@159.65.103.147
+
+
+== Atualizar
+
+yum update -y
+reboot
+
+== Adicionar usuário ribafs
+
+adduser ribafs
+passwd ribafs
+usermod -aG wheel ribafs
+
+== Mudar a porta do SSH para que possa acessar do meu desktop.
+
+yum install -y nano unzip
+
+nano /etc/ssh/sshd_config
+
+service sshd restart
+
+
+== Instalação do LAMP
+
+Seguindo este tutorial, instalei o PHP 7.1, Apache 2.4 e MySQL 5.6
+https://tecadmin.net/install-lamp-apache-mysql-and-php-on-centos-rhel-7/
+
+nano /var/www/html/info.php
+
+<?php
+phpinfo();
+
+Teste
+
+http://159.65.103.147/info.php
+

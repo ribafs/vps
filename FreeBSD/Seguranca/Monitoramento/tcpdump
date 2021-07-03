@@ -1,0 +1,55 @@
+pkg install tcpdump
+
+mkdir ~/scan_results/syn_scan
+
+We can start a tcpdump capture and write the results to a file in our ~/scan_results/syn_scan directory with the following command:
+
+sudo tcpdump host target_ip_addr -w ~/scan_results/syn_scan/packets
+
+Pausar com Ctrl+Z
+
+If we want to see the actual packet traffic that was sent to and received from the target, we can read the packets file back into tcpdump, like this:
+sudo tcpdump -nn -r ~/scan_results/syn_scan/packets | less
+
+This file contains the entire conversation that took place between the two hosts. You can filter in a number of ways.
+For instance, to view only the traffic sent to the target, you can type:
+sudo tcpdump -nn -r ~/scan_results/syn_scan/packets 'dst target_ip_addr' | less
+
+Likewise, to view only the response traffic, you can change the "dst" to "src":
+sudo tcpdump -nn -r ~/scan_results/syn_scan/packets 'src target_ip_addr' | less
+
+Open TCP ports would respond to these requests with a SYN packet. We can search directly for responses for this type with a filter like this:
+sudo tcpdump -nn -r ~/scan_results/syn_scan/packets 'src target_ip_addr and tcp[tcpflags] & tcp-syn != 0' | less
+
+Start a tcpdump capture again. This time, write the file to the new ~/scan_results/udp_scan directory:
+sudo tcpdump host target_ip_addr -w ~/scan_results/udp_scan/packets
+
+Pause the process and put it into the background:
+CTRL-Z
+bg
+
+Be sure to write the results to the ~/scan_results/udp_scan directory. All together, the command should look like this:
+sudo nmap -sU -Pn -p- -T4 -vv --reason -oN ~/scan_results/udp_scan/nmap.results target_ip_addr
+
+We can see how nmap had to send out many packets to the ports that were reported as open|filtered by asking to see the UDP traffic to one of the reported ports:
+sudo tcpdump -nn -Q out -r ~/scan_results/udp_scan/packets 'udp and port 22'
+
+Compare this to the results we see from one of the scanned ports that was marked as "closed":
+sudo tcpdump -nn -Q out -r ~/scan_results/udp_scan/packets 'udp and port 53'
+
+We can try to manually reconstruct the process that nmap goes through by first compiling a list of all of the ports that we're sending UDP packets to using something like this:
+sudo tcpdump -nn -Q out -r ~/scan_results/udp_scan/packets "udp" | awk '{print $5;}' | awk 'BEGIN { FS = "." } ; { print $5 +0}' | sort -u | tee outgoing
+
+Then, we can see which ICMP packets we received back saying the port was unreachable:
+sudo tcpdump -nn -Q in -r ~/scan_results/udp_scan/packets "icmp" |  awk '{print $10,$11}' | grep unreachable | awk '{print $1}' | sort -u | tee response
+
+We can see then take these two responses and see which UDP packets never received an ICMP response back by typing:
+comm -3 outgoing response
+
+The nmap scan we need to use is triggered by the -sV flag. Since we already did SYN and UDP scans, we can pass in the exact ports we want to look at with the -p flag. Here, we'll look at 22 and 80 (the ports that were shown in our SYN scan):
+sudo nmap -sV -Pn -p 22,80 -vv --reason -oN ~/scan_results/versions/service_versions.nmap target_ip_addr
+
+The flag we need in order to perform operating system detection is -O (the capitalized letter "O"). A full command may look something like this:
+sudo nmap -O -Pn -vv --reason -oN ~/scan_results/versions/os_version.nmap target_ip_addr
+
+

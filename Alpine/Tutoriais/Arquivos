@@ -1,0 +1,14 @@
+Arquivos
+
+/etc/passwd /etc/group
+
+Customizar o shell do bash
+
+cat ~/.bash_profile
+
+Arquivos
+
+/etc/passwd
+
+/etc/group
+

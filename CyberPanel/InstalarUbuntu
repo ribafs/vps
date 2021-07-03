@@ -1,0 +1,182 @@
+Ununtu 18.04
+
+apt update && apt upgrade -y && reboot
+
+sh <(curl https://cyberpanel.net/install.sh || wget -O - https://cyberpanel.net/install.sh)
+
+
+		CyberPanel Installer v2.1.1
+
+1. Install CyberPanel.
+
+2. Addons and Miscellaneous
+
+3. Exit.
+
+
+  Please enter the number[1-3]: 1
+
+		CyberPanel Installer v2.1.1
+
+RAM check : 75/985MB (7.61%)
+
+Disk check : 1/25GB (6%) (Minimal 10GB free space)
+
+1. Install CyberPanel with OpenLiteSpeed.
+
+2. Install Cyberpanel with LiteSpeed Enterprise.
+
+3. Exit.
+
+
+  Please enter the number[1-3]: 1
+
+
+Install Full service for CyberPanel? This will include PowerDNS, Postfix and Pure-FTPd.
+
+Full installation [Y/n]: 
+
+Full installation selected...
+
+Do you want to setup Remote MySQL? (This will skip installation of local MySQL)
+
+(Default = No) Remote MySQL [y/N]: 
+
+Install Full service for CyberPanel? This will include PowerDNS, Postfix and Pure-FTPd.
+
+Full installation [Y/n]: 
+
+Full installation selected...
+
+Do you want to setup Remote MySQL? (This will skip installation of local MySQL)
+
+(Default = No) Remote MySQL [y/N]: 
+
+Local MySQL selected...
+
+Press Enter key to continue with latest version or Enter specific version such as: 1.9.4 , 2.0.1 , 2.0.2 ...etc
+
+Branch name set to v2.1.1
+
+Please choose to use default admin password 1234567, randomly generate one (recommended) or specify the admin password?
+Choose [d]fault, [r]andom or [s]et password: [d/r/s] s
+
+Please enter your password:
+Password: Confirm Password:
+Install Memcached process and its PHP extension set to Yes...
+
+
+Do you wish to install Redis process and its PHP extension?
+Please select [Y/n]: 
+
+Install Redis process and its PHP extension set to Yes...
+
+
+Would you like to set up a WatchDog (beta) for Web service and Database service ?
+The watchdog script will be automatically started up after installation and server reboot
+If you want to kill the watchdog , run watchdog kill
+Please type Yes or no (with capital Y, default Yes): 
+
+
+Install Watchdog set to Yes...
+
+
+Finalicou com
+
+###################################################################
+                CyberPanel Successfully Installed                  
+                                                                   
+                Current Disk usage : 5/25GB (22%)                        
+                                                                   
+                Current RAM  usage : 239/985MB (24.26%)                         
+                                                                   
+                Installation time  : 0 hrs 22 min 0 sec                 
+                                                                   
+                Visit: https://134.209.114.156:8090                     
+                Panel username: admin                              
+                Panel password: *****                              
+                Visit: https://134.209.114.156:7080                     
+                WebAdmin console username: admin                   
+                WebAdmin console password: 2ZjuFDrEV4Lxwnw4          
+                                                                   
+                Visit: https://134.209.114.156:8090/rainloop/?admin     
+                Rainloop Admin username: admin                     
+                Rainloop Admin password: iONYGKWN9sgrME        
+                                                                   
+             Run cyberpanel help to get FAQ info
+             Run cyberpanel upgrade to upgrade it to latest version.
+             Run cyberpanel utility to access some handy tools .
+                                                                   
+              Website : https://www.cyberpanel.net                 
+              Forums  : https://forums.cyberpanel.net              
+              Wikipage: https://docs.cyberpanel.net                
+              Docs    : https://cyberpanel.net/docs/               
+                                                                   
+            Enjoy your accelerated Internet by                  
+                CyberPanel & OpenLiteSpeed 				                     
+###################################################################
+Digital Ocean detected...
+This provider has a network-level firewall
+Please make sure you have opened following port for both in/out:
+TCP: 8090 for CyberPanel
+TCP: 80, TCP: 443 and UDP: 443 for webserver
+TCP: 21 and TCP: 40110-40210 for FTP
+TCP: 25, TCP: 587, TCP: 465, TCP: 110, TCP: 143 and TCP: 993 for mail service
+TCP: 53 and UDP: 53 for DNS service
+Your provider seems blocked port 25 , E-mail sending may not work properly.
+Would you like to restart your server now? [y/N]: 
+
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Fri May 28 22:13:23 UTC 2021
+
+  System load:  0.32               Processes:           111
+  Usage of /:   21.0% of 24.06GB   Users logged in:     0
+  Memory usage: 27%                IP address for eth0: 134.209.114.156
+  Swap usage:   0%                 IP address for eth1: 10.116.0.3
+
+
+
+New release '20.04.2 LTS' available.
+Run 'do-release-upgrade' to upgrade to it.
+
+
+You have new mail.
+Last login: Fri May 28 21:46:28 2021 from 138.122.83.75
+
+This server has installed CyberPanel.
+Visit  https://www.cyberpanel.net
+Forum  https://forums.cyberpanel.net
+Log in https://134.209.114.156:8090
+
+Current Server time : 2021-05-28 22:13:25.
+Current Load average: 0.37, 0.12, 0.04
+Current CPU usage   : 41.8793%.
+Current RAM usage   : 218/985MB (22.13%).
+Current Disk usage  : 5/25GB (22%).
+System uptime       : 0 days, 0 hours, 0 minutes.
+
+Enjoy your accelerated Internet by CyberPanel.
+
+==========
+Eu fiz
+
+apt install ufw
+
+ufw allow 80
+ufw allow 442
+ufw allow 22
+ufw allow 8090
+ufw enable
+
+Depois permitir as demais portas
+
+===========
+Após tudo isso instalar o Certbot
+https://certbot.eff.org/lets-encrypt/ubuntubionic-webproduct
+
+My HTTP website is running Web Hosting Product on Ubuntu 18.04
+

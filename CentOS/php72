@@ -1,0 +1,11 @@
+yum install epel-release
+rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm
+rpm -Uvh http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+
+yum --enablerepo=remi-php72 install php
+yum --enablerepo=remi-php72 search php
+
+yum --enablerepo=remi-php72 install php-mysql php-xml \
+php-soap php-xmlrpc php-mbstring php-json php-gd php-mcrypt
+
+

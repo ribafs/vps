@@ -1,0 +1,63 @@
+Fail2Ban
+
+O fail2ban deve ser instalado após a instalação do AMP/EMP
+
+O fail2ban é mais eficiente que o denyhosts, pois ele extende a monitoração de logs para outros serviços além do ssh, como o apache, courier, ftp e mais.
+
+O fail2ban escaneia arquivos de log e bane IPs que parecem suspeitos (muitas tentativas erradas de senha, procurando por exploits, etc)
+Geralmente bloqueia através do firewall por um certo tempo que é configurável
+
+Instalação
+
+apt install fail2ban
+
+Após instalar edite
+
+nano /etc/fail2ban/jail.conf
+
+E crie o filtro de regras requerido
+Ative todos os serviços que deseja que o fail2ban monitore
+
+Para que monitore o ssh, altere ou adicione
+enable	= true
+
+OBS: atente para mudar de ssh para o número que escolheu, caso não use a 22.
+
+[sshd]
+
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 3
+Caso o seu ssh esteja usando outra porta, mude port = suaporta
+
+Checar status:
+
+fail2ban-client status
+
+Restartar
+/etc/init.d/fail2ban restart
+
+Desbloquear um certo IP bloqueado por engano
+iptables -L -n 
+
+Checar porta 443
+iptables -L -n | grep 443
+
+Caso o comando acima mostre o IP 201.14.45.23 rodamos o seguinte comando para liberar:
+iptables -D fail2ban-SSH -s 201.14.45.23 -j DROP
+
+Comando mais específico:
+fail2ban-client set ssh-iptables unbanip IpaRemover
+
+Whitelisting
+
+Whitelisting é configurada no jail.conf usando uma lista separada por espaço
+
+[DEFAULT]
+# "ignoreip" can be an IP address, a CIDR mask or a DNS host. Fail2ban will not
+# ban a host which matches an address in this list. Several addresses can be
+# defined using space separator.
+Ignoreip = 127.0.0.1 192.168.1.0/24 8.8.8.8
+

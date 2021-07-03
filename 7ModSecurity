@@ -1,0 +1,367 @@
+Mod Security
+
+ModSecurity no Apache no Ubuntu 20.04 LTS. Para aqueles que não sabem, o ModSecurity é um módulo do Apache que ajuda a proteger o seu site de vários ataques, como scripts entre sites, ataques de injeção de SQL/SQL injection, ataques de passagem de caminho/path traversal, etc. O ModSecurity também pode monitorar o tráfego da web em tempo real e ajudá-lo a detectar e responder a intrusões.
+
+Instalação
+
+sudo apt update; sudo apt upgrade -y
+
+sudo apt install -y libapache2-mod-security2
+
+Reiniciar apache
+
+apres
+
+Configurar
+
+sudo mv /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+Download OWASP ModSecurity CRS do Github
+
+cd ~
+git clone https://github.com/SpiderLabs/owasp-modsecurity-crs.git
+
+cd ~/owasp-modsecurity-crs
+sudo mv crs-setup.conf.example /etc/modsecurity/crs-setup.conf
+sudo mv rules/ /etc/modsecurity/
+
+sudo nano /etc/apache2/mods-available/security2.conf
+
+Arquivo origial
+
+...
+
+Arquivo modificado
+
+Adicionar outra diretiva Include para que fique assim:
+
+<IfModule security2_module>
+   # Default Debian dir for modsecurity's persistent data
+   SecDataDir /var/cache/modsecurity
+
+   # Include all the *.conf files in /etc/modsecurity.
+   # Keeping your local configuration in that directory
+   # will allow for an easy upgrade of THIS file and
+   # make your life easier
+   IncludeOptional /etc/modsecurity/*.conf
+   Include /etc/modsecurity/rules/*.conf
+</IfModule>
+
+apres
+
+Testar o ModSecurity
+
+Editar o virtualhost default
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+
+Adicione as duas diretivas ao final
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    SecRuleEngine On
+    SecRule ARGS:modsecparam "@contains test" "id:4321,deny,status:403,msg:'ModSecurity test rule has triggered'"
+</VirtualHost>
+
+Caso tenhamos vários virtualhosts no Apache e desejemos ativar o ModSecurity para todos, então
+
+sudo nano /etc/modsecurity/modsecurity.conf
+
+Renomear
+SecRuleEngine DetectionOnly
+
+E adicionar
+SecRuleEngine On
+
+Comentar
+SecAuditLogParts ABDEFHIJZ
+
+E add
+SecAuditLogParts ABCEFHJKZ
+
+Testar a sintaxe antes
+aptes
+
+Reiniciar o apache
+apres
+
+Execute pelo terminal
+
+curl localhost/index.html?modsecparam=test
+
+Pelo navegador
+
+https://yourdomain.com/?id=3 or 'a'='a'
+
+A resposta correta para ambos é um Forbiden 403
+
+Logs do mod-security
+
+Existem dois:
+
+    • debug log: desabilitado por default. 
+    • audit log: /var/log/apache2/modsec_audit.log 
+    
+Para entender os logs de auditoria do ModSecurity, você precisa conhecer as 5 fases de processamento do ModSecurity, que são:
+
+    • Phase 1: Inspect request headers 
+    • Phase 2: Inspect request body 
+    • Phase 3: Inspect response headers 
+    • Phase 4: Inspect response body 
+    • Phase 5: Action (logging/blocking malicious requests) 
+    
+Os eventos no log são divididos em várias seções.
+
+    • section A: audit log header 
+    • section B: request header 
+    • section C: request body 
+    • section D: reserved 
+    • section E: intermediary response body 
+    • section F: final response headers 
+    • section G: reserved 
+    • section H: audit log trailer 
+    • section I: compact request body alternative, which excludes files 
+    • section J: information on uploaded files 
+    • section K: every rule matched by an event, in order of match 
+    • section Z: final boundary 
+    
+Trabalhando com falsos positivos
+
+O ModSecurity é um firewall de aplicativo da web genérico e não foi projetado para um aplicativo específico. O conjunto de regras básicas OWASP também é um conjunto de regras genérico sem nenhum aplicativo específico em mente, portanto, é provável que você veja falsos positivos após ativar o ModSecurity e o OWASP CRS. Se você aumentar o nível de paranóia no SRC, haverá mais falsos positivos.
+
+Por exemplo, por padrão, o CRS proíbe a injeção de comandos do Unix, como inserir sudo em uma página da web, o que é bastante comum em meu blog. Para eliminar falsos positivos, você precisa adicionar exclusões de regra ao CRS.
+
+Regras de Exclusões para específicos aplicativos
+
+Existem algumas exclusões predefinidas e específicas para aplicativos enviadas com o OWASP CRS. Edite o arquivo crs-setup.conf.
+
+sudo cp /etc/modsecurity/crs-setup.conf /etc/modsecurity/crs-setup.conf.BK
+
+sudo nano /etc/modsecurity/crs-setup.conf
+
+Vá para a seção Application Specific Rule Exclusions e encontre as seguintes linhas:
+
+#SecAction \
+# "id:900130,\
+#  phase:1,\
+#  nolog,\
+#  pass,\
+#  t:none,\
+#  setvar:tx.crs_exclusions_cpanel=1,\
+#  setvar:tx.crs_exclusions_drupal=1,\
+#  setvar:tx.crs_exclusions_dokuwiki=1,\
+#  setvar:tx.crs_exclusions_nextcloud=1,\
+#  setvar:tx.crs_exclusions_wordpress=1,\
+#  setvar:tx.crs_exclusions_xenforo=1"
+
+Por exemplo, se eu quiser habilitar as exclusões do WordPress, as linhas acima devem ser alteradas para as seguintes. Tenha cuidado com a sintaxe. Não deve haver comentários entre t:none,\ e setvar:tx.crs_exclusions_wordpress=1". (O caractere barra invertida \ no final indica que a próxima linha é uma continuação da linha atual.)
+
+SecAction \
+  "id:900130,\
+   phase:1,\
+   nolog,\
+   pass,\
+   t:none,\
+   setvar:tx.crs_exclusions_wordpress=1"
+#  setvar:tx.crs_exclusions_cpanel=1,\
+#  setvar:tx.crs_exclusions_drupal=1,\
+#  setvar:tx.crs_exclusions_dokuwiki=1,\
+#  setvar:tx.crs_exclusions_nextcloud=1,\
+#  setvar:tx.crs_exclusions_xenforo=1"
+
+Salve e feche, então teste a sintaxe do Apache
+
+aptes
+
+Se tudo bem
+
+apres
+
+Observe que se você tiver vários aplicativos, como (WordPress, Nextcloud, Drupal, etc) instalados no mesmo servidor, as exclusões de regra acima serão aplicadas a todos os aplicativos. Para minimizar os riscos de segurança, você deve habilitar uma exclusão de regra para apenas um aplicativo. Para fazer isso, vá para o diretório /etc/apache2/modsecurity-crs/coreruleset-3.3.0/rules/.
+
+cd /etc/modsecurity/rules/
+
+sudo cp REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.example REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+
+sudo nano REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf
+
+Adicione a seguinte linha na parte inferior deste arquivo. Se o seu WordPress estiver usando o subdomínio blog.yourdomain.com e o cabeçalho da solicitação enviado do navegador do visitante contiver este subdomínio, o ModSecurity aplicará as exclusões de regra para o WordPress.
+
+SecRule REQUEST_HEADERS:Host "@streq blog.yourdomain.com" "id:1000,phase:1,setvar:tx.crs_exclusions_wordpress=1"
+
+Se você instalou o Nextcloud no mesmo servidor, então você também pode adicionar a seguinte linha neste arquivo, então se um visitante estiver acessando seu subdomínio Nextcloud, ModSecurity aplicará as exclusões de regra Nextcloud.
+
+SecRule REQUEST_HEADERS:Host "@streq nextcloud.yourdomain.com" "id:1001,phase:1,setvar:tx.crs_exclusions_nextcloud=1"
+
+Salve, feche e teste a sintaxe do apache
+
+aptes
+
+Se tudo bem
+
+apres
+
+Exclusão de rules/regras customizadas
+
+Ativar as exclusões de regra específicas do aplicativo pré-construídas pode não elimina todos os falsos positivos. Em caso afirmativo, você precisa examinar o log de auditoria do ModSecurity (/var/log/apache2/modsec_audit.log), verificar qual regra causou o falso positivo e adicionar suas exclusões de regras personalizadas em REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.
+
+A seção H no log de auditoria informa qual regra é correspondida. Por exemplo, se eu tentar usar o HTML <code> ... </code> no formulário de comentário, o ModSecurity bloqueará meu comentário. O log a seguir me informa que a solicitação HTTP correspondeu a uma regra em REQUEST-941-APPLICATION-ATTACK-XSS.conf (linha 527). O ID da regra é 941310. O URI do pedido é /wp-comments-post.php.
+
+É detectado como ataque de filtro XSS de codificação malformado. No entanto, desejo que os usuários possam usar as tags HTML <code> ... </code> e <pre> ... </pre> no formulário de comentário, então criei uma exclusão de regra. Adicione a seguinte linha na parte inferior do arquivo REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf.
+
+SecRule REQUEST_URI "@streq /wp-comments-post.php" "id:1002,phase:1,ctl:ruleRemoveById=941310"
+
+Esta linha diz ao ModSecurity que se o URI do pedido for /wp-comments-post.php, então não aplique a regra ID 941310. Salve e feche o arquivo. Em seguida, teste as configurações do Apache.
+
+aptes
+
+Se tudo bem
+
+apres
+
+Se um falso positivo corresponder a vários IDs de regra, você pode adicionar exclusões de regra em uma linha como:
+
+SecRule REQUEST_URI "@streq /wp-admin/post.php" "id:1003,phase:1,ctl:ruleRemoveById=941160,ctl:ruleRemoveById=941310,ctl:ruleRemoveById=942100"
+
+Observação: não é recomendado desativar muitas regras de nível 1 no OWASP CRS, pois isso fará com que seu site seja hackeado com muito mais facilidade. Desative as regras apenas se souber o que está fazendo.
+
+Whitelist de IP
+
+Se você quiser desabilitar o ModSecurity para seu próprio endereço IP, mas deixá-lo habilitado para todos os outros endereços IP, então adicione a seguinte regra customizada no arquivo REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf. Substitua 12.34.56.78 pelo seu endereço IP real.
+
+SecRule REMOTE_ADDR "^12\.34\.56\.78" "id:1004,phase:1,allow,ctl:ruleEngine=off"
+
+Testar
+
+aptes
+
+Se tudo bem
+
+apres
+
+Regras de encadeamento/Chaining
+
+Se o seu Apache tem vários hosts virtuais, você pode querer colocar seu endereço IP na lista de permissões para um host virtual específico. Você precisa encadear duas regras como:	
+
+SecRule REMOTE_ADDR "^12\.34\.56\.78" "id:1004,phase:1,allow,ctl:ruleEngine=off,chain"
+SecRule REQUEST_HEADERS:Host "@streq nextcloud.yourdomain.com" "t:none"
+
+A palavra-chave da cadeia no final da primeira regra indica que a ação ruleEngine = off só será executada se a condição na próxima regra também for verdadeira.
+
+Integração do ModSecurity com o Honeypot (opcional)
+
+O Projeto Honeypot mantém uma lista de endereços IP maliciosos conhecidos (https://www.projecthoneypot.org/list_of_ips.php), disponível gratuitamente para o público. O ModSecurity pode se integrar ao Projeto Honeypot e bloquear endereços IP na lista do Projeto Honeypot.
+
+Observe que o uso do Project Honeypot tornará seu site mais lento para novos visitantes, porque seu servidor da web precisará enviar uma consulta ao Project Honeypot antes de enviar uma resposta ao novo visitante. No entanto, uma vez que os dados de reputação de IP são armazenados em cache em seu servidor da web, o impacto no desempenho será mínimo.
+
+Para usar o Projeto Honeypot, primeiro crie uma conta gratuita no site acima. Em seguida, vá para o painel de sua conta e clique no link obter um para solicitar uma chave de acesso para a lista negra de HTTP.
+
+https://www.projecthoneypot.org/manage_honey_pots.php
+
+https://www.projecthoneypot.org/create_account.php
+
+Para colocar endereços de honeypots em seu servidor, você precisa registrá-lo aqui. Especifique a linguagem de script de sua preferência (por exemplo, PHP, ASP, Perl, mod_perl, ColdFusion, Python ou Movable Type; outro suporte de linguagem em breve). Você também pode escolher o nome do script do Projeto Honey Pot ou permitir que geremos seu nome aleatoriamente.
+
+Com base em suas escolhas, criaremos um script personalizado no idioma de sua preferência. Por meio desse script, você pode exibir endereços de honeypot em seu site e rastrear os spambots que os coletam. Se você gostaria de ver um exemplo da saída do script, você pode encontrar um aqui (a página de exemplo será aberta em uma nova janela - https://www.projecthoneypot.org/honey_pot_example.php).
+
+Depois de enviar seu registro, forneceremos instruções sobre como instalar o script da página do Projeto Honey Pot. Observação: ao clicar no botão ENVIAR, você indica que leu e concorda com os Termos do serviço.
+
+Após o download do script...
+
+Depois de instalar seu script, você precisa ativá-lo. Para isso, basta instalar o script no local apropriado em seu servidor e acessar pelo seu site de qualquer navegador da Internet. Se instalado corretamente, o script conterá instruções e um link. Ao clicar nesse link, você ativará o script para que possa começar a entregar os endereços dos potes de mel.
+
+Se as instruções de ativação não forem exibidas ou se você for direcionado para uma página de erro, significa que o script não foi instalado corretamente. Primeiro, certifique-se de que o script esteja no lugar certo em seu servidor e que as permissões, o proprietário e o grupo estejam definidos corretamente para que o script possa ser executado em seu servidor. Observe que se você editou o conteúdo ou o nome do script, ele pode não ser ativado. Se continuar tendo problemas, você deve verificar com o administrador do servidor e baixar uma nova cópia do script.
+
+Editar
+
+sudo nano /etc/modsecurity/crs-setup.conf
+
+Procure as seguintes linhas
+
+#SecHttpBlKey XXXXXXXXXXXXXXXXX
+#SecAction "id:900500,\
+#  phase:1,\
+#  nolog,\
+#  pass,\
+#  t:none,\
+#  setvar:tx.block_search_ip=1,\
+#  setvar:tx.block_suspicious_ip=1,\
+#  setvar:tx.block_harvester_ip=1,\
+#  setvar:tx.block_spammer_ip=1"
+
+Remova os comentários e adicione sua chave de API HTTPBL obtida do Projeto Honeypot.
+
+SecHttpBlKey abcdefghijkl
+SecAction "id:900500,\
+  phase:1,\
+  nolog,\
+  pass,\
+  t:none,\
+  setvar:tx.block_search_ip=0,\
+  setvar:tx.block_suspicious_ip=1,\
+  setvar:tx.block_harvester_ip=1,\
+  setvar:tx.block_spammer_ip=1"
+
+Solicitar a chave
+https://www.projecthoneypot.org/httpbl_configure.php (o captcha é case sensitive)
+
+Observe que block_search_ip deve ser definido como 0 (desativado), pois não queremos bloquear rastreadores de mecanismos de pesquisa. Salve e feche o arquivo. Em seguida, reinicie o Apache.
+
+apres
+
+Agora o ModSecurity consultará o Project Honeypot em todas as solicitações HTTP. Para testar se isso funcionaria, edite o arquivo crs-setup.conf.
+
+sudo nano /etc/modsecurity/crs-setup.conf
+
+No editor de texto Nano, você pode pular rapidamente para o final do arquivo pressionando Ctrl + W e, em seguida, Ctrl + V. Adicione a seguinte linha no final deste arquivo. Isso nos permite passar um endereço IP em uma URL. (Assim que o teste for bem-sucedido, você pode remover esta linha do arquivo.)
+
+SecRule ARGS:IP "@rbl dnsbl.httpbl.org" "phase:1,id:171,t:none,deny,nolog,auditlog,msg:'RBL Match for SPAM Source'
+
+Salve, feche e teste
+
+aptes
+
+Se tudo ok
+
+apres
+
+Acesse o site do Project Honeypot e encontre um endereço IP malicioso, por exemplo, 134.119.218.243. Execute o seguinte comando para testar a lista negra de HTTP.
+
+curl -i -s -k -X $'GET' 'https://yourdomain.com/?IP=134.119.218.243'
+
+Seu servidor web deve retornar uma resposta proibido/Forbiden 403 porque o endereço IP está no Projeto Honeypot.
+
+Como desativar o ModSecurity para um host virtual
+
+Por padrão, o ModSecurity está habilitado para todos os hosts virtuais do Apache. Se você deseja desativar o ModSecurity para um host virtual específico, edite o arquivo do host virtual (/etc/apache2/sites-enabled/example.com.conf) e adicione a seguinte linha ao <VirtualHost> ... </ VirtualHost > contexto.
+
+SecRuleEngine DetectionOnly
+
+apres
+
+Consulta ao DNS
+
+Formato da Access Key - abcdefghijkl
+IP - 203.14.23.67
+Domínio - sub.dominio.ext
+
+qcdbofibkfpq.67.23.14.203.sub.dominio.ext
+
+abcdefghijkl.2.1.9.127.dnsbl.httpbl.org
+[Access Key] [Octet-Reversed IP] [List-Specific Domain]
+
+Documentação oficial do mod-security
+https://www.modsecurity.org/
+
+Referências
+https://idroot.us/install-modsecurity-apache-ubuntu-20-04/
+https://www.linuxbabe.com/security/modsecurity-apache-debian-ubuntu
+https://www.techsupportpk.com/2020/04/secure-apache-web-server-content-using-modsecurity-ubuntu-debian.html
+https://www.netnea.com/cms/apache-tutorial-7_including-modsecurity-core-rules/
+https://www.atlantic.net/vps-hosting/securing-your-apache-web-server-with-mod-security/
+

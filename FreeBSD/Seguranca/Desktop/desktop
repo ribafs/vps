@@ -1,0 +1,57 @@
+Melhorar a segurança no Desktop
+
+Precisamos ter nosso ambiente de trabalho, nosso computador desktop onde criamos o site, isento de ameaças, para que ao enviar o conteúdo ou o nosso site para o servidor não estejamos colaborando para aumentar as ameaças do mesmo. Por isso a sugestão de usar um sistema operacional mais seguro como Linux. Mesmo usando Linux devemos usar um bom firewall para filtrar ameaças. Caso utilizemos Windows devemos nos prevenir usando um navegador menos inseguro e com um bom e atualizado anti-virus, firewall e diversos outros softwares que ajudem a manter o ambiente limpo de ameaças.
+Fique atento para a atualização de todos os softwares importantes que utiliza, como antivirus, firewall, IDEs, etc. Não esquecer de atualizar o Sistema Operacional.
+Use sempre senhas fortes para tudo no servidor e inclusive em seu desktop. Será perca de tempo investir em muitos cuidados com a segurança, muito tempo de trabalho, muita pesquisa e estudo, se usar senhas fracas e fáceis de serem quebradas. Senhas fortes devem ter no mínimo letras e números. Para reforçar use também símbolos. Uma recomendação importante é que nunca mantenha sua senha do servidor em arquivo texto.
+Ajuda muito usar com frequência programas/sites para varredura/scan dos sites que estamos trabalhando. Veja na seção de programação algumas sugestões.
+Mesmo que você esteja usando Linux, instale um antivirus como o clamav para manter sua máquina limpa de arquivos de outros sistemas operacionais frágeis e para varrer os arquivos do site quando baixar e antes de enviar. Não esquecer de varrer pendrives que vieram do Windows.
+
+Melhorar a segurança no desktop é importane para maior segurança do servidor.
+Hábitos saudáveis como usar um sistema operacional seguro e atualizado, como usando o firewall ativo e fechando tudo que pode.
+
+Assim como também instalando boas ferramentas de monitoramento do servidor.
+
+Instalar no micro desktop o W3AF
+
+apt-get install w3af
+
+Traz uma interface para a console e uma gráfica/web
+
+Testando vulnerabilidades web com Nikto
+
+O Nikto é web server scanner escrito em perl usado para detectar vulnerabilidades em servidores web. Ele é muito simples de ser usado e atualizado gerando relatórios em txt, html e csv.
+
+Requer repositório multiverse no /etc/apt/sources.list
+
+apt-get install nikto
+
+Atualizando os plugins:
+
+nikto -update
+
+Usando o Nikto
+
+nikto -h HOST -p PORT
+nikto -h HOST -p PORT -ssl
+nikto -h ribafs.org
+nikto -C all -host 200.128.X.X -o vitima.txt (mude X.X pelos números desejados)
+
+- C all - Força a checagem de todos os diretórios em busca de cgi
+- host - Ip da vitima
+-o - Gera um arquivo de relatório
+
+Varrendo uma porta de um host:
+nikto -h google.com -p 443
+
+Help
+nikto -H | less
+
+Esta ferramenta tanto ajuda a defender o seu site quanto ajuda para quem quer perceber
+vulnerabilidades em outros sites ou atacar.
+
+Documentação oficial:
+http://cirt.net/nikto2-docs/ 
+
+Exemplos de uso:
+http://cirt.net/nikto2-docs/usage.html
+

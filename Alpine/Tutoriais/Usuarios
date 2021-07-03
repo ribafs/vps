@@ -1,0 +1,281 @@
+New users: management of users and logins
+
+When Alpine Linux is first installed by default it comes with the user root with no password set so the first step after boot into alpine fresh install are set a password to the user root, if during install was run setup-alpine to change root password, that will be already assigned and can be changed with those setup steps described here. More info in the Setting users wiki page.
+Users creation and defaults
+
+Only root can manage users. Creating an account allows it to have it's own $HOME directory and allows you to limit access to the configuration of the operating system for security reasons. So the following commands will first setup root environment login and then assing a new password:
+
+cat > /root/.cshrc << EOF
+unsetenv DISPLAY || true
+HISTCONTROL=ignoreboth
+EOF
+
+cp /root/.cshrc /root/.profile
+
+echo "secret_new_root_password" | chpasswd
+
+The remote management cannot be done with root directly by default, due ssh security, so we need to setup an remote connection account to made "su" once connected.
+
+The most recommended it's having a access user here named "remote" and normal general usage user here named "general" for convenience, in the next commands we will setup a very hardened limited environment for any new user and created those two users:
+
+mkdir -p /etc/skel/
+
+cat > /etc/skel/.logout << EOF
+history -c
+/bin/rm -f /opt/remote/.mysql_history
+/bin/rm -f /opt/remote/.history
+/bin/rm -f /opt/remote/.bash_history
+EOF
+
+cat > /etc/skel/.cshrc << EOF
+set autologout = 30
+set prompt = "\$ "
+set history = 0
+set ignoreeof
+EOF
+
+cp /etc/skel/.cshrc /etc/skel/.profile
+
+adduser -D --home /opt/remote --shell /bin/ash remote
+
+echo "secret_new_remote_user_password" | chpasswd
+
+adduser -D --shell /bin/bash general
+
+echo "secret_new_general_user_password" | chpasswd
+
+Tip: "general" and "remote" are the names of the users, MUST be only lowercase, no spaces with no symbols
+
+Note that those users are created with minimal settings. Of course you must changed "secret_new_remote_user_password" by a proper password provided by you, also equaly with "secret_new_general_user_password" too.
+Users management and system access
+
+But this user will not have enough privileges for a desktop made purposes, Alpine comes with high security so administrator (the root account owner) must perform the management of that user. Take care, for a server made there's no similar procedure!
+
+Management of users can be made with the default busybox, but there's some packages that makes the life easy of the admins, lest use the libuser package now from testing repository:
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+http://mirror.math.princeton.edu/pub/alpinelinux/edge/testing/
+EOF
+
+apk update
+
+apk add libuser
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+EOF
+
+apk update
+
+touch /etc/login.defs
+
+touch /etc/default/useradd
+
+Now we can changes some defaults and added to proper groups to access devices or perform connections so, those are the recommended groups where the user must have in:
+
+for u in $(ls /home); do for g in disk lp floppy audio cdrom dialout video netdev games users; do addgroup $u $g; done;done
+
+    disk:x:6:root,adm Only if need usage vith virtual machines and access to other partitions over new disks for
+    lp:x:7:lp IF will need to use printing services and printers management
+    floppy:x:11:root Backguard compatible group, use only if need access to external special devices
+    audio:x:18: Need for audio listening and management of sound volumes as normal user
+    cdrom:x:19: For access to disck writers and mounting DVD, BR or CD rom disk as normal user
+    dialout:x:20:root Need for dial private connections and use of modems as normal users
+    tape:x:26:root Need have into this if plan to use special devices for backup.. rarelly in no servers
+    video:x:27:root For usage of cameras, mor thant one GPU special features, as normal user
+    netdev:x:28: For network connections management as normal user
+    kvm:x:34:kvm Only if as normal user will manage graphically virtual machines.. rarelly on no servers
+    games:x:35: Need if you want to play games also specially need if will share score between users
+    cdrw:x:80: To write RW-DVD, RW-BR or RW-CD disk on a disk writing device
+    apache:x:81: Need if you will perfom development as normal user and want to publish locally on web server
+    usb:x:85: Need to access to special usb devices, deprecated group
+    users:x:100:games If you plan to used common files for all users, mandatory as desktop usage
+
+Now we have libuser also can change default shell:
+
+    If you want to change the current user's shell, log in as that user and then inside their terminal session execute::
+
+    lchsh
+
+    If you want to change a different user's shell, run as administration or as root:
+
+    lchsh general
+
+Where "general" was the name of a created user login in previous sections. 
+
+
+su -l root
+
+su -
+
+adduser ribafs
+    Senha - xA@
+
+apk add sudo
+echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel
+
+adduser ribafs wheel
+
+su - ribafs
+sudo clear
+
+sudo -i
+sudo command with arguments
+
+
+Criando user comum
+
+adduser -h /home/john -s /bin/ash john
+
+useradd -m -U -s /bin/ash jane
+
+Adicionar ao sudo
+
+apk add sudo 
+
+echo '%wheel ALL=(ALL) ALL' > /etc/sudoers.d/wheel 
+
+adduser joe wheel
+
+cp /etc/skel/.cshrc /etc/skel/.profile
+
+adduser -D --home /opt/remote --shell /bin/ash remote
+
+echo "secret_new_remote_user_password" | chpasswd
+
+adduser -D --shell /bin/bash general
+
+echo "secret_new_general_user_password" | chpasswd
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+http://mirror.math.princeton.edu/pub/alpinelinux/edge/testing/
+EOF
+
+apk update
+
+apk add libuser
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+EOF
+
+apk update
+
+touch /etc/login.defs
+
+touch /etc/default/useradd
+
+
+New users: management of users and logins
+
+When Alpine Linux is first installed by default it comes with the user root with no password set so the first step after boot into alpine fresh install are set a password to the user root, if during install was run setup-alpine to change root password, that will be already assigned and can be changed with those setup steps described here. More info in the Setting users wiki page.
+Users creation and defaults
+
+Only root can manage users. Creating an account allows it to have it's own $HOME directory and allows you to limit access to the configuration of the operating system for security reasons. So the following commands will first setup root environment login and then assing a new password:
+
+cat > /root/.cshrc << EOF
+unsetenv DISPLAY || true
+HISTCONTROL=ignoreboth
+EOF
+
+cp /root/.cshrc /root/.profile
+
+echo "secret_new_root_password" | chpasswd
+
+The remote management cannot be done with root directly by default, due ssh security, so we need to setup an remote connection account to made "su" once connected.
+
+The most recommended it's having a access user here named "remote" and normal general usage user here named "general" for convenience, in the next commands we will setup a very hardened limited environment for any new user and created those two users:
+
+mkdir -p /etc/skel/
+
+cat > /etc/skel/.logout << EOF
+history -c
+/bin/rm -f /opt/remote/.mysql_history
+/bin/rm -f /opt/remote/.history
+/bin/rm -f /opt/remote/.bash_history
+EOF
+
+cat > /etc/skel/.cshrc << EOF
+set autologout = 30
+set prompt = "\$ "
+set history = 0
+set ignoreeof
+EOF
+
+cp /etc/skel/.cshrc /etc/skel/.profile
+
+adduser -D --home /opt/remote --shell /bin/ash remote
+
+echo "secret_new_remote_user_password" | chpasswd
+
+adduser -D --shell /bin/bash general
+
+echo "secret_new_general_user_password" | chpasswd
+
+Tip: "general" and "remote" are the names of the users, MUST be only lowercase, no spaces with no symbols
+
+Note that those users are created with minimal settings. Of course you must changed "secret_new_remote_user_password" by a proper password provided by you, also equaly with "secret_new_general_user_password" too.
+Users management and system access
+
+But this user will not have enough privileges for a desktop made purposes, Alpine comes with high security so administrator (the root account owner) must perform the management of that user. Take care, for a server made there's no similar procedure!
+
+Management of users can be made with the default busybox, but there's some packages that makes the life easy of the admins, lest use the libuser package now from testing repository:
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+http://mirror.math.princeton.edu/pub/alpinelinux/edge/testing/
+EOF
+
+apk update
+
+apk add libuser
+
+cat > /etc/apk/repositories << EOF; $(echo)
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/main
+http://dl-cdn.alpinelinux.org/alpine/v$(cat /etc/alpine-release | cut -d'.' -f1,2)/community
+EOF
+
+apk update
+
+touch /etc/login.defs
+
+touch /etc/default/useradd
+
+Now we can changes some defaults and added to proper groups to access devices or perform connections so, those are the recommended groups where the user must have in:
+
+for u in $(ls /home); do for g in disk lp floppy audio cdrom dialout video netdev games users; do addgroup $u $g; done;done
+
+    disk:x:6:root,adm Only if need usage vith virtual machines and access to other partitions over new disks for
+    lp:x:7:lp IF will need to use printing services and printers management
+    floppy:x:11:root Backguard compatible group, use only if need access to external special devices
+    audio:x:18: Need for audio listening and management of sound volumes as normal user
+    cdrom:x:19: For access to disck writers and mounting DVD, BR or CD rom disk as normal user
+    dialout:x:20:root Need for dial private connections and use of modems as normal users
+    tape:x:26:root Need have into this if plan to use special devices for backup.. rarelly in no servers
+    video:x:27:root For usage of cameras, mor thant one GPU special features, as normal user
+    netdev:x:28: For network connections management as normal user
+    kvm:x:34:kvm Only if as normal user will manage graphically virtual machines.. rarelly on no servers
+    games:x:35: Need if you want to play games also specially need if will share score between users
+    cdrw:x:80: To write RW-DVD, RW-BR or RW-CD disk on a disk writing device
+    apache:x:81: Need if you will perfom development as normal user and want to publish locally on web server
+    usb:x:85: Need to access to special usb devices, deprecated group
+    users:x:100:games If you plan to used common files for all users, mandatory as desktop usage
+
+Now we have libuser also can change default shell:
+
+    If you want to change the current user's shell, log in as that user and then inside their terminal session execute::
+
+    lchsh
+
+    If you want to change a different user's shell, run as administration or as root:
+
+    lchsh general
+
+Where "general" was the name of a created user login in previous sections. 

@@ -1,0 +1,39 @@
+Certbot para CentOS 8 com Nginx
+
+https://certbot.eff.org/lets-encrypt/centosrhel8-nginx
+
+Instalar snap
+
+Quando usar domínio apenas.
+Caso use apenas IP usar o 5SSL, que é certificado auto-assinado
+
+Apontar o ribafs.me para o IP deste servidor
+
+ribafs.me	IP
+
+sudo dnf install epel-release
+
+sudo dnf upgrade
+
+sudo dnf install snapd
+
+sudo systemctl enable --now snapd.socket
+
+sudo ln -s /var/lib/snapd/snap /snap
+
+snap --version
+
+https://otodiginet.com/operating-system/how-to-install-snapd-on-centos-8/
+
+sudo snap install core; sudo snap refresh core
+
+sudo dnf remove certbot
+
+sudo snap install --classic certbot
+
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+Testar renovação automática
+
+sudo certbot renew --dry-run
+

@@ -1,0 +1,27 @@
+SSHGuard – Block Brute Force Attack in RHEL/CentOS 7.x
+https://lintut.com/sshguard-block-brute-force-attack-on-rhel-centos/
+
+by Rasho · 07/12/2014
+
+SSHGuard is an intrusion prevention system written in C language. SSHGuard parses server logs, determines malicious activity, and then bans malicious users via firewall rules.
+SSHGuard protects many services out of the box:
+
+sshd
+
+rpm -ivh https://centos.pkgs.org/7/lux/sshguard-2.1.0-1.el7.lux.x86_64.rpm.html
+
+Criar novo chain para o SSHGuard no iptables
+
+iptables -N sshguard
+
+Bloquear todo o tráfico de abusos
+iptables -A INPUT -j sshguard
+
+Bloquear outros serviços
+iptables -A INPUT -m multiport -p tcp --destination-ports 22 -j sshguard
+
+Salvar as regras
+service iptables save
+
+Mais informações em
+http://www.sshguard.net/

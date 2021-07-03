@@ -1,0 +1,47 @@
+alpine
+
+Distribuição linux pequena e leve
+
+Alpine Linux, o sistema operacional subjacente para muitas imagens oficiais do Docker, é uma ótima escolha para a tarefa. Com apenas 5MB de tamanho, Alpine Linux está na extremidade oposta do espectro das distribuições completas de Linux de alguns anos atrás, que competiam com o Solaris e pretendiam rodar em sistemas de hardware massivos. Esta nova geração de Linux foi projetada para rodar em hardware embarcado e consumir recursos mínimos, tornando-o uma escolha perfeita para contêineres.
+
+O legado do Alpine Linux como um sistema operacional de sistemas embarcados ficou evidente durante minha análise. Muitas das opções de configuração são padronizadas para sistemas incorporados e a documentação em muitas áreas era esparsa ou inexistente. Claramente um sistema projetado e usado principalmente por hackers, o Alpine Linux exigirá que as empresas superem alguns obstáculos para construir seus aplicativos.
+
+As implantações de produção do Alpine Linux terão várias vantagens, incluindo inicialização rápida, uma pegada minimalista e uma postura segura por padrão não encontrada em nenhum outro lugar. Tudo, desde os binários do sistema às bibliotecas C, é projetado para implantações pequenas, rápidas e seguras. Não há inchaço aqui.
+
+A administração do Alpine Linux é diferente dos sistemas Linux tradicionais e levará algum tempo para aprender. A instalação e o gerenciamento de pacotes são únicos até mesmo entre os sistemas operacionais de contêiner, embora bem pensados. Se sua loja de desenvolvimento tiver desenvolvedores acima da média dispostos a fazer o investimento, o Alpine Linux fornecerá uma base sólida, estável e segura para aplicativos por muito tempo.
+
+O Alpine Linux realmente permite que você crie imagens Docker muito pequenas. É baseado no busybox e musl libc. Ele está enraizado no Linux embarcado. Embora muito útil para teste e desenvolvimento, acredito que Alpine é um desafio em um ambiente corporativo usado para CentOS e Debian, onde a proveniência do pacote e patching são críticos e onde o código pode quebrar inesperadamente com muslc.
+
+Sistema de init
+
+https://wiki.alpinelinux.org/wiki/Alpine_Linux_Init_System
+
+O alpine usa o OpenRC como seu init system.
+
+Memory
+
+    At least 128 Megs of RAM for server without graphical GUI.
+    At least 1.6 Gigs for graphical desktop
+    At least 4 Gigs for high firefox or chromium usage!
+
+Storage
+
+    At least 1 Gigs storage device for server without graphical GUI
+    At least 10 Gigs for graphical desktop, or at least 80 Gigs overall!
+
+GPU
+
+Almost any GPU are supported, but for advanced features, 3D acceleration are manager by MESA project:
+
+    Intel: mostly any Intel by one exception, intel i810/i815 will lack of features cos only has 4Mb memory, Mesa and Linux drop theit support.
+    ATI/AMD, only radeon series with exception of recent two last years respect Alpine release, Rage r128/match64 series has limited support.
+    Nvidia: limited; only few are complete supported! not all features are allowed!
+    Matrox: not all features are supported, just cos are shipped on most servers.
+    Sis: limited features are supported, since code are not updated on Xorg and Linux kernel
+    Via: limited features are supported, since openchrome code are not updated on Xorg and Linux kernel
+
+More complete requirements documentation are at Requirements#Peripherals wiki page. 
+
+https://kamrul.dev/how-to-install-alpine-linux-easily-on-digitalocean/
+https://github.com/bontibon/digitalocean-alpine
+

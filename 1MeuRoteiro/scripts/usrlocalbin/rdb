@@ -1,0 +1,2 @@
+mysql -uroot -e "drop database $1;create database $1;"
+

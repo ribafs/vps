@@ -1,0 +1,28 @@
+Webmin is a web-based version of the Virtualmin panel best known for its flexibility. It originally supports UNIX and similar systems while recent versions support Windows.
+
+In comparison to others, Webmin is written in the high-level, dynamic Perl programming language. Similar to Virtualmin, Webmin is both open source and commercial. And like others, Webmin is used for the basics but its extensibility is an addition which helps admins manage multiple tasks.
+
+Also, Webmin is known for its wealth of modules and excellent interface geared towards efficient file, domain, email, and server configuration.
+Features
+
+Web and email domains management: YES
+Web-based virtual servers management: YES
+Database systems management: YES
+Multiple servers from one control panel management: YES
+Great flexibility; integration with another control panel: YES
+Support for IPv6: YES
+Management of DNS: YES
+Management of emails: YES
+FTP administration: YES
+Availability of website statistics: NO
+Multilingual (multiple languages): NO
+Management of command line: NO
+User-friendly web interface: YES
+Logfile reporting and access: YES
+Direct access to server logs: YES
+Presence of built-in plugins: NO
+High extensibility with Python: NO
+Authentication of LDAP and 2-factor: NO
+Availability of firewall for maximum security: YES
+Availability of numerous modules for the utmost configuration: YES
+Mirrors and Clusters configuration: YES

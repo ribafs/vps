@@ -1,0 +1,10 @@
+Recursos
+
+     Instalação fácil: configure um ou mais servidores com um clique em menos de dez minutos sem ser um especialista em Linux.
+     Gerenciamento de servidores: gerencie um ou mais servidores com apenas alguns cliques, sem ser um Guru LEMP.
+     Pilha perfeita para desenvolvedores PHP: o Cipi vem com nginx, PHP, MySql, Composer, npm, Redis e Supervisor.
+     Multi-PHP: execute versões PHP simultâneas com facilidade e conveniência.
+     Seguro: sem portas abertas não protegidas, PHP sem privilégios, usuários e sistema de arquivos isolados, apenas SFTP (sem FTP inseguro), http / 2, certificados SSL grátis em todos os lugares.
+     Sempre atualize: a Cipi cuida do seu negócio e mantém automaticamente o software do seu servidor atualizado para que você tenha sempre os patches de segurança mais recentes.
+     Estatísticas de servidores em tempo real: fique de olho em tudo por meio de um painel incrível.
+     Sempre atualizado: Cipi instala as últimas versões de LTS dists e suporta Ubuntu 20.04 LTS.

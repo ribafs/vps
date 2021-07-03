@@ -1,0 +1,108 @@
+Agora irei instalar os componentes do AMP
+Apache, MySQL e PHP
+
+O Ubuntu 16.04 vem por padrão com o PHP 7.0, o MySQL 5.7 e o Apache 2.4
+
+
+== Instalar o LAMP com um script
+
+Usarei um shell script para realizar a instalação destes componentes e efetuar algumas configurações
+
+ub1604_lamp.sh
+
+Basta enviar para o servidor usando o scp
+
+- Copiar para a pasta /home/ribafs no desktop
+- Acessar o terminal e executar:
+	scp -P 55522 ub1604_lamp.sh ribafs@159.65.91.82:/tmp
+
+Agora basta executar o mesmo
+
+
+== Instalar o LAMP
+
+Acessar o servidor
+
+sh /tmp/ub1604_lamp.sh
+
+Logo ao executar ele abre um menu usando a biblioteca dialog
+
+1 Atualizar Repositórios
+2 Instalar Servidor Web e Cia
+3 Efetuar o Upgrade da Distribuição
+0 Sair
+
+= Mantenha o item 1 selecionado e tecle Enter para atualizar a distribuição. Ele voltará para o menu
+
+= Selecione com a seta para baixo o item 2 e tecle Enter. Aguarde...
+
+= Na primeira interação ele pede a senha do MySQL. Digite e tecle Enter. Repita e tecle Enter
+
+= A próxima interação ele mostra na tela a mensagem
+
+Configurar .htaccess no Apache 2.4 trocando None por All
+Aperte ENTER para configurar o Apache.
+
+Tecle Enter apenas
+Altere as linhas para configurar o .htaccess e mod_rewrite
+
+Role a tela até as ocorrências de <Directory >
+
+Antes da primeira ocorrência de <Directory > digite:
+ServerName localhost
+
+Logo mais abaixo mude de None para All deixando assim:
+
+<Directory />
+        Options FollowSymLinks
+        AllowOverride All
+        Require all denied
+</Directory>
+
+<Directory /usr/share>
+        AllowOverride All
+        Require all granted
+</Directory>
+
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+</Directory>
+
+Salve e feche com Ctrl+O e Ctrl+X
+
+= Selecione o item 3 e tecle Enter para que seja feito o upgrade da distribuição
+
+= Agora selecione o 0 para Sair
+
+
+== Verificações
+
+php -v
+apache2 -v
+mysql -V
+
+
+== Reforçar a segurança do mysql
+
+mysql_secure_installation
+
+Change the password for root ? ((Press y|Y for Yes, any other key for No) : n
+
+Remove anonymous users? (Press y|Y for Yes, any other key for No) : y
+
+Disallow root login remotely? (Press y|Y for Yes, any other key for No) : y
+
+Remove test database and access to it? (Press y|Y for Yes, any other key for No) : y
+
+Reload privilege tables now? (Press y|Y for Yes, any other key for No) : y
+All done! 
+
+
+== Agora implementar o SSL para ser usado no administrator do site em Joomla
+
+Usando o arquivo 3ssl
+
+
+

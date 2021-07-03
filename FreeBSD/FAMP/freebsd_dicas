@@ -1,0 +1,40 @@
+Shell
+
+.cshrc
+
+grep prompt ~/.cshrc
+
+if ($?prompt) then
+set prompt = "%B%n@%~%b: "
+
+Standard key bindings
+"^A" -> beginning-of-line
+"^B" -> backward-char
+"^E" -> end-of-line
+"^F" -> forward-char
+"^L" -> clear-screen
+"^N" -> down-history
+"^P" -> up-history
+"^U" -> kill-whole-line
+Arrow key bindings
+down -> history-search-forward
+up -> history-search-backward
+left -> backward-char
+right -> forward-char
+home -> beginning-of-line
+end -> end-of-line
+
+
+Usar mouse no terminal
+
+grep moused /etc/rc.conf
+
+moused_port="/dev/psm0"
+moused_type="auto"
+moused_enable="YES"
+
+Fortune
+
+echo '/usr/games/fortune' >> ~/.cshrc
+
+

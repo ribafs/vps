@@ -1,0 +1,32 @@
+Linode
+
+Nanode 1GB
+1 CPU, 25GB Storage, 1GB RAM - 5 $/mês
+173.230.131.33
+Plan: Nanode 1GB
+
+Region: Atlanta, GA
+
+Linode ID: 26335987
+
+Created: 2021-04-25 16:15
+
+https://github.com/benpye/alpine-droplet
+
+
+Access
+SSH Access	
+ssh root@173.230.131.33
+	
+LISH Console via SSH	
+ssh -t ribafs@lish-atlanta.linode.com alpine
+
+cat /etc/os-release 
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.13.3
+PRETTY_NAME="Alpine Linux v3.13"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+
+

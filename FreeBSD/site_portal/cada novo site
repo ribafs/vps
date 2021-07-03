@@ -1,0 +1,6 @@
+Cada novo site instalado requer:
+
+- Adicionar subdomínio com CNAME ao DNS
+- Adicionar authentication do Apache no httpd.conf
+- Adicionar subdomínio ao final do httpd.conf
+- Adicionar extrada para SSL no extra/httpd-ssl.conf

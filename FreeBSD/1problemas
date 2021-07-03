@@ -1,0 +1,43 @@
+Problemas encontrados ao tentar acessar o site via web
+
+- error Failed to start application: Failed to start the session
+
+As buscas não ajudaram
+
+O problema era que o mysql sem eu saber o porque havia caido
+
+service mysql-server restart
+
+Depois de alguma reflexão lembrei que apaguei todo o conteúdo da pasta /tmp
+E dentro havia o arquivo mysql.sock
+
+Isso deve ter derrubado o mysql.
+
+
+Após tentar salvar um artigo do Joomla recebo:
+Request Entity Too Large
+
+Solução
+
+Precisei desabilitar o mod_security
+
+Podemos SecRequestBodyAccess Off para resolver isso
+
+nano /usr/local/etc/php.ini
+
+Originais
+upload_max_filesize = 2M
+post_max_size = 8M
+max_execution_time = 50     Recomendado 60 para o cmsms
+
+Sugestão do conf-recommended
+
+SecRuleEngine On
+SecRequestBodyAccess On
+SecRequestBodyLimit 131072
+SecRequestBodyNoFilesLimit 131072
+SecRequestBodyInMemoryLimit 131072
+SecRequestBodyLimitAction ProcessPartial
+
+SecResponseBodyAccess Off
+[most other config directives/rules are from the modsecurity.conf-recommended file]

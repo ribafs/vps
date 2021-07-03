@@ -1,0 +1,151 @@
+Acessar
+
+Já ter o domínio com os registros abaixo criados
+
+A - dominio - IP
+CNAME www-@
+NS
+
+E o usuário que acessa o servidor com sudo e com acesso ao SSH
+
+https://certbot.eff.org/
+
+Acessar o site
+Rolar a tela até
+
+My HTTP website is running Software on System
+
+Clicar em Software e selecionar - Nginx
+Clicar em System e selecionar - Ubuntu 20.04
+
+Nginx on Ubuntu 20.04
+
+https://certbot.eff.org/lets-encrypt/ubuntufocal-nginx
+
+Acessar o servidor via SSH
+
+Instalar o snapd
+
+sudo snap install core; sudo snap refresh core
+
+Remover o certbot-auto e qualquer pacote do Certbot OS
+
+sudo apt-get remove certbot
+
+Instalar certbot
+
+sudo snap install --classic certbot
+
+Preparar o comando
+
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+Instalar o certificado
+
+Antes instalar o nginx
+
+
+sudo certbot --nginx
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator nginx, Installer nginx
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): 
+
+ribafs@gmail.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf. You must
+agree in order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: 
+
+Y
+
+Would you be willing, once your first certificate is successfully issued, to
+share your email address with the Electronic Frontier Foundation, a founding
+partner of the Let's Encrypt project and the non-profit organization that
+develops Certbot? We'd like to send you email about our work encrypting the web,
+EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: 
+
+Y
+
+Account registered.
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter 'c' to cancel): 
+
+despertai.net.br
+
+Requesting a certificate for despertai.net.br
+Performing the following challenges:
+http-01 challenge for despertai.net.br
+Waiting for verification...
+Cleaning up challenges
+Deploying Certificate to VirtualHost /etc/nginx/sites-enabled/default
+Redirecting all traffic on port 80 to ssl in /etc/nginx/sites-enabled/default
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations! You have successfully enabled https://despertai.net.br
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Subscribe to the EFF mailing list (email: ribafs@gmail.com).
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/despertai.net.br/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/despertai.net.br/privkey.pem
+   Your certificate will expire on 2021-05-11. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again with the "certonly" option. To non-interactively
+   renew *all* of your certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+Certificado espira em 11/05/2021.
+Para obter uma nova versão execute certbot novamente com a opção "certonly".
+Renovar todos os certificados de forma não interativa execute com
+"certbot renew"
+
+Testar renovação automática
+
+sudo certbot renew --dry-run
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/despertai.net.br.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Cert not due for renewal, but simulating renewal for dry run
+Plugins selected: Authenticator nginx, Installer nginx
+Account registered.
+Simulating renewal of an existing certificate for despertai.net.br
+Performing the following challenges:
+http-01 challenge for despertai.net.br
+Waiting for verification...
+Cleaning up challenges
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+new certificate deployed with reload of nginx server; fullchain is
+/etc/letsencrypt/live/despertai.net.br/fullchain.pem
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations, all simulated renewals succeeded: 
+  /etc/letsencrypt/live/despertai.net.br/fullchain.pem (success)
+
+ The command to renew certbot is installed in one of the following locations:
+
+    /etc/crontab/
+    /etc/cron.*/*
+    systemctl list-timers
+
+Testar
+
+https://despertai.net.br/
+
+

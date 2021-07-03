@@ -1,0 +1,193 @@
+Configurações do Apache 
+
+Sobre o .htaccess
+O arquivo .htaccess, que num Unix é um arquivo oculto (inicia com ponto), é um arquivo muito útil para a administração de segurança e vários outros recursos em sites que usam o Apache como servidor web. Em especial quando não temos acesso direto às configurações do Apache.
+Usado para configurar o Apache e também o PHP (somente se instalado como módulo do Apache). 
+Veja alguns dos seus vários e úteis usos. 
+Li certa vez: "Use e abuse do .htaccess, pois ele é seu amigo." 
+
+Listar Arquivos de Diretório 
+Se por exemplo você quer que o diretório onde você colocou o .htaccess liste os arquivos caso não haja um index.html da vida, você adiciona o seguinte no .htaccess: 
+Options +Indexes 
+
+E para tirar essa opção: 
+Options -Indexes
+
+Permitir acesso somente para uma faixa de IPs: 
+<Files pagina_erro_403.php> 
+Order Deny,Allow 
+Deny from all 
+Allow from 192.168. 
+</Files> 
+
+Como personalizar páginas de erro: 
+ErrorDocument 403 /acesso_negado.php 
+ErrorDocument 404 /nao_encontrado.php 
+ErrorDocument 500 /erro_interno_servidor.php 
+
+401 - Authorization Required 
+400 - Bad request 
+403 - Forbidden 
+404 - Wrong page 
+500 - Internal Server Error 
+
+
+Ativar mod_rewrite 
+RewriteEngine On 
+RewriteCond %{SCRIPT_FILENAME} !-f 
+RewriteCond %{SCRIPT_FILENAME} !-d 
+RewriteRule ^(.*)$ index.php?pagina=$1
+
+Bloqueia uma lista de IPs:
+order allow, deny
+deny from 210.140.98.160
+deny from 69.197.132.70
+deny from 74.14.13.236
+allow from all
+
+Deixa a Intranet acessar 
+Order allow,deny 
+allow from 192.168.0. 
+deny from all
+
+Deixa todo mundo acessar, menos o IP 192.168.0.25 
+Order deny,allow 
+deny from 192.168.0.25 
+allow from all 
+
+Impedir todos de visitarem o site 
+deny from all
+Obs.: no caso acima somente permite acesso pelo cpanel, ftp ou outro, nunca pela web.
+
+Restringe o arquivo "secreto.html" somente para o IP 192.168.0.30 
+<Files secreto.html> 
+Order allow,Deny 
+Allow from 192.168.0.30 
+Deny from all 
+</Files> 
+
+
+Nega o acesso dos clientes ao .htaccess (bom colocar no httpd.conf) 
+Vem com a configuração padrão do Apache 
+<Files ~ "^\.ht"> 
+Order allow,deny 
+Deny from all 
+</Files> 
+
+Redirecionar todos os visitantes que chegarem na pasta /antigo para o site http://www.novosite.com/novo 
+Redirect /antigo http://www.site.com/novo 
+
+No caso, o arquivo http://www.site.com/antigo/teste.png será redirecionado para http://www.site.com/novo/teste.png
+
+Proteger Diretório com Login e Senha 
+Usar o comando htpasswd para criar a senha com a seguinte sintaxe: 
+
+htpasswd -c arquivodasenha login
+htpasswd -c senha joao 
+
+O arquivo gerado conterá uma linha com login:senhacriptografada
+Inserir no diretório um arquivo .htaccess com o conteúdo:
+
+AuthName "Acesso Restrito" 
+AuthType Basic 
+AuthUserFile /backup/www/diretorio/senha 
+Require valid-user
+
+/backup/www/diretorio/senha - é o caminho complato para o arquivo com a senha
+
+Exige senha para acessar o diretório administrator 
+<Directory /administrator> 
+AuthName "Acesso Restrito à Usuários" 
+AuthType Basic 
+AuthUserFile /etc/httpd/auth/acesso 
+AuthGroupFile /etc/httpd/auth/grupos 
+require group admin 
+</Directory> 
+
+Bloquear Perl
+Muitos scripts de ataque são criados em Perl, portanto para bloquear perl e outros bots para que não acessem seu site, adicione o código abaixo em um .htaccess (no raiz do domínio):
+SetEnvIfNoCase User-Agent libwww-perl bad_bots 
+order deny,allow 
+deny from env=bad_bots 
+
+bogus handler para perl
+Caso não esteja usando scripts em Perl em seu site adicione um "bogus handler" para estes scripts no .htaccess:
+##Deny access to all CGI, Perl, Python and text files 
+<FilesMatch "\.(cgi|pl|py|txt)"> 
+Deny from all 
+</FilesMatch> 
+## Se não está usando um arquivo robots.txt, então comente 
+# as 3 linhas abaixo para evitar o acesso somente ao arquivo robots.txt 
+<FilesMatch robots.txt> 
+Allow from all 
+</FilesMatch> 
+
+Outros recursos importantes para o .htaccess: 
+#Enable mod_rewrite and insert some sample rules: 
+RewriteEngine On 
+RewriteCond %{REQUEST_FILENAME} !-f 
+RewriteCond %{REQUEST_FILENAME} !-d 
+#RewriteCond %{REQUEST_URI} ^(/component/option,com) [NC,OR] ##optional - see notes## 
+RewriteCond %{REQUEST_URI} (/|\.htm|\.php|\.html|/[^.]*)$ [NC] 
+RewriteRule ^(content/|component/) index.php
+
+Protegendo o acesso direto ao .htaccess e ao configuration.php: 
+<Files .htaccess> 
+order allow,deny 
+deny from all 
+</Files> 
+
+<FilesMatch "configuration.php"> 
+Order allow,deny 
+Deny from all 
+</FilesMatch>
+
+E outros 
+<FilesMatch "\.(htaccess|htpasswd|ini|phps|log|sh|conf)$"> 
+Order allow,deny 
+Deny from all 
+</FilesMatch> 
+
+Muito Importante 
+Adicione ao final do .htaccess:
+# Block out any script trying to set a mosConfig value through the URL 
+RewriteCond %{QUERY_STRING} mosConfig_[a-zA-Z_]{1,21}(=|\%3D) [OR] 
+# Block out any script trying to base64_encode crap to send via URL 
+RewriteCond %{QUERY_STRING} base64_encode.*\(.*\) [OR] 
+# Block out any script that includes a <script> tag in URL 
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC,OR] 
+# Block out any script trying to set a PHP GLOBALS variable via URL 
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR] 
+# Block out any script trying to modify a _REQUEST variable via URL 
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2}) 
+# Send all blocked request to homepage with 403 Forbidden error! 
+RewriteRule ^(.*)$ index.php [F,L]
+# Dica de http://forum.codecall.net/security-tutorials/4867-joomla-hacking-script.html 
+
+Criando um sistema de detecção de intrusão com o .htaccess
+URL encoding attacks such as SQL injection, white space, javascript, etc and redirects the URL to log.php. Log.php will then alert you via email.
+Referência: http://www.hackosis.com/simple-htaccess-intrusion-detection-system/ 
+Options +FollowSymLinks 
+RewriteEngine On 
+RewriteCond %{QUERY_STRING} (\"|%22).*(\>|%3E|<|%3C).* [NC] 
+RewriteRule ^(.*)$ log.php [NC] 
+RewriteCond %{QUERY_STRING} (\<|%3C).*script.*(\>|%3E) [NC] 
+RewriteRule ^(.*)$ log.php [NC] 
+RewriteCond %{QUERY_STRING} (javascript:).*(\;).* [NC] 
+RewriteRule ^(.*)$ log.php [NC] 
+RewriteCond %{QUERY_STRING} (\;|\’|\"|\%22).*(union|select|insert|drop|update|md5|benchmark|or|and|if).* [NC] 
+RewriteRule ^(.*)$ log.php [NC] 
+RewriteRule (,|;|<|>|’|`) /log.php [NC]
+Criar o arquivo lop.php no raiz do site. Mudar o e-mail dmin@site.com Este endereço de e-mail está protegido contra spambots. Você deve habilitar o JavaScript para visualizá-lo para receber a notificação: 
+
+<?php 
+$r= $_SERVER['REQUEST_URI']; 
+$q= $_SERVER['QUERY_STRING']; 
+$i= $_SERVER['REMOTE_ADDR']; 
+$u= $_SERVER['HTTP_USER_AGENT']; 
+$mess = $r . ' | ' . $q . ' | ' . $i . ' | ' .$u; 
+mail(" admin@site.com este endereço de e-mail está protegido contra spambots. Você deve habilitar o JavaScript para visualizá-lo. ","bad request",$mess,"from: bot@site.com este endereço de e-mail está protegido contra spambots. Você deve habilitar o JavaScript para visualizá-lo. "); 
+echo "Hot Damn!"; 
+?> 
+
+

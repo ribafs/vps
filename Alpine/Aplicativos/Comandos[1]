@@ -1,0 +1,174 @@
+Alpine Comandos
+
+setup-alpine
+
+DNS nameserver(s)? [67.207.67.3 67.207.67.2] 173.245.58.51 173.245.59.41 198.41.222.173
+
+Timezone - America/Fortaleza
+
+Adicionar usuário
+
+adduser [OPTIONS] USER [GROUP]
+
+adduser nome
+
+Equivalent to shutdown -h now from traditional GNU/Linux systems: 
+poweroff
+
+Equivalent to shutdown -r now from traditional GNU/Linux systems: 
+halt
+
+https://wiki.alpinelinux.org/wiki/Setting_up_a_new_user
+
+Gerenciador de pacotes
+
+Serviços
+
+rc-status
+
+rc-update add <service> <runlevel>
+
+rc-update del <service> <runlevel>
+
+rc-service <service> <start stop restart>
+
+o check services and their set runlevels
+
+rc <runlevel>
+
+To change to a different runlevel
+
+reboot- Equivalent to shutdown -r now from traditional GNU/Linux systems
+
+halt - Equivalent to shutdown -h now from traditional GNU/Linux systems
+
+poweroff - To turn off the machine
+
+Comandos
+
+Atualizando pacotes
+
+apk update
+
+Instalando
+
+apk add pacote
+
+Instalar bash
+
+apk add bash
+
+cat /etc/shells
+valid login shells
+
+/bin/sh /bin/ash /bin/bash
+
+apk add bash-completion
+
+apk update
+
+Para usar digite
+
+bash
+
+O prompt muda para bash-5.0#
+
+Customizar o shell do bash
+
+cat ~/.bash_profile
+
+https://bash.cyberciti.biz/guide/Customize_the_bash_shell_environments
+
+bash --version
+
+Para instalar o bash numa imagem com alpine, adicionar ao Dockerfile
+
+RUN apk add --no-cache bash
+
+https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management
+
+apk
+
+The apk tool supports the following operations:
+add 	Add new packages or upgrade packages to the running system
+del 	Delete packages from the running system
+fix 	Attempt to repair or upgrade an installed package
+update 	Update the index of available packages
+info 	Prints information about installed or available packages
+search 	Search for packages or descriptions with wildcard patterns
+upgrade 	Upgrade the currently installed packages
+cache 	Maintenance operations for locally cached package repository
+version 	Compare version differences between installed and available packages
+index 	create a repository index from a list of packages
+fetch 	download (but not install) packages
+audit 	List changes to the file system from pristine package install state
+verify 	Verify a package signature
+dot 	Create a graphviz graph description for a given package
+policy 	Display the repository that updates a given package, plus repositories that also offer the package
+stats 	Display statistics, including number of packages installed and available, number of directories and files, etc.
+manifest 	Display checksums for files contained in a given package 
+
+Repositórios
+
+/etc/apk/repositories
+
+Podemos adicionar outros repositórios
+
+http://nl.alpinelinux.org/alpine/v3.7/main
+http://nl.alpinelinux.org/alpine/v3.7/community
+@edge http://nl.alpinelinux.org/alpine/edge/main
+@edgecommunity http://nl.alpinelinux.org/alpine/edge/community
+@testing http://nl.alpinelinux.org/alpine/edge/testing
+
+apk add stableapp newapp@edge bleedingapp@testing
+
+Após adicionar
+
+apk update
+
+Adicionar pacote
+
+apk add openssh
+apk add openssh openntp vim
+
+Remover
+
+apk del openssh
+apk del openssh openntp vim
+
+Upgrade
+
+apk update
+apk upgrade
+
+ou
+apk -U upgrade
+
+Atualizar somente um pacote
+
+apk update
+apk add --upgrade busybox 
+
+Listar todos os pacotes disponíveis
+
+apk search -v
+
+Listar todos os pacotes que são parte do sistema ACF
+
+apk search -v 'acf*'
+
+Listar pacotes que tem NTP em sua descrição
+
+apk search -v --description 'NTP' 
+
+Informações sobre pacotes
+
+apk info -a zlib
+
+Todos os pacotes instalador
+
+apk info
+
+Listar todos os pacotes instalador em ordem alfabérica com a descrição de cada um
+
+apk -vv info|sort

@@ -1,0 +1,16 @@
+mysql -uroot -p
+
+CREATE USER 'crud_us'@'localhost' IDENTIFIED BY 'senhaforte';
+CREATE DATABASE `crud_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `crud_db`.* TO `crud_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+Após testar tudo, então restringir o acesso
+
+REVOKE ALL PRIVILEGES ON `crud_db`.* from 'crud_us'@'localhost';
+
+GRANT GRANT OPTION ON `teste
+s`.* TO 'crud_us'@'localhost';
+GRANT SELECT ON `crud_db`.* TO `crud_us`@localhost IDENTIFIED BY 'zmxn1029C@';
+
+SHOW GRANTS FOR super@localhost;

@@ -1,0 +1,299 @@
+# Criar senha do postgres e liberar acesso no pg_hba
+
+sudo su
+su - postgres
+
+sudo -u postgres psql postgres
+
+sudo su - postgres
+createdb mydb
+dropdb mydb
+createuser -P myuser
+psql mydb
+Para rodar os comandos que estão no arquivo basics.sql digite
+\i basics.sql
+
+CREATE TABLE cities (id SERIAL PRIMARY KEY, city VARCHAR(50), uf VARCHAR(2));
+CREATE TABLE person (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50),
+    age INT,
+    city_id INT REFERENCES cities(id),
+    created TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+Listar tabelas
+\dt
+
+Ver esquema de tabela
+\d cities
+
+DROP TABLE cities
+SET timezone = 'America/Sao_Paulo';
+INSERT INTO cities (city, uf) VALUES ('São Paulo', 'SP'),('Salvador', 'BA'),('Curitiba', 'PR');
+SELECT * FROM person ORDER BY name;
+
+SELECT cities.city, COUNT(person.city_id) AS persons
+FROM cities INNER JOIN person ON cities.id = person.city_id
+GROUP BY cities.city;
+
+UPDATE person SET name = 'Jose da Silva', age = age - 2 WHERE name = 'Jose';
+
+DELETE FROM person WHERE age < 18;
+
+Herança
+
+sudo su - postgres
+createdb vendas
+psql vendas
+
+CREATE TABLE person (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50)
+);
+CREATE TABLE seller (
+    commission DECIMAL(6,2)
+) INHERITS (person);
+
+\d person
+
+\d seller
+
+INSERT INTO person (name) VALUES ('Paulo'),('Fernando');
+INSERT INTO seller (name,commission) VALUES
+    ('Roberto',149.99),
+    ('Rubens',85.01);
+
+ALTER TABLE person ALTER COLUMN name TYPE VARCHAR(80);
+
+Backup
+pg_dump mydb > bkp.dump
+# ou
+pg_dump -f bkp.dump mydb
+
+Restaurando
+dropdb mydb
+
+createdb mydb; psql mydb < bkp.dump
+
+http://pythonclub.com.br/tutorial-postgresql.html
+
+psql
+alter role postgres password 'postgres';
+\q
+exit
+nano /etc/postgresql/12/main/pg_hba.conf
+
+Mudar 
+local   all             postgres                                peer
+
+Para
+local   all             postgres                                md5
+
+sudo service postgresql restart
+
+== Criar banco
+
+sudo su
+su - postgres
+psql
+create database laraveldb;
+
+== Criar usuário com direito de logar
+
+sudo su
+su - postgres
+psql
+
+CREATE ROLE laravelus WITH LOGIN CONNECT PASSWORD 'senhaforte';
+
+GRANT CONNECT ON DATABASE laraveldb TO laravelus;
+
+GRANT ALL PRIVILEGES ON DATABASE laraveldb TO laravelus;
+
+\c laraveldb (mudar para o laraveldb)
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO laravelus;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO laravelus;
+
+
+
+Adicionar ao pg_hba.conf
+Mudei a existente
+local   all        all                                  peer
+para
+local   all        all                                  md5
+
+sudo service postgresql reastart
+
+== Conceder privilégios
+
+
+
+== Conectar pela console
+
+psql -U laravelus -d laraveldb
+
+GRANT USAGE ON SCHEMA public TO laravelus;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA schema_name TO username;
+
+\d esquema_um.clientes
+Lista a estrutura da tabela
+
+select * from esquema_um.clientes;
+
+psql -U super1 -d banco_um
+REVOKE ALL PRIVILEGES ON esquema_um.tabela_um FROM usuario;
+
+\z esquema_um
+\z esquema_um.tabela_um
+Veja que o acesso é somente para super1.
+
+REVOKE ALL ON tabela FROM usuario;
+GRANT PRIVILÉGIOS ON tabela TO usuario;
+
+psql -U us_dnocs -d db_intranet
+
+create schema sc_testes AUTHORIZATION us_testes;
+
+GRANT ALL ON SCHEMA sc_testes TO us_testes;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA sc_testes TO us_testes;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA sc_testes TO us_testes;
+
+ALTER DEFAULT PRIVILEGES
+FOR USER username
+IN SCHEMA schema_name
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO username;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO new_user;
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO my_user;
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA MY_SCHEMA TO MY_GROUP;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA MY_SCHEMA TO MY_GROUP;
+
+pg_lsclusters
+
+pg_ctlcluster 12 main start
+sudo systemctl start postgresql@12-main
+systemctl status postgresql@12-main.service
+journalctl -xe
+
+Resolvendo
+
+sudo apt-get remove --purge postgresql
+
+sudo apt-get install postgresql
+
+netstat -nlp | grep 5432
+
+Solução: deixar o pg_hba como veio originalmente
+
+# Allow any user on the local system to connect to any database with
+# any database user name using Unix-domain sockets (the default for local
+# connections).
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   all             all                                     trust
+
+# The same using local loopback TCP/IP connections.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             all             127.0.0.1/32            trust
+
+# The same as the previous line, but using a separate netmask column
+#
+# TYPE  DATABASE        USER            IP-ADDRESS      IP-MASK             METHOD
+host    all             all             127.0.0.1       255.255.255.255     trust
+
+# The same over IPv6.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             all             ::1/128                 trust
+
+# The same using a host name (would typically cover both IPv4 and IPv6).
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             all             localhost               trust
+
+# Allow any user from any host with IP address 192.168.93.x to connect
+# to database "postgres" as the same user name that ident reports for
+# the connection (typically the operating system user name).
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    postgres        all             192.168.93.0/24         ident
+
+# Allow any user from host 192.168.12.10 to connect to database
+# "postgres" if the user's password is correctly supplied.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    postgres        all             192.168.12.10/32        scram-sha-256
+
+# Allow any user from hosts in the example.com domain to connect to
+# any database if the user's password is correctly supplied.
+#
+# Require SCRAM authentication for most users, but make an exception
+# for user 'mike', who uses an older client that doesn't support SCRAM
+# authentication.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             mike            .example.com            md5
+host    all             all             .example.com            scram-sha-256
+
+# In the absence of preceding "host" lines, these three lines will
+# reject all connections from 192.168.54.1 (since that entry will be
+# matched first), but allow GSSAPI-encrypted connections from anywhere else
+# on the Internet.  The zero mask causes no bits of the host IP address to
+# be considered, so it matches any host.  Unencrypted GSSAPI connections
+# (which "fall through" to the third line since "hostgssenc" only matches
+# encrypted GSSAPI connections) are allowed, but only from 192.168.12.10.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             all             192.168.54.1/32         reject
+hostgssenc all          all             0.0.0.0/0               gss
+host    all             all             192.168.12.10/32        gss
+
+# Allow users from 192.168.x.x hosts to connect to any database, if
+# they pass the ident check.  If, for example, ident says the user is
+# "bryanh" and he requests to connect as PostgreSQL user "guest1", the
+# connection is allowed if there is an entry in pg_ident.conf for map
+# "omicron" that says "bryanh" is allowed to connect as "guest1".
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    all             all             192.168.0.0/16          ident map=omicron
+
+# If these are the only three lines for local connections, they will
+# allow local users to connect only to their own databases (databases
+# with the same name as their database user name) except for administrators
+# and members of role "support", who can connect to all databases.  The file
+# $PGDATA/admins contains a list of names of administrators.  Passwords
+# are required in all cases.
+#
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+local   sameuser        all                                     md5
+local   all             @admins                                 md5
+local   all             +support                                md5
+
+# The last two lines above can be combined into a single line:
+local   all             @admins,+support                        md5
+
+# The database column can also use lists and file names:
+local   db1,db2,@demodbs  all                                   md5
+
+Pra ser acessado por toda a internet
+
+
+266
+
+postgresql.conf :
+
+listen_addresses = '*'
+
+pg_hba.conf
+
+# TYPE DATABASE USER CIDR-ADDRESS  METHOD
+host  all  all 0.0.0.0/0 md5
+
+

@@ -1,0 +1,86 @@
+
+Nas próximas vezes Quick Mode
+
+setup-alpine -q
+
+Under quick mode, setup-alpine will:
+
+    Setup your Keyboard Layout
+
+    Initialize your Hostname to the default "alpine" value
+
+    Set your primary (autodetected) interface to use DHCP, and start networking
+
+    Enable various relevant system services, and start them
+
+    Generate a valid /etc/hosts file
+
+    Enable the default repository
+
+The steps quick mode skips are, in order:
+
+    Setting a root password
+
+    Setting the timezone
+
+    Setting up an optional proxy
+
+    Enabling SSH
+
+    Enabling NTP synchronization
+
+    Configuring the disk, if any
+
+    Configuring lbu
+
+    Configuring apk’s caching mechanism
+
+Full setup-alpine
+
+You can preprogram various answers to setup-alpine 's questions. Here is the answer file it generates for you if you ask it to.
+
+# Example answer file for setup-alpine script
+# If you don't want to use a certain option, then comment it out
+
+# Use US layout with US variant
+KEYMAPOPTS="br br"
+
+# Set hostname to alpine-test
+HOSTNAMEOPTS="-n alpine-test"
+
+# Contents of /etc/network/interfaces
+INTERFACESOPTS="auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet dhcp
+    hostname alpine-test
+"
+
+# Search domain of example.com, Google public nameserver
+DNSOPTS="-d example.com 8.8.8.8"
+
+# Set timezone to UTC
+TIMEZONEOPTS="-z UTC"
+
+# set http/ftp proxy
+PROXYOPTS="http://webproxy:8080"
+
+# Add a random mirror
+APKREPOSOPTS="-r"
+
+# Install Openssh
+SSHDOPTS="-c openssh"
+
+# Use openntpd
+NTPOPTS="-c openntpd"
+
+# Use /dev/sda as a data disk
+DISKOPTS="-m data /dev/sda"
+
+# Setup in /media/sdb1
+LBUOPTS="/media/sdb1"
+APKCACHEOPTS="/media/sdb1/cache"
+
+You can also add extra environment variables to configure the behavior of any given utility. For more details on those, see the next section of the user handbook, or the developer handbook on the technical details of those utilities.
+

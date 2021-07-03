@@ -1,0 +1,9 @@
+
+
+Remover usuário de grupo
+
+usermod -G grupo usuario
+
+Apagar grupo
+
+groupdel grupo

@@ -1,0 +1,32 @@
+
+Analisando os fatores abaixo em sites para gerenciamento de conteúdo.
+
+Segurança, performance, custo e usabilidade
+
+Estes são quatro entre os fatores mais importantes para sites. Vou aqui analisar algumas das alternativas que já experimentei para a criação e gerenciamento de sites de conteúdo ou blogs.
+
+Tipos de sites:
+
+- Site estático, somente HTML, CSS e pouco Javascript. Na maioria usando Bootstrap.
+- Usando um CMS
+
+Segurança - a melhor alternativa que já experimentei em termos de segurança é usando site estático, visto que não usa servidores como Apache ou MySQL nem linguagem dinâmica e outros fatores próprios dos sites criados com CMS, geralmente com Apache, MySQL e PHP. Um princípio da segurança: quanto menos recursos usar mais seguro.
+
+Performance - a melhor performance que conheço é um site com apenas HTML, sem CSS ou JS. Mas não fica um site bonito, nem fica responsivo, que é um tipo de site atualmente de grande importância, pois se adapta automaticamente para as dimensões do dispositivo que acessa o site. Como atualmente temos uma grande quantidade de pessoas acessando internet com dispositivos móveis, talvez a maioria, então um site com apenas HTML é praticamente inviável. A forma mais pratica que conheço e tenho usado é pegar um template bonito, geralmente com o Bootstrap e adaptado. Aqui precisamos tomar cuidado, em termos de performance, com o Javascript, que pode degradar a eprformance. Jś um site criado com um CMS tem todo as consequências do uso de servidores, que o torna menos performático. Também temos CMS que geram sites estáticos e softwares que geram sites de documentação, com certa praticidade, mas vejamos os demais fatores.
+
+Custo - Este é o terceiro fator em que os sites em HTML estáticos são vencedores. Existem boas hospedagens free para sites estáticos. A minha melhor esperiência é com o Github, que inclusive suporta nosso domínio por lá. Praticamente não existe um bom servidor de hospedagem free para CMS. Existem alguns poucos que podemos usar, mas apenas para testes e não para um site em produção.
+
+Usabilidade - Este fator precismos dividir em duas áreas: usabilidade para o visitante e usabilidade para quem cria e administra o site e especialmente o conteúdo. Em termos de visitante um site estático pode sem grande dificuldade para quem cria, melhor para quem adapta um template, pode deixar a usabilidade para o visitante bem suave. Praticamente nada perde para a usabilidade de um site criado com um CMS. 
+
+Até aqui os sites estáticos ou ganharam dos sites criados com CMS ou empataram. Mas agora vamos analisar a usabilidade para quem cria, gerencia o site e/ou gerencia o conteúdo. Este é o ponto forte dos sites criados com CMS, especialmente no gerenciamento do conteúdo, que praticamente é feito num editor HTML amigável, parecido com um bom processador de textos, como o Word ou o do LibreOffice.
+
+Veja que não é simplesmente contar em quantos fatores um tipo de site leva vantagem, pois os do tipo de sites estáticos levam vantagem em 3 dos 4 fatores e empatam em parte do quarto, mas perdem apenas na última parte do quarto fator e esta parte é vital para a maioria dos sites com gerenciamento de conteúdo.
+
+Algo que é inviável é criar um site estático e entregar para um cliente leigo alimentar o conteúdo. Talvez se possa ministrar um treinamento para ele mas não vou considerar isso como viável. Ele precisará entender de HTML, CSS e JS, qua praticamente nenhum cliente que conheço sabe.
+
+Algo importante é o carregamento de páginas usando JS ou AJAX. No jQuery existe um método de AJAX chamado 'load', que carrega um uma página outras páginas, tipo um include do PHP. Acontece que é'algo complexo de fazer para que fique algo decente. Vejo vários sites, mesmo de grandes empresas, que usam este recurso mas de forma feia. A página carrega primeiro sem o CSS e em seguida carrega com o CSS. Imagino que estejam usando um site estático por conta da segurança e não se preocupam com isso do load, nem tem alguém fiscalizando que entenda e exiga algo decente. Sei que isso é apenas estético, mas dá para fazer melhor.
+
+Após concluir o conteúdo
+
+12Backup
+

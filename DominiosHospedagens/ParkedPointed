@@ -1,0 +1,97 @@
+Um nome de domínio é o seu próprio endereço da web exclusivo que os usuários usam para acessar o seu site pela Internet. Um nome de domínio pode ser qualquer combinação de letras e números e usa várias extensões de nome de domínio, como .com, .net e muito mais. (ou seja, www.000webhost.com).
+
+
+O que é um “Pointed Domain/domínio apontado”?
+
+Apontar o registro CNAME para o nome do site é recomendado para usuários avançados. Você precisará ter acesso à zona DNS do seu nome de domínio. Passos gerais:
+
+     Confirme que você possui o nome de domínio personalizado. Caso contrário, você pode comprar um com um serviço de registro de domínio.
+     Configure o provedor de DNS do seu domínio para apontar para o nome do site 000webhostapp.com.
+     Adicione o domínio personalizado clicando no botão Adicionar domínio na tabela abaixo.
+     Teste se seu site pode ser acessado por meio do domínio personalizado. Pode haver um atraso enquanto as alterações de DNS se propagam.
+
+Depois de se inscrever na hospedagem em nuvem https://000webhost.com 3.4k, você receberá o nome do site padrão, como my-name.000webhostapp.com. Isso é muito conveniente porque seu site fica online instantaneamente. A construção do site pode ser iniciada imediatamente. Este nome será reservado apenas para você, se você excluí-lo - você não poderá usá-lo novamente.
+
+Durante o processo de construção de seu site, você pode pensar em um nome de domínio ou pode já ter um nome de domínio. Definir seu nome de domínio em vez de my-name.000webhostapp.com é algo que você provavelmente deseja fazer para marcar totalmente seu site com seu domínio pessoal. Felizmente, isso é muito fácil de fazer. 000webhost oferece 2 maneiras fáceis de alterar o endereço do site. Escolha aquele que melhor se adapta a você.
+
+Domínio do parque - a opção mais simples para novos usuários
+
+000webhost fornece estacionamento DNS para alterar facilmente o endereço do seu site. Altere seus servidores de nomes de domínio para ns01.000webhost.com e ns02.000webhost.com. Cada provedor de serviço de registro de domínio tem seu próprio método para alterar servidores de nomes. Aqui está uma lista dos provedores de serviços de domínio mais comuns e instruções sobre como alterar os servidores de nomes.
+Freenom
+Vai Papai
+
+    NameCheap 6.0k
+    HostGator 1.4k
+    GoDaddy 5,3 k
+    BlueHost 448
+    Google Domains 2,4 k
+    OVH 528
+    1and1 587
+    DNSMadeEasy 327
+    DreamHost 159
+    MediaTemple 54
+    Rackspace 56
+    Enom 170
+    Moniker 63
+    Domínio Rápido 422
+    Internetbs 48
+    DirectNIC 141
+    Domain.com 928
+    Yola 98
+    Gandi 127
+    Soluções de rede 105
+    MelbourneIT 38
+    Tucows 74
+    EasyDNS 281
+    Blacknight 62
+    Name.com 578
+    Site5 100
+    iPage 116
+    Softlayer 35
+    HostMonster 170
+    Dotster 79
+    Yahoo! 482
+    Registrar 1.0k
+
+Etapas após a alteração dos servidores de nomes de domínio:
+
+    Certifique-se de que os servidores de nomes estejam visíveis para o Google 5.1k (mude para o seu nome de domínio).
+    Domínio do parque no painel 000webhost. Vá para Definir endereço da web -> Adicionar domínio -> Parque de domínio
+    Digite seu nome de domínio e clique em Park domain
+    Se seus servidores de nomes forem apontados corretamente para 000webhost nameservers, o domínio mostrará o status Pronto, o que significa que está pronto para vincular o site.
+    Clique em Gerenciar -> Vincular site.
+
+Agora seu site pode ser acessado com seu próprio nome de domínio.
+
+Domínio de ponto (método de registros CNAME)
+
+O requisito é adicionar o registro CNAME que aponta para o seu site na nuvem 000webhost. Não altere os servidores de nomes. Você terá controle total da zona DNS do seu domínio. Dependendo de onde seu domínio está registrado atualmente, as instruções para definir o registro CNAME podem ser diferentes. Aqui está a lista de tutoriais:
+
+    Criar registro CNAME em freenom.com 7,2k
+    Criar registro CNAME em godaddy.com
+    Crie um registro CNAME em cloudflare.com
+    Criar registro CNAME em CloudFlare.com atualizado tutorial 3,6k
+
+Use a caixa de ferramentas 858 para testar se seu registro cname foi criado corretamente.
+Depois que o domínio é apontado para a nuvem 000webhost
+
+Alterar o nome de domínio geralmente envolve algumas modificações em seu site. Os mais comuns são estes:
+
+    Alterar o nome de domínio do Wordpress após apontar o domínio via DATABASE> PHPMYADMIN 792
+    Alterar o nome de domínio do WordPress após apontar o domínio via WORDPRESS ADMIN> wp-admin 629
+    Usar o CloudFlare para obter o status SSL / HTTPS gratuito em seu domínio personalizado - requer o método de apontar e não estacionar 3,6k
+
+
+Parked
+
+O que é um “domínio estacionado”?
+
+Esta é a maneira mais fácil de alterar o endereço do seu site e é o método recomendado para alterar o endereço do seu site. Passos gerais:
+
+     Confirme que você possui o nome de domínio personalizado. Caso contrário, você pode comprar um com um serviço de registro de domínio.
+     Configure o provedor de DNS do seu domínio para apontar para os servidores de nomes ns01.000webhost.com e ns02.000webhost.com.
+     Adicione o domínio personalizado clicando no botão Adicionar domínio na tabela abaixo.
+     O sistema verificará se o seu domínio está direcionado para os servidores de nomes corretos. Os domínios que não forem apontados para 000webhost nameservers durante o período de 24 horas serão removidos automaticamente.
+     Quando o domínio está estacionado em servidores de nomes 000webhost, você pode vincular seu site clicando em "Gerenciar -> Vincular site".
+     Escolha qual site você deseja vincular ao seu domínio.
+     O domínio com e sem www será vinculado ao seu site.

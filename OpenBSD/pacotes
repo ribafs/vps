@@ -1,0 +1,48 @@
+Procurar pacotes
+
+== Informações e busca
+pkg_info -Q nome
+
+== Instalar
+pkg_add pkglocatedb
+
+pkglocate nome
+
+
+== Atualizando pacotes instalados
+
+pkg_add -u nome
+
+
+== Removendo
+
+pkg_delete nome
+
+
+== Checar pacotes
+
+pkg_check
+
+
+== Mirror de pacotes
+
+Existem dois lugares de onde o pkg traz seus pacotes, o installurl e da variável de ambiente PKG_PATH
+
+nano /etc/installurl
+
+http://ftp.openbsd.org/pub/OpenBSD
+
+Setando manualmente
+
+export PKG_PATH=scp://user@company-build-server/usr/ports/packages/%a/all:https://trusted-public-server/%m:installpath
+
+
+
+df -H
+
+fdisk sd0
+
+Interativamente podendo alterar
+fdisk -e sd0
+
+

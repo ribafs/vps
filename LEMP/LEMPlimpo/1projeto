@@ -1,0 +1,84 @@
+Criar um servidor com Ubuntu 16.04 limpo na DigitalOcean
+
+Tamanho de 5 US$
+London
+167.99.80.172
+
+Nome - ubuntu-llemp
+
+
+== Conexão via ssh pelo desktop
+
+A criação de servidores Ubuntu limpo, ou seja, que é apenas o servidor, permite conectar via ssh com root pelo desktop.
+Já a versão LEMP vem com o firewall habilitado e bloqueia este acesso.
+
+ssh root@167.99.80.172
+
+
+== Atualizar a distribuição
+
+apt update -y
+apt upgrade -y
+reboot
+
+Obs.: a cada reboot o Ubuntu remove tudo do /tmp
+
+
+== Usar os script criados na versão LEMP
+
+Enviar os scripts com scp para o servidor
+
+
+== Enviar o script que instala o LEMP no servidor
+
+Enviar por scp
+
+Executar
+sh /tmp/ub1604_lemp.sh
+
+apt autoremove
+
+
+== Verificar
+
+php -v = 7.0.25
+nginx -v = 1.10.3
+mysql -V = 5.7.21
+
+
+== Reforçar a segurança do MySQL
+
+mysql_secure_installation
+
+
+Teste
+http://167.99.80.172
+
+
+== Configurar script do site default
+
+Copiar o script do backup ribafs.conf para /etc/nginx/sites-available/
+
+service nginx reload
+
+Copiar o script www.conf para /etc/php/7.0/fpm/pool.d/
+
+nano /etc/php/7.0/fpm/php.ini
+
+Mudar
+
+cgi.fix_pathinfo=0;
+date.timezone = America/Fortaleza;
+
+service php7.0-fpm reload
+
+nano /var/www/html/info.php
+
+<?php	
+phpinfo();
+
+http://167.99.80.172/info.php
+
+Beelza!
+
+

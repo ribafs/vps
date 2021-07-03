@@ -1,0 +1,46 @@
+Autenticação do Apache para proteger o administrator do joomla
+
+htpasswd -c /etc/apache2/.htpasswd ribafs
+
+Para adicionar outros usuários remova o -c
+
+cat /etc/apache2/.htpasswd
+
+nano /etc/apache2/sites-enabled/000-default.conf
+
+Deixe assim
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    <Directory "/var/www/html/administrator">
+        AuthType Basic
+        AuthName "Restricted Content"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+    </Directory>
+</VirtualHost>
+
+service apache2 restart
+
+Para adicionar para um .htaccess
+
+nano /var/www/html/administrator/.htaccess
+
+AuthType Basic
+AuthName "Restricted Content"
+AuthUserFile /etc/apache2/.htpasswd
+Require valid-user
+
+service apache2 restart
+
+Teste
+
+https://165.227.227.139/administrator
+
+
+Crédito
+https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-14-04

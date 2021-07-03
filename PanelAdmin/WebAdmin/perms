@@ -1,0 +1,18 @@
+#!/bin/sh
+# sudo adduser ribafs www-data
+clear;
+# Ajustar permissões
+
+sudo adduser $USER:www-data;
+DIRCAKE=$( dialog --stdout --inputbox 'Digite o path completo para o aplicativo:' 0 0 )
+echo "Aguarde enquanto ajusto as permissões do $DIRCAKE...";
+echo '';
+echo '';
+echo '';
+echo '';
+sudo find $DIRCAKE -type d -exec chmod 775 {} \;
+sudo find $DIRCAKE -type d -exec chmod ug+s {} \;
+sudo find $DIRCAKE -type f -exec chmod 664 {} \;
+sudo chown -R $USER:www-data $DIRCAKE;
+echo "";
+echo "Concluído!";

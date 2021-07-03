@@ -1,0 +1,12 @@
+yum install pacote
+
+yum remove pacote
+
+yum search substring
+
+rpm -Uvh instalarouatualizar.rpm
+
+Consultar
+rpm -qa | grep substring
+
+

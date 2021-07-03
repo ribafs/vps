@@ -1,0 +1,15 @@
+Após configurar o mod_security ficaram alguns problemas que mantive:
+
+- O backup não permite download do sql pelo link (Access denied)
+- Fui alterar um artigo e recebi  (Access denied)
+
+Que faço:
+- Alterei o componente simplebackup para que faça o download de um único arquivo
+- Desabilitei o mod_security
+- Alteri o artigo
+- Habilitei o mod_security
+
+Se tenho dificuldade de alterar os outros também terão.
+Tenho um pouco mais de trabalho mas fica mais seguro
+
+

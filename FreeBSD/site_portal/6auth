@@ -1,0 +1,37 @@
+Protegendo diretório com a autenticação do Apache 2.4 no FreeBSD 11.1
+
+htpasswd -c /usr/local/etc/apache24/.httpd_access ribafs
+
+cat /usr/local/etc/apache24/.httpd_access
+
+Criar um directório protegido
+
+Adicionar
+nano /usr/local/etc/apache24/httpd.conf
+
+Abaixo do bloco <Directory> existente
+
+<Directory "/usr/local/www/apache24/data/administrator">
+      AuthType Basic
+      AuthName "Restricted Content"
+      IndexIgnore .*
+      AuthName protectthis
+      AuthUserFile  /usr/local/etc/apache24/.httpd_access
+      AuthGroupFile /usr/local/etc/apache24/.httpd_access_group
+      AuthType Basic
+      <Limit GET>
+          # A linha abaixo é para um grupo
+          #Require valid-user
+          require user ribafs
+      </Limit>
+</Directory>
+
+mkdir /usr/local/www/apache24/data/administrator
+
+service apache24 restart
+
+Testando
+
+https://ribafs.org/administrator/
+
+Caso o DNS não tenha propagado ainda use o iP.

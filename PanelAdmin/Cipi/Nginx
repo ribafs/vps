@@ -1,0 +1,208 @@
+Account registered.
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter 'c' to cancel): despertai.net.br
+Requesting a certificate for despertai.net.br
+Performing the following challenges:
+http-01 challenge for despertai.net.br
+Using default address 80 for authentication.
+Waiting for verification...
+Cleaning up challenges
+Could not automatically find a matching server block for despertai.net.br. Set the `server_name` directive to use the Nginx installer.
+
+IMPORTANT NOTES:
+ - Unable to install the certificate
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/despertai.net.br/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/despertai.net.br/privkey.pem
+   Your certificate will expire on 2021-08-21. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again with the "certonly" option. To non-interactively
+   renew *all* of your certificates, run "certbot renew"
+
+certbot certonly --nginx
+
+Renovação não interativa:
+
+certbot renew --dry-run
+
+
+nano /etc/nginx/conf.d/despertai.net.br.conf
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    server_name despertai.net.br www.despertai.net.br;
+}
+
+ou
+
+    Go to sites-available folder and add the following in respective site configuration file
+
+server {
+    listen 443;
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/tlscert.crt;
+    ssl_certificate_key /etc/nginx/ssl/private.key;
+}
+
+service nginx restart
+
+Testar
+
+nginx -t && nginx -s reload
+service nginx reload
+
+Certificado
+
+certbot --nginx -d despertai.net.br -d www.despertai.net.br
+
+SSL
+
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    server_name despertai.net.br www.despertai.net.br;
+
+    listen 443 ssl; # managed by Certbot
+
+    # RSA certificate
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem; # managed by Certbot
+
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+
+    # Redirect non-https traffic to https
+    if ($scheme != "https") {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+}
+
+Renovar certificado automaticamente
+
+crontab -e
+
+0 12 * * * /usr/bin/certbot renew --quiet
+
+https://www.nginx.com/blog/using-free-ssltls-certificates-from-lets-encrypt-with-nginx/
+
+
+
+Com suporte ao php
+
+nano /etc/nginx/conf.d/despertai.net.br.conf
+
+server {
+    listen 80;
+    server_name despertai.net.br;
+
+    listen 443 ssl; # managed by Certbot
+
+    # Add headers to serve security related headers
+    add_header X-Content-Type-Options nosniff;
+    add_header X-XSS-Protection "1; mode=block";
+    add_header X-Robots-Tag none;
+    add_header X-Download-Options noopen;
+    add_header X-Permitted-Cross-Domain-Policies none;
+    add_header Referrer-Policy no-referrer;
+
+    #I found this header is needed on Ubuntu, but not on Arch Linux. 
+    add_header X-Frame-Options "SAMEORIGIN";
+
+    # Path to the root of your installation
+    root /usr/share/nginx/nextcloud/;
+
+    access_log /var/log/nginx/nextcloud.access;
+    error_log /var/log/nginx/nextcloud.error;
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    # The following 2 rules are only needed for the user_webfinger app.
+    # Uncomment it if you're planning to use this app.
+    #rewrite ^/.well-known/host-meta /public.php?service=host-meta last;
+    #rewrite ^/.well-known/host-meta.json /public.php?service=host-meta-json
+    # last;
+
+    location = /.well-known/carddav {
+        return 301 $scheme://$host/remote.php/dav;
+    }
+    location = /.well-known/caldav {
+       return 301 $scheme://$host/remote.php/dav;
+    }
+
+    location ~ /.well-known/acme-challenge {
+      allow all;
+    }
+
+    # set max upload size
+    client_max_body_size 512M;
+    fastcgi_buffers 64 4K;
+
+    # Disable gzip to avoid the removal of the ETag header
+    gzip off;
+
+    # Uncomment if your server is build with the ngx_pagespeed module
+    # This module is currently not supported.
+    #pagespeed off;
+
+    error_page 403 /core/templates/403.php;
+    error_page 404 /core/templates/404.php;
+
+    location / {
+       rewrite ^ /index.php$uri;
+    }
+
+    location ~ ^/(?:build|tests|config|lib|3rdparty|templates|data)/ {
+       deny all;
+    }
+    location ~ ^/(?:\.|autotest|occ|issue|indie|db_|console) {
+       deny all;
+     }
+
+    location ~ ^/(?:index|remote|public|cron|core/ajax/update|status|ocs/v[12]|updater/.+|ocs-provider/.+|core/templates/40[34])\.php(?:$|/) {
+       include fastcgi_params;
+       fastcgi_split_path_info ^(.+\.php)(/.*)$;
+       fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+       fastcgi_param PATH_INFO $fastcgi_path_info;
+       #Avoid sending the security headers twice
+       fastcgi_param modHeadersAvailable true;
+       fastcgi_param front_controller_active true;
+       fastcgi_pass unix:/run/php/php7.2-fpm.sock;
+       fastcgi_intercept_errors on;
+       fastcgi_request_buffering off;
+    }
+
+    location ~ ^/(?:updater|ocs-provider)(?:$|/) {
+       try_files $uri/ =404;
+       index index.php;
+    }
+
+    # Adding the cache control header for js and css files
+    # Make sure it is BELOW the PHP block
+    location ~* \.(?:css|js)$ {
+        try_files $uri /index.php$uri$is_args$args;
+        add_header Cache-Control "public, max-age=7200";
+        # Add headers to serve security related headers (It is intended to
+        # have those duplicated to the ones above)
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+        add_header X-Robots-Tag none;
+        add_header X-Download-Options noopen;
+        add_header X-Permitted-Cross-Domain-Policies none;
+        add_header Referrer-Policy no-referrer;
+        # Optional: Don't log access to assets
+        access_log off;
+   }
+
+   location ~* \.(?:svg|gif|png|html|ttf|woff|ico|jpg|jpeg)$ {
+        try_files $uri /index.php$uri$is_args$args;
+        # Optional: Don't log access to other assets
+        access_log off;
+   }
+}

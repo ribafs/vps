@@ -1,0 +1,18 @@
+nano /etc/php7/php.ini
+
+display_errors = Off
+
+
+nano /etc/apache2/httpd.conf
+
+ServerName localhost
+
+
+Descomentar a linha
+
+LoadModule rewrite_module modules/mod_rewrite.so
+
+Trocar os AllowOverride None por AllowOverride All
+
+rc-update add apache2
+rc-service apache2 restart

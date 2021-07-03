@@ -1,0 +1,42 @@
+FreeBSD 11.1 com XFCE
+
+sudo su
+
+pkg update -y
+pkg upgrade -y
+
+pkg install -y xorg xfce slim
+
+nano /etc/rc.conf
+
+moused_enable="YES"
+dbus_enable="YES"
+hald_enable="YES"
+slim_enable="YES"
+
+adduser
+
+su - ribafs
+
+Testar
+exec /usr/local/bin/startxfce4
+
+exit
+
+nano /etc/rc.conf
+
+su - ribafs
+
+nano .xinitrc
+
+/usr/local/bin/xfce4-session
+
+exit
+
+chown ribafs:ribafs /home/ribafs/.xinitrc
+
+reboot
+
+logar com ribafs
+
+

@@ -1,0 +1,31 @@
+RKHunter e CHKRootKit
+
+Checar por RootKits
+
+Rootkits e RKHunter basicamente fazem a mesma coisa, procuram rootkits no sistema. Nenhuma ofensiva aqui, apenas mostram o que veem.
+
+Instalação
+
+pkg search rkhunter
+
+pkg search chkrootkit
+
+pkg install rkhunter chkrootkit
+
+Executando chkrootkit
+
+chkrootkit
+
+Atualizando e rodando rkhunter
+
+No debian
+nano /etc/rkhunter.conf
+Mudar
+UPDATE_MIRRORS=0   --> UPDATE_MIRRORS=1
+MIRRORS_MODE=1      --> MIRRORS_MODE=0
+WEB_CMD="/bin/false" --> WEB_CMD=""
+
+rkhunter --update
+rkhunter --propupd
+rkhunter --check
+

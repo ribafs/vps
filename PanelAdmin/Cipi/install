@@ -1,0 +1,222 @@
+Cipi
+
+Recebi esta dica do
+Wesley Silva
+Para gerenciar meus servidores uso cipi.sh ele já instala o necessário e é feito em laravel, da até para criar novos módulos
+No grupo Jaravel Brasil do Facebook
+Eu não conhecia o cipi
+
+Seja um Sys Admin para implantar e gerenciar sites e aplicativos em PHP disponíveis em cloud VPS com facilidade.
+
+Cipi é um painel de controle de servidor em nuvem, tipo o cPanel, baseado em Laravel que suporta Digital Ocean, AWS, Vultr, Google Cloud, Linode, Azure e outros VPS. Ele vem com Nginx, Mysql, versões multi PHP-FPM, multiusuários, Supervisor, Composer, npm, certificados Let's Encrypt grátis, implantação Git, backups, postfix, phpmyadmin, fail2ban, Redis, API, migração de dados e com uma interface web simples e útil para gerenciar Laravel, Codeigniter, Symphony, Joomla, WordPress ou outros aplicativos e sites PHP. Com o Cipi, você não precisa ser um administrador de sistemas para implantar e gerenciar sites e aplicativos PHP baseados em nuvem VPS.
+
+Instalação Via script de instalação automática
+
+A melhor maneira de instalar o Cipi é executando este script de instalação automática em um VPS com Ubuntu 18.04 LTS ou 20.04 LTS (instalação nova):
+
+wget -O - https://cipi.sh/go.sh | bash
+
+Ao final do processo de instalação, o Cipi mostrará algumas senhas que você deve guardar.
+
+Antes de instalar o Cipi, certifique-se de que seu servidor atenda a estes requisitos:
+
+    Ubuntu 18.04 ou 20.04 x86_64 LTS (instalação nova)
+    Se o servidor for virtual (VPS), OpenVZ pode não ser compatível (Kernel 2.6)
+    Requisito de hardware: 
+    - mais de 1 GB de HDD / pelo menos 1 processador central / mínimo de 512 MB de RAM / pelo menos 1 endereço IP público 
+    (NAT VPS não é compatível) / Firewall externo / Para provedores de VPS como AWS, esses provedores já incluem um firewall externo para o seu VPS. 
+    Abra as portas 22, 80 e 443 para instalar o Cipi.
+
+    Mantive o firewall desabilitado durante a instalação...
+
+    A instalação pode demorar cerca de dez minutos, o que também pode depender da velocidade de Internet do seu servidor. Após a conclusão da instalação, você está pronto para usar o Cipi para gerenciar seus servidores.
+
+    Para gerenciar corretamente os servidores remotos o Cipi deve estar em um endereço IP público ... não use em localhost!
+
+Vem com um swap de 1GB
+
+== Instalação
+
+== Criação da máquina virtual
+
+- Ubuntu 20.04
+- 2GB de rAM
+- 50 GB de disco
+- 1 vCPU
+- 2 TB transf
+- Datacenter - Frankfurt
+
+- Hostname - cipis (cipi-server)
+- SSK key
+
+IP - 159.89.10.166
+
+== Copiar e colar
+No terminal de um Linux
+
+Selecione um trecho em arquivo texto, no navegador, etc
+Vá até o terminal (tecle Alt+Tab e escolha o terminal)e tecle
+Shift+Insert
+
+Os: somente colará se o texto ainda estiver selecionado no software antes
+
+
+== Acesso via desktop
+
+Criar o script no desktop
+sudo nano /usr/local/bin/doceancipi
+ssh root@159.89.10.166
+sudo chmod +x /usr/local/bin/doceancipi
+
+O script facilita a digitação e, ainda mais importante, garante que as informações sejam entradas com precisão, s em erros.
+
+Acessar com
+
+doceancipi
+
+== Erro no SSH
+
+Caso esteja acessando outra VM, com outro IP, pode aparecer:
+
+@    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+It is also possible that a host key has just been changed.
+The fingerprint for the ECDSA key sent by the remote host is
+SHA256:1E61vYZ3aOKXl6iDJNjUChTROdZMBsFP7ryla8dkb4g.
+Please contact your system administrator.
+Add correct host key in /home/ribafs/.ssh/known_hosts to get rid of this message.
+Offending ECDSA key in /home/ribafs/.ssh/known_hosts:24
+  remove with:
+  ssh-keygen -f "/home/ribafs/.ssh/known_hosts" -R "159.89.10.166"
+ECDSA host key for 159.89.10.166 has changed and you have requested strict checking.
+Host key verification failed.
+
+Neste caso execute esta linha (mude o IP)
+ssh-keygen -f "/home/ribafs/.ssh/known_hosts" -R "159.89.10.166"
+
+
+Checar a versão do Ubuntu
+
+cat /etc/lsb-release
+
+Informações sobre a RAM
+free -m
+
+Espaço em disco
+df -h
+
+
+== Instalar o cipi
+
+Script de instalação automática
+
+A melhor maneira de instalar o Cipi é executando este script de instalação automática em um VPS com Ubuntu 18.04 LTS ou 20.04 LTS (instalação nova):
+
+wget -O - https://cipi.sh/go.sh | bash
+
+Aguarde ...
+Veja as mensagens
+
+== Ao final
+
+Recebi estas informações, que para você devem ser diferentes:
+
+***********************************************************
+                    SETUP COMPLETE
+***********************************************************
+Visit http://159.89.10.166 and login into Cipi:
+USERNAME: admin@admin.com
+PASSWORD: 12345678
+After login, you can update your data into 'settings' section
+
+If you need SSH into this server:
+Cipi server username: cipi
+Cipi server password: aZM1MOGHiOMv5XlNeRHmYuhx6NE=
+Cipi server db root pass: nWGQAqKArvMIGZPgHQnbew==
+
+Enjoy Cipi :)
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+***********************************************************
+
+
+== Criar snapshot
+
+Criar um snapshot com as configurações originais.
+Somente então executar os comandos do posinstall.
+
+5cipi-server_10102020_0933
+Ficou com 3.55GB
+
+Criar logo que recebi estas informações, antes de qualquer alteração ou mesmo do acesso pela web.
+
+Caso tenha algum problema pode recriar com este snapshot
+- Acessar a droplet no DO
+- Destroy
+- Rebuild droplet
+- Selecionar o snapshot
+- Rebuild    
+
+O snapshot é criado a quente, portanto é melhor esperar que ele termine para somente então realizar alguma alteração no servidor.
+
+Obs.: Importante acostumas a criar um snapshot ou efetuar backup (serviço do DO) cada vez antes de executar mudanças no servidor.
+
+== Trocar a senha do user cipi
+
+Ainda logado como root, após o finald a instalação execute
+
+Entrar com a senha recebida: 
+Cipi server password:
+aZM1MOGHiOMv5XlNeRHmYuhx6NE=
+
+su - cipi
+passwd cipi
+Changing password for cipi.
+Current password: 
+New password: 
+Retype new password: 
+passwd: password updated successfully
+
+exit
+exit
+
+== Logar pelo desktop com cipi
+ssh cipi@159.89.10.166
+
+== Acessar mysql com root pelo terminal
+
+su - cipi
+sudo mysql -uroot
+
+
+== Primeiro acesso web
+
+http://159.89.10.166
+USERNAME: admin@admin.com
+PASSWORD: 12345678
+
+OK
+
+== Trocar usuário e senha no primeiro acesso
+
+Change your password
+Password - 12345678
+New password -
+Confirm password -
+Update
+
+E-mail - ribafs@gmail.com
+Logout
+
+
+== Acessar cipis pelo terminal como root
+
+doceancipi
+
+Agora ele pede a senha do root e veja que não recebemos uma senha de root. Foi desabilitado seu acesso, que agora deve ser com o user cipi:
+ssh cipi@159.89.10.166
+
+

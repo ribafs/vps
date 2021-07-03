@@ -1,0 +1,20 @@
+We understand that using a Cloud Computing Platform can be intimidating. That's why at Linode, we've designed our offerings to be Simple, Affordable, and Accessible - we'd rather you spend more time building your own systems than learning ours.
+
+The easiest way for you to see this is for us to show you. Attached to this email is a projection of what your invoice will look like at the end of this month, should your current services remain as they are today. There are a few things to keep in mind as you take a look:
+
+Hourly Billing
+We bill by the hour for each Linode you create, as long as it exists on your account. If your Linode exists for the entire month, we cap off costs at the monthly cost stated on our pricing page for your plan. That's it!
+
+Network Transfer
+Your Linodes have a set amount of allotted Network Transfer per month. A few things to keep in mind:
+
+    We only count outbound, public data against this cap – inbound private data transfers don't count
+    Transfer caps for each of your Linodes are pooled across your entire account to form a single quota
+    Should you go over, we charge an additional $0.01 per GB transferred beyond the quota
+
+Do we bill for a Linode that's powered down?
+Any Linode that exists on your account will be billed for services, whether powered on or off. To avoid being charged for a system you're not using, you must completely remove it from your account. Note: we provide Linode Images to make for easy redeployment.
+
+If you're looking for additional detail about how billing works here at Linode, our Billing Guide can be found here. That's all for now, but please don't hesitate to reach out to us should you need clarification on anything you find on your bill.
+
+The Linode Team

@@ -1,0 +1,108 @@
+Instalação do Alpine em droplet do DO
+
+Etapas
+
+- Criar droplet com Debian 10 x64
+- Primeiro acesso via SSH
+- Baixar o script e converter Debian em Alpine
+- Efetuar upgrade de 3.10 para 3.13
+- Monitorar RAM, espaço em disco e tipo de arquivos (ext4) no fstab
+
+Requisitos
+
+Criar uma droplet com
+
+Debian 10 x64
+
+Efetuar o primeiro acesso
+
+ssh root@IP
+
+cat /etc/issue
+ou
+cat /etc/alpine-release
+
+wget https://github.com/bontibon/digitalocean-alpine/raw/master/digitalocean-alpine.sh
+
+chmod +x digitalocean-alpine.sh
+
+Lembre que destruirá tudo deste servidor
+
+sh digitalocean-alpine.sh --rebuild
+
+Após o boot
+
+ssh root@IP
+
+apk update
+
+Efetuar upgrade do alpine da versão 3.10 para a 3.13
+
+apk add nano
+
+nano /etc/apk/repositories
+
+http://dl-cdn.alpinelinux.org/alpine/v3.13/main
+http://dl-cdn.alpinelinux.org/alpine/v3.13/community
+
+#https://cdn.layeh.com/alpine/3.10/
+Remover o repositório acima após atualizar?
+
+apk -U upgrade --available && sync
+
+reboot
+
+ssh root@IP
+
+cat /etc/issue
+
+3.13.2
+
+Welcome to Alpine!
+
+The Alpine Wiki contains a large amount of how-to guides and general
+information about administrating Alpine systems.
+See <http://wiki.alpinelinux.org/>.
+
+You can setup the system with the command: setup-alpine
+
+You may change this message by editing /etc/motd.
+
+Criei um snapshot e ficou com o inacreditável
+
+df -h
+
+alpine:~# df -h
+Filesystem                Size      Used Available Use% Mounted on
+/dev/vda1                24.6G    150.8M     23.4G   1% /
+
+
+free -m
+              total        used        free      shared  buff/cache   available
+Mem:            988          29         928           0          29         938
+
+Após atualizar pacotes e fazer upgrade:
+
+df -h
+Filesystem                Size      Used Available Use% Mounted on
+/dev/vda1                24.6G    201.9M     23.3G   1% /
+
+Depois de todo o LAMP (Apache2, PHP 7.4 e extensões) instalado e com o PostgreSQL, git, composer, curl e SQLite
+
+df -h
+Filesystem                Size      Used Available Use% Mounted on
+shm                     494.1M         0    494.1M   0% /dev/shm
+
+cat /etc/fstab
+
+# /etc/fstab: static file system information.
+UUID=4e8b8101-6a06-429a-aaca-0ccd7ff14aa1	/	ext4	errors=remount-ro	0	1
+
+/dev/vdb	/media/cdrom	iso9660	ro	0	0
+
+
+Awesome
+
+Agora setup-alpine
+
+

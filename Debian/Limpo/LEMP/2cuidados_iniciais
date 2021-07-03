@@ -1,0 +1,40 @@
+IP do Servidor -  138.68.176.116
+IP do trabalho - 177.14.224.187
+
+Atualizar
+
+apt update
+apt upgrade -y
+reboot
+
+Enviar do desktop para o servidor em /tmp script debian9_lemp.sh
+
+E executar
+
+no servidor
+cd /tmp
+sh debian9_lemp.sh
+
+
+Testar
+
+http://138.68.176.116
+
+Para instalar o LEMP
+
+Após instalar rodar:
+
+mysql_secure_installation
+
+Enter na primeira pergunta e adicione uma senha ao root.
+
+service php7.0-fpm restart
+service nginx restart
+service mysql restart
+
+
+Fuso horário
+dpkg-reconfigure tzdata
+
+date
+

@@ -1,0 +1,84 @@
+Usando o Nmap
+
+O Nmap é um portscan de uso geral, que pode ser usado, sempre que você precisar verificar rapidamente as portas abertas em determinado host, seja na sua rede local, seja na Internet.
+
+Instalar no desktop para monitorar o servidor.
+
+sudo apt install nmap
+
+O uso mais simples é escanear diretamente uma máquina da rede, como em:
+nmap 192.168.0.3
+
+nmap 177.130.208.59
+
+Starting Nmap 7.01 ( https://nmap.org ) at 2018-03-26 19:42 -03
+Nmap scan report for 177.130.208.59
+Host is up (0.052s latency).
+Not shown: 994 closed ports
+PORT      STATE    SERVICE
+22/tcp    filtered ssh
+23/tcp    filtered telnet
+80/tcp    open     http
+139/tcp   filtered netbios-ssn
+8082/tcp  filtered blackice-alerts
+12345/tcp filtered netbus
+
+Nmap done: 1 IP address (1 host up) scanned in 1.85 seconds
+
+Veja que se refere a 994 portas fechadas. Ele varreu as 1000 primeiras portas.
+
+Mostra várias portas abertas.
+O simples fato de uma determinada porta estar aberta, não significa que a máquina está vulnerável, mas apenas que existem serviços ativos e as portas não estão sendo bloqueadas por nenhum firewall.
+
+Mostrar o sistema operacional
+sudo nmap -O IP_dominio
+
+nmap -v -A ribafs.org
+
+nmap -v -sn ribafs.org
+
+Scan completo em todas as portas:
+nmap -sS -p 0-65535 192.168.0.4
+
+sudo nmap -sS -p 0-65535 - em servidor com freebsd e ipfw não conseguiu. Sugeriu usar -Pn mas demorou demais
+sudo nmap -sS -Pn -p 0-65535 IP
+
+Scannear uma porta específica
+nmap -sV -p 22543 192.168.0.4
+nmap -p 80 192.168.2.2
+nmap -p 80,443 192.168.1.1
+nmap -p 80-200 192.168.1.1
+
+Forçar scan de serviços escondidos em portas altas
+nmap -sS -P0 -p 0-65535 192.168.0.4
+
+Analisar servidor protegido por firewall
+nmap -PN 192.168.1.1
+
+Analisar que programas e versão correm nas portas abertas:
+nmap -sv 192.168.2.2
+
+Procurar falhas na firewall
+##  Uma analise nula para fazer a firewall gerar uma resposta##
+nmap -sN 192.168.2.2
+
+## Verificação de firewall
+nmap -sF 192.168.2.2
+
+## Faz os sets FIN, PSH, e URG, serem analisados.
+nmap -sX 192.168.2.2
+
+A opção -D faz com que o alvo pense que está a ser analisado por mais maquinas.
+#O IDS fará com que se reporte entre 5  a 10 portas a cada IP mas nunca sabe quais são os verdadeiros e os falsos.
+nmap -n -Ddecoy-ip1,decoy-ip2,your-own-ip,decoy-ip3,decoy-ip4 remote-host-ip
+nmap -n -D192.168.1.5,10.5.1.2,172.1.2.4,3.4.2.1 192.168.1.5
+
+Salvar as informações obtidas para um ficheiro:
+nmap 192.168.2.2 > output.txt
+nmap -oN /path/to/filename 192.168.2.2
+nmap -oN output.txt 192.168.2.2
+
+A ferramenta zenmap é a versão gráfica do nmap
+apt-get install zenmap
+
+

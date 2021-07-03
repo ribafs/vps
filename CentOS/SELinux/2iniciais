@@ -1,0 +1,200 @@
+Criei um servidor com CentOS 7.4 64 na Vultr.
+
+207.246.78.135
+
+Ajustes iniciais
+
+Com a senha oferecida acessei a console no servidor do Vultr
+
+Logo após o login troquei a senha do root com o comando
+passwd
+
+Entrei com root como usuário
+Copiei a senha para o gedit e digitei olhando de lá
+
+Executei
+iptables -L
+
+O firewall está ativo
+
+Executei
+sestatus
+
+Mostra que o SELinux não está ativo ou não está instalado.
+Manter ele desativado durante as instalações e configurações do EMP.
+Ao final, após tudo instalado e configurado habilitar o sELinux no modo Enforcing.
+
+
+== Criar um usuário comum, adicionar ao grupo wheel, dar poderes de sudo e adicionar ao ssh
+
+Criar um diretório para backup dos scripts antes que sejam alterados
+Isso permitirá restaurar os scripts originais em caso de problema sem solução ao alterar script
+mkdir /root/backup
+
+Ao final, após tudo configurado e funcionando fazer outra cópia de todos os scripta para
+/root/backup
+
+Com o sufixo Ok em cada.
+
+
+Criar novo usuário
+
+useradd ribafs
+passwd ribafs
+
+usermod -a -G wheel ribafs
+
+Adicionar ao sudoers
+
+cp /etc/sudoers /root/backup
+nano /etc/sudoers
+
+Adicionar abaixo da linha do root
+ribafs	ALL=(ALL)	NOPASSWD:ALL
+
+Adicionar ao SSH
+
+cp /etc/ssh/sshd_config /root/backup
+
+nano /etc/ssh/sshd_config
+
+Mudar a porta para uma acima de 55000
+LoginGraceTime 30
+PermitRootLogin no
+
+Adicionar ao final
+AllowUsers ribafs
+
+service sshd restart
+
+
+== Conectar pelo desktop
+
+Executei
+service firewalld status
+
+O firewalld está instalado e ativo
+
+service firewalld stop
+
+Via terminal execute
+
+ssh -p porta ribafs@IP
+
+Agora conectou via ssh com o usuário comum pelo meu desktop.
+Conectou e consegui mudar para root usando
+sudo su
+
+
+== Desinstalar o firewalld e instalar o iptables
+
+Vou desinstalar o firewalld e instalar o iptables
+
+systemctl stop firewalld
+systemctl disable firewalld
+yum remove -y firewalld
+
+yum install -y iptables-services
+systemctl enable iptables.service
+systemctl start iptables
+
+iptables -L
+
+Adicionar as minhas regras
+
+iptables -F
+
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 65522 -j ACCEPT
+iptables -A INPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P INPUT DROP
+
+service iptables save
+reboot
+
+Tentar conectar novamente
+ssh -p porta ribafs@IP
+
+Obs.: lembrar de após finalizar a instalação e configurações restringir o acesso via ssh apenas para meu IP.
+
+== Atualizar a distribuição e reiniciar.
+
+yum update -y
+reboot
+
+Instalar pacotes básicos:
+yum install -y unzip mc net-tools
+
+
+== Instalar SELinux e manter desabilitado
+
+Para usar o SELinux precisamos instalar os pacotes abaixo:
+
+yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
+
+Após instalar os pacotes do SELinux e reiniciar ele inicia no estado Enforcing:
+
+[root@ribafs ~]# sestatus
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   permissive
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Max kernel policy version:      28
+
+
+Mudei para Disabled e reiniciei.
+
+cp /etc/selinux/config /root/backup
+
+nano /etc/selinux/config
+
+Mudar para disabled
+SELINUX=disabled
+
+reboot
+
+Veja agora
+
+sestatus
+SELinux status:                 disabled
+
+
+== Adicionar partição de swap
+
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+mkswap /swapfile
+chmod 600 /swapfile
+swapon /swapfile
+
+Adicionar ao fstab
+nano /etc/fstab
+/swapfile	swap	swap	defaults	0	0
+
+Testar
+free -m
+
+== Limpar o cache de RAM
+
+Criar script em /root
+nano /root/m
+
+Contendo
+sysctl -w vm.drop_caches=3
+
+chmod +x /root/m
+
+Rodar:
+sh /root/m
+
+
+Agora ajustar o SSH com
+3ssh_key
+

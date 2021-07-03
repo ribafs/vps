@@ -1,0 +1,78 @@
+Sudomínio no Apache 2.4 com FreeBSD
+
+Criar os subdiretórios
+
+Podemos criálos em
+/usr/local/www
+
+ou em
+/usr/local/www/apache24/data
+
+Criarei no data
+
+/usr/local/www/apache24/data/cakephp
+/usr/local/www/apache24/data/vps
+/usr/local/www/apache24/data/joomla
+/usr/local/www/apache24/data/postgresql
+
+Adicionar registros CNAME ao DNS
+
+Type 	Hostname 	                    Value 	    TTL (seconds)
+
+CNAME 	vps.ribafs.org 	is an alias of ribafs.org.  43200
+CNAME 	postgresql.ribafs.org is an alias of ribafs.org. 43200
+CNAME 	joomla.ribafs.org is an alias of ribafs.org. 43200
+CNAME 	cakephp.ribafs.org is an alias of ribafs.org. 43200
+
+nano /etc/hosts
+
+::1                     localhost localhost.my.domain
+127.0.0.1               localhost localhost.my.domain
+46.101.50.99            ribafs.org      www.ribafs.org
+46.101.50.99            cakephp.ribafs.org
+46.101.50.99            vps.ribafs.org
+46.101.50.99            joomla.ribafs.org
+46.101.50.99            postgresql.ribafs.org
+
+Adicionar Hosts Virtuais ao httpd.conf do Apache
+
+#Virtual host configuration
+
+<VirtualHost ribafs.org:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/"
+ServerName ribafs.org
+</VirtualHost>
+
+<VirtualHost ribafs.org:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/cakephp/"
+ServerName cakephp.ribafs.org
+</VirtualHost>
+
+<VirtualHost ribafs.org:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/vps/"
+ServerName vps.ribafs.org
+</VirtualHost>
+
+<VirtualHost ribafs.org:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/joomla/"
+ServerName joomla.ribafs.org
+</VirtualHost>
+
+<VirtualHost familia.ribafs.org:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/postgresql/"
+ServerName postgresql.ribafs.org
+</VirtualHost>
+
+Reiniciar o Apache
+
+service apache24 restart
+
+Referências
+
+https://www.linuxhelp.com/configure-apache-virtual-host-freebsd/
+

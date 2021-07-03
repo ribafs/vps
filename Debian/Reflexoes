@@ -1,0 +1,19 @@
+Tenho um servidor comm a pasta web em
+
+/var/www/html
+
+Instalo o laravel em
+
+/var/www/html/lv
+
+Após a instalação preciso criar um banco e o configurar em .env
+
+Acesso
+
+https://dominio/lv/public
+
+Funciona ok
+
+Quando acesso login
+
+Recebo um 404

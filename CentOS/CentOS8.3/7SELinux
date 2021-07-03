@@ -1,0 +1,340 @@
+Instalação e Configuração do SELinux no CentOS 8.3
+
+Recomendação
+
+Instale e/ou habilite para enforcing o SELinux somente após configurar o SO e instalar, configurar o EMP e o CMS
+
+Adicionar usuário comum
+
+adduser testsecvps
+passwd testsecvps
+
+Adicionar usuário testsecvps ao grupo wheel, que dará acesso ao sudo
+
+usermod -aG wheel testsecvps
+
+Instalação
+
+Quando o SELinux é instalado em seu sistema, ele pode estar habilitado ou desabilitado. Como também quando instalamos o CentOS 8.3 o SELinux pode já vir instalado e habilitado/enforcing ou não.
+
+Checando
+
+sudo sestatus
+
+sudo dnf update
+
+sudo dnf install -y policycoreutils setools setools-console setroubleshoot selinux-policy-targeted selinux-policy-devel setroubleshoot-server  mctrans libselinux-utils setools
+
+SELinux rotulando todos os arquivos com os devidos contextos
+
+sudo touch /.autorelabel
+
+O SELinux detectará o arquivo /.autorelabel no boot e, a seguir, rotulará novamente todos os arquivos com os contextos SELinux corretos. Se você tiver muitos arquivos, a instância pode ficar indisponível por um longo tempo. Você pode monitorar a instância no console da administração do VPS.
+
+sudo reboot
+
+Lembre que o boot irá demorar mais que o normal. Poderá monitorá-lo pelo console do DO
+
+Configuração
+
+sudo nano /etc/selinux/config
+
+sudo reboot
+
+Liberar SSH em porta customizada
+
+sudo semanage port -l | grep ssh
+ssh_port_t                     tcp      22
+
+sudo semanage port -a -t ssh_port_t -p tcp 55522
+
+sudo semanage port -l | grep ssh
+ssh_port_t                     tcp      55522, 22
+
+
+Abrir a porta 55522 no FirewallD
+
+É sempre recomendável manter o serviço de Firewall em execução e permitir apenas serviços confiáveis.
+
+sudo firewall-cmd --add-port=55533/tcp --permanent
+sudo firewall-cmd --reload
+
+Agora podemos remover o serviço de SSH que roda na porta 22
+
+sudo firewall-cmd --remove-service=ssh --permanent
+sudo firewall-cmd --reload
+
+sudo systemctl restart sshd
+
+
+Liberar FirewallD no SELinux
+
+sudo ausearch -c 'firewalld' --raw | audit2allow -M my-firewalld
+
+sudo semodule -X 300 -i my-firewalld.pp
+
+Adicionar o usuário para a whitelist do firewalld, com
+
+sudo firewall-cmd --add-lockdown-whitelist-user=testsecvps
+
+
+Nginx
+
+Permitir que scripts e módulos HTTPD se conectem à rede, atualize a variável booleana correspondente
+
+sudo setsebool -P httpd_can_network_connect 1
+sudo setsebool -P httpd_can_network_connect_db 1
+
+
+Para permitir ao nginx (/usr/sbin/httpd) escrever no diretório de logs (/var/log/audit/audit.log), como mostra o output, você pode executar: 
+    
+    semanage fcontext -a -t httpd_sys_rw_content_t 'logs'
+    
+    restorecon -v 'logs'.
+   
+
+sudo chcon -R -t httpd_sys_rw_content_t /var/www/html
+
+sudo systemctl restart httpd
+
+
+Alterar as permissões e o contexto de segurança do arquivo no SELinux:
+
+sudo chown -R testsecvps:Nginx /var/www/html
+
+sudo chcon -t httpd_sys_rw_content_t /var/www/html -R
+    
+
+Para ver quais booleanos httpd estão ativados, use 
+
+semanage boolean -l | grep httpd | grep -v off
+
+
+/var/www/html/log
+
+sudo ls -dlZ /var/www/html/log/
+
+sudo semanage fcontext -a -t httpd_log_t "/var/www/html/log(/.*)?"
+ 
+Em seguida, use o comando restorecon para aplicar essas alterações e persisti-las entre as reinicializações:
+
+sudo restorecon -R -v /var/www/html/log
+
+Você pode listar os contextos mais uma vez para ver as alterações:
+
+sudo ls -dlZ /var/www/html/log/
+ 
+A saída reflete o tipo de contexto atualizado:
+
+Os diretórios do seu site precisam de httpd_sys_content_t
+
+semanage fcontext -a -t httpd_sys_content_t "/var/www/html(/.*)?"
+
+restorecon -Rv /var/www/html
+
+Execute o seguinte comando para definir uma política universal do Nginx:
+
+sudo setsebool -P httpd_unified 1
+
+
+Instruir o SELinux para permitir que o Nginx execute o código PHP via PHP-FPM.
+
+sudo setsebool -P httpd_execmem 1
+    
+
+Ao visualizar uma lista de suas variáveis booleanas, você deve ver agora que está definido como ON.
+
+sudo getsebool -a | grep "httpd_can"
+
+
+== PostgreSQL
+
+Liberando PostgreSQL no FirewallD
+
+sudo firewall-cmd --permanent --zone=trusted --add-port=5432/tcp
+
+#firewall-cmd --add-service=postgresql --permanent
+
+firewall-cmd --permanent --zone=public --add-service=postgresql
+
+setsebool -P postgresql_selinux_transmit_client_label 1
+
+setsebool -P selinuxuser_postgresql_connect_enabled 1
+
+semanage fcontext -a -e /var/lib/sepgsql /srv/sepgsql
+
+restorecon -R -v /srv/sepgsql
+
+semanage fcontext -a -e /var/lib/pgsql /srv/pgsql
+
+semanage fcontext -a -t postgresql_var_run_t '/srv/mypostgresql_content(/.*)?'
+
+restorecon -R -v /srv/mypostgresql_content 
+
+restorecon -R -v /srv/pgsql 
+
+firewall-cmd --reload
+
+Liberar no SELinux
+
+getenforce
+
+Colocar temporariamente no modo eprmissive
+
+sudo semanage permissive -a postgresql_t
+
+sudo dnf install selinux-policy-devel
+
+cd /usr/share/mysql/policy/selinux/
+
+make -f /usr/share/selinux/devel/Makefile mariadb-server.pp
+sudo semodule -i mariadb-server.pp
+
+sudo dnf install policycoreutils
+
+sudo semanage fcontext --list | grep mysqld_db_t
+
+sudo semanage fcontext -a -t mysqld_db_t "/mariadb/data(/.*)?"
+sudo restorecon -Rv /mariadb/data
+
+ls --directory --scontext /mariadb/data
+
+sudo semanage fcontext --list | grep mysqld_log_t
+
+sudo semanage fcontext -a -t mysqld_log_t "/var/log/mysql(/.*)?"
+sudo restorecon -Rv /var/log/mysql
+
+ls --directory --scontext /var/log/mysql
+
+sudo semanage fcontext --list | grep mysqld_etc_t
+
+sudo semanage fcontext -a -t mysqld_etc_t "/etc/mariadb(/.*)?"
+sudo restorecon -Rv /etc/mariadb
+
+ls --directory --scontext /etc/mariadb
+
+SELinux e MariaDB em porta diferente
+
+sudo semanage port -a -t mysqld_port_t -p tcp 3307 
+
+Generating SELinux Policies with audit2allow
+
+sudo semodule -DB
+
+sudo semanage permissive -a mysqld_t
+
+sudo grep mysqld /var/log/audit/audit.log | audit2allow -M mariadb_local
+sudo semodule -i mariadb_local.pp
+
+sudo semanage permissive -d mysqld_t
+
+sudo setmodule -B
+
+https://mariadb.com/kb/en/selinux/
+
+
+Contexto correto para o Wordpress
+
+Execute o seguinte comando para definir o contexto SELinux correto para o diretório /var/www/wordpress e seu conteúdo
+
+sudo semanage fcontext -a -t httpd_sys_rw_content_t \
+"/var/www/wordpress(/.*)?"
+
+Para que as alterações do SELinux tenham efeito, execute o seguinte comando:
+
+sudo restorecon -Rv /var/www/wordpress
+
+
+Para mostrar os diferentes interruptores que podem ser ligados ou desligados para http, o que eles fazem e seus status atuais:
+
+semanage boolean -l | less | grep http
+
+
+Para alterar qualquer uma das configurações, podemos usar o comando setsebool. Como exemplo, vamos considerar o acesso de gravação de FTP anônimo:
+
+Consultar
+
+getsebool httpd_anon_write
+
+Isso nos mostra que a chave está desligada no momento:
+
+httpd_anon_write --> off
+
+Em seguida, alteramos o booleano para habilitá-lo:
+
+setsebool httpd_anon_write on
+
+Verificar o valor novamente deve mostrar a alteração:
+getsebool httpd_anon_write
+
+httpd_anon_write --> on
+
+Os booleanos alterados não são permanentes. Eles voltam aos valores anteriores após uma reinicialização. Para tornar as coisas permanentes, podemos usar a opção -P com o comando setsebool.
+
+setsebool httpd_anon_write -P on
+
+
+Podemos executar o comando ps com alguns sinalizadores para mostrar o processo Nginx em execução em nosso servidor:
+
+ps -efZ | grep httpd
+
+
+Podemos usar o comando sesearch para verificar o tipo de acesso permitido para o daemon httpd:
+
+sesearch --allow --source httpd_t --target httpd_sys_content_t --class file
+
+
+Para fazer as coisas funcionarem normalmente, vamos mudar o tipo de arquivo com o comando restorecon. A opção -v mostra a alteração dos rótulos de contexto:
+
+restorecon -v /var/www/testsecvps/index.html
+
+
+Para alterar permanentemente o contexto do nosso arquivo index.html em /var/www/testsecvps, temos que seguir um processo de duas etapas.
+
+• Primeiro, executamos o comando semanage fcontext. Isso gravará o novo contexto no arquivo /etc/selinux/targeted/contexts/files/file_contexts.local. Mas não vai renomear o próprio arquivo. Faremos isso para os dois diretórios.
+     
+semanage fcontext --add --type httpd_sys_content_t "/var/www(/.*)?"
+semanage fcontext --add --type httpd_sys_content_t "/var/www/testsecvps(/.*)?"
+
+Para ter certeza, podemos verificar o banco de dados de contexto do arquivo (observe que estamos usando o arquivo file_contexts.local):
+
+cat /etc/selinux/targeted/contexts/files/file_contexts.local | less
+
+Você deve ver os contextos atualizados:
+# This file is auto-generated by libsemanage
+# Do not edit directly.
+
+/var/www(/.*)?    system_u:object_r:httpd_sys_content_t:s0
+/var/www/testsecvps(/.*)?    system_u:object_r:httpd_sys_content_t:s0
+
+A seguir, executaremos o comando restorecon. Isso irá rotular novamente o arquivo ou diretório com o que foi registrado na etapa anterior:
+
+restorecon -Rv /var/www
+
+Isso deve redefinir o contexto em três níveis: o diretório de nível superior /var/www, o diretório /var/www/testsecvps abaixo dele e o arquivo index.html em /var/www/testsecvps:
+
+Relabeled /var/www from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/testsecvps from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
+Relabeled /var/www/testsecvps/index.html from unconfined_u:object_r:default_t:s0 to unconfined_u:object_r:httpd_sys_content_t:s0
+
+Se tentarmos acessar a página da web, ela deve funcionar.
+
+Existe uma ferramenta bacana chamada matchpathcon que pode ajudar a solucionar problemas relacionados ao contexto. Este comando examinará o contexto atual de um recurso e o comparará com o que está listado no banco de dados de contexto SELinux. Se for diferente, irá sugerir a mudança necessária. Vamos testar isso com o arquivo /www/html/index.html. Usaremos a sinalização -V que verifica o contexto:
+
+matchpathcon -V /var/www/testsecvps/index.html
+
+A saída do matchpathcon deve mostrar que o contexto foi verificado.
+
+/var/www/testsecvps/index.html verified.
+
+
+exibir todas as regras permitidas (muitas regras exibidas)
+sesearch --allow 
+
+exibir regras que o domínio [httpd_t] tem permissão para acessar
+sesearch -s httpd_t --allow 
+
+exibir regras permitidas que o domínio pode acessar ao tipo [httpd_sys_script_exec_t]
+sesearch -t httpd_sys_script_exec_t --allow 
+
+https://docs.fedoraproject.org/en-US/Fedora/12/html/Managing_Confined_Services/sect-Managing_Confined_Services-PostgreSQL-Configuration_Examples.html

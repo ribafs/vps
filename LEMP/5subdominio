@@ -1,0 +1,33 @@
+Caso haja a necessidade de adicionar um subdomínio
+
+Adicionar um Subdomínio
+
+Para criar um subdomínio chamado php
+
+Criar o Virtual Host no Apache
+mkdir /var/www/html/php
+cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/php.conf
+nano /etc/apache2/sites-available/php.conf
+
+Adicione logo abaixo da linha com ServerAdmin:
+DocumentRoot /var/www/html/php
+ServerName php.ribafs.org
+
+a2ensite php
+service apache2 restart
+
+Criar arquivo para teste:
+
+nano /var/www/html/php/index.html
+<h1>Curso de PHP</h1>
+
+Adicione registro CNAME ao DNS
+
+Type	Hostname			Value			TTL
+
+CNAME	php.ribafs.org		ribafs.org.		43200
+
+
+O site deve ficar na pasta /var/www/html/php
+
+

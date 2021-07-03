@@ -1,0 +1,92 @@
+Instalação e Configuração do ModSecurity no FreeBSD
+
+Apache 2.4 instalado e rodando
+
+pkg search mod_security
+
+ap24-mod_security-2.9.2        Intrusion detection and prevention engine
+mod_security-devel-3.0.0.g2017080200_1 Intrusion detection and prevention engine
+
+Instalação
+
+pkg install ap24-mod_security
+
+Para habilitar o mod_security no Apache siga as instruções em
+/usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+nano /usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+Descomentar as 3 últimas linhas
+
+Veja sobre o OWASP
+fetch https://raw.github.com/SpiderLabs/ModSecurity/master/unicode.mapping
+
+pkg install git
+  cd /usr/local/etc/modsecurity
+  git clone https://github.com/SpiderLabs/owasp-modsecurity-crs
+  cp owasp-modsecurity-crs/crs-setup.conf.example crs.conf
+
+cat << EOF > /usr/local/etc/apache24/modules.d/000_modsecurity.conf
+# Load ModSecurity
+# Comment out the next line to temporarily disable ModSecurity:
+LoadModule security2_module libexec/apache24/mod_security2.so
+
+<IfModule security2_module>
+    # Include ModSecurity configuration
+    Include etc/modsecurity/modsecurity.conf
+
+    # Include OWASP Core Rule Set (CRS) configuration and base rules
+    Include etc/modsecurity/modsecurity_crs_10_setup.conf
+    Include etc/modsecurity/crs/base_rules/*.conf
+
+    # Add custom configuration and CRS exceptions here. Example:
+    # SecRuleRemoveById 960015
+</IfModule>
+EOF
+
+/usr/local/share/doc/mod_security2/README
+
+Para habilitar ModSecurity no Apache habilite os módulos
+mod_unique_id no httpd.conf e
+mod_security2 no
+/usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+nano /usr/local/etc/apache24/httpd.con
+Descomente
+LoadModule unique_id_module libexec/apache24/mod_unique_id.so
+
+O core foi instalado em
+/usr/local/etc/apache24/Includes/mod_security2/
+
+Configurações em
+/usr/local/etc/modsecurity/modsecurity.conf
+
+nano /usr/local/etc/modsecurity/modsecurity.conf
+
+Veja que por default o modo é DetectOnly
+
+SecRuleEngine DetectionOnly
+
+service apache24 restart
+
+Monitorar logs
+
+/var/log/modsec_audit.log
+/var/log/httpd-error.log
+
+
+Mudando para SecRuleEngine On
+
+nano /usr/local/etc/modsecurity/modsecurity.conf
+
+SecRuleEngine On
+
+service apache24 restart
+
+Acessar o site e o administrator e verificar
+
+tail -f /var/log/modsec_audit.log
+
+tail -f /var/log/httpd-error.log
+
+

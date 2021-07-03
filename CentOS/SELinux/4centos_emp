@@ -1,0 +1,230 @@
+Instalação dos pacotes do EMP no CentOS7
+
+207.246.78.135
+
+sudo su
+
+ou
+su
+
+== NGINX
+
+yum install epel-release -y
+
+yum install nginx -y
+
+systemctl start nginx
+systemctl enable nginx
+
+nginx -v
+
+== Testar
+
+curl http://IP
+Ou usando o navegador
+
+
+== MARIADB
+
+Instalação
+
+yum install mariadb-server mariadb -y
+
+systemctl start mariadb
+systemctl enable mariadb
+
+mysql_secure_installation
+
+Enter para aceitar senha em branco
+Entre com uma senha para o root e confirme
+Confirme com Enter as demais perguntas
+
+mysql -V
+
+
+== PHP
+
+Instalação
+
+wget http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+rpm -Uvh remi-release-7.rpm
+
+yum install yum-utils -y
+yum-config-manager --enable remi-php71
+
+yum --enablerepo=remi,remi-php71 install php-common php-fpm
+
+yum --enablerepo=remi,remi-php71 install -y php-fpm php-opcache php-pecl-apcu php-cli php-pear php-pdo php-mysqlnd php-pecl-memcache php-pecl-memcached php-gd php-mbstring php-mcrypt php-xml php71-php-bcmath php-bcmath
+
+php -v
+
+
+== Configurar Nginx com PHP
+
+nano /etc/nginx/conf.d/default.conf
+
+Deixe com este código abaixo:
+
+server {
+    listen       80;
+    server_name  207.246.78.135; # ou 207.246.78.135 ou ribafs.org www.ribafs.org;
+
+    # note that these lines are originally from the "location /" block
+    root   /usr/share/nginx/html;
+    index index.php index.html index.htm;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+        #try_files $uri $uri/ =404;
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+}
+
+Veja alternativa ao final sem php
+
+systemctl restart nginx
+
+
+== Configurar PHP-FPM
+
+systemctl start php-fpm
+systemctl enable php-fpm
+
+nano /etc/php-fpm.d/www.conf
+
+Mudar as linhas
+
+user = nginx
+group = nginx
+listen.owner = nginx
+listen.group = nginx
+
+Mudar a linha abaixo
+listen = 127.0.0.1:9000
+
+Para
+listen = /var/run/php-fpm/php-fpm.sock
+
+systemctl start php-fpm.service
+systemctl enable php-fpm.service
+
+
+== Testar
+
+nano /usr/share/nginx/html/info.php
+
+<?php
+phpinfo();
+
+No navegador
+http://IP/info.php
+
+Ou localmente via curl
+
+curl -I http://localhost/info.php
+
+Após o teste remover o arquivo:
+rm /usr/share/nginx/html/info.php
+
+
+== Alternativas de configuração para o virtualhost
+
+Sem PHP
+
+server {
+    listen       80;
+    server_name  localhost;
+
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+}
+
+
+com PHP
+
+# You should look at the following URL's in order to grasp a solid understanding of Nginx configuration files in order to fully unleash the power of Nginx.
+# http://wiki.nginx.org/Pitfalls
+# http://wiki.nginx.org/QuickStart
+# http://wiki.nginx.org/Configuration
+
+
+== Suporte para Joomla
+
+Remover o index.html do root web
+rm /usr/share/nginx/html/index.html
+
+Criei o banco de dados e um usuário para o site
+Importei o script do banco do site para o banco criado
+Enviei os arquivos para os ervidor e descompactei para o /usr/share/nginx/html
+
+Ao abrir o site ele apareceu sem o CSS. Desconfiei das permissões e alterei as permissões. Adicionei o ribafs ao grupo nginx
+
+usermod -a -G nginx ribafs
+
+Criei o script /root/perms contendo
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /usr/share/nginx/html/$1";
+echo "";
+chown -R ribafs:nginx /usr/share/nginx/html/$1;
+find /usr/share/nginx/html/$1 -type d -exec chmod 775 {} \;
+find /usr/share/nginx/html/$1 -type f -exec chmod 664 {} \;
+echo "";
+echo "Concluído!";
+
+Rodei assim:
+
+sh /root/perms
+
+Após rodar consegui ver o site normalmente, com o CSS
+
+Quando fui abrir o administrator ele não encontra a página.
+Percebi que havia deixado o administrator forçando SSL e ainda não instalei o SSL.
+Então editei
+
+nano /usr/share/nginx/html/configuration.php
+
+E alterei a linha abaixo para 0
+
+public $force_ssl = '0';
+
+
+Verificando os logs do nginx
+
+tail -f /var/log/nginx/error.log
+
+Limpando o log de erros do nginx
+
+> /var/log/nginx/error.log
+
+
+Agora implementar o SSL no nginx:
+Usar o arquivo
+5ssl_nginx
+
+
+Referências
+https://www.hostinger.com/tutorials/how-to-install-lemp-centos7
+http://acrelinux.org/nginx-php7-centos7/
+https://www.godaddy.com/garage/how-to-install-and-configure-nginx-on-centos-7/
+

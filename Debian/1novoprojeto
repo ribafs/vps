@@ -1,0 +1,64 @@
+Debian 9.3 com nginx
+
+Efetuar Destroy - Rebuild usando Debian 9.3 e mantendo o atual IP
+
+Reforçar todas as senhas
+root
+site
+mysql
+...
+
+Usar como nome da droplet - ribafs.org, alias ele é mantido no Rebuild como também o IP
+Depois do rebuild não recebi e-mail com senha então preciso efetuar 
+Access - Reset Root Password
+Também devo excluir o snapshot criado, visto que não tenho mais interesse nele.
+
+Instalar ufw no debian
+
+adicionar ao sources.list
+
+deb http://httpredir.debian.org/debian jessie main contrib
+deb-src http://httpredir.debian.org/debian jessie main contrib
+
+O projeto com Debian será encessado por conta da dificuldade de instalar o ufw nele814M
+RAM usada - 246M Free 747	
+
+Agora, após ter instalado os pacotes com o script
+RAM usada 130
+
+Voltarei para o Ubuntu 14.04.5-64 com nginx
+
+Enxuguei o script de instalação, removendo apache e colocando e removendo vários módulos do php.
+Caso falte algum instalarei.
+
+Após instalar o Ubuntu 14.04.5 mostra
+
+Espaço em disco usado - 
+Desisti
+
+Testei Debian 7.11 com apache
+Com ele instalo o ufw pelos repositórios
+
+Medindo após instalar os pacotes:
+
+ribafs@ribafs:~/backup$ free -m
+             total       used       free     shared    buffers     cached
+Mem:          1002        491        511          0         25        372
+-/+ buffers/cache:         94        908
+Swap:            0          0          0
+
+
+Atual com Ubuntu 16.04 e Apache2 e site com php7
+
+free -n
+ribafs@ribafs:~$ free -m
+              total        used        free      shared  buff/cache   available
+Mem:            992         395         177          44         419         364
+Swap:          2047           0        2047
+
+
+Debian9.3 com nginx e o site com php7
+
+free -n
+
+

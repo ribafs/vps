@@ -1,0 +1,49 @@
+Exportando um aplicativo laravel para outro server
+
+No servef de destino deve ficar na pasta de mesmo nome. Exemplo
+Origem - /var/www/html
+Destino - /var/www/html
+
+O banco no destino deve estar vazio
+
+Em config/app.php, set debugging as true with:
+
+'debug' => env('APP_DEBUG', true)' 
+
+Ajustar devidamente as permissões do /var/www/html
+
+Supondo que o laravel está em
+
+/var/www/html
+
+No server onde está
+
+cd /var/www
+
+sudo tar czpvf laravel.tar.gz html
+
+Ambos os computadores devem ter a mesma versão do PHP e as mesmas extensões
+
+Copiar o laravel.tar.gz para o server de destino, na pasta /var/www
+
+cd /var/www
+
+tar zxpvf laravel.tar.gz .
+
+composer install
+
+php artisan key:generate
+
+php artisan cache:clear
+
+php artisan migrate --seed
+
+    http://php.net/manual/en/install.windows.commandline.php
+
+    Make sure your webserver is serving pages from project/public folder.
+
+If laravel is failing, check the log file to see the cause
+
+your_project/storage/logs/laravel.log
+
+

@@ -1,0 +1,72 @@
+FreeBSD com XFCE
+
+https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/x11.html
+ a
+sudo freebsd-update fetch
+sudo freebsd-update install
+sudo pkg update
+sudo pkg upgrade -y
+
+XORG
+
+pkg install xorg nano
+
+Adicionar usuário
+
+adduser ribafs
+
+startx - vem com TWM
+
+pw groupmod video -m ribafs || pw groupmod wheel -m ribafs
+
+mv /etc/X11/xorg.conf ~/xorg.conf.etc
+mv /usr/local/etc/X11/xorg.conf ~/xorg.conf.localetc
+
+pw groupmod video -m jru || pw groupmod wheel -m ribafs
+
+nano /boot/loader.conf
+
+Adicione
+kern.vty=vt
+
+Gerando o xorg.conf
+
+Xorg -configure
+
+Testando
+Xorg -config /root/xorg.conf.new
+
+
+XDM
+
+pkg install -y x11/xdm
+
+nano /etc/ttys
+
+ttyv8   "/usr/local/bin/xdm -nodaemon"  xterm   off secure
+
+Mudar off para on
+
+
+
+XFCE
+
+pkg install xfce
+
+su - ribafs
+
+echo "exec /usr/local/bin/startxfce4 --with-ck-launch" > ~/.xinitrc
+sudo reboot
+
+Exigirá startx
+
+Para que entre automaticamente no ambiente gráfico
+
+echo "#!/bin/sh" > ~/.xsession
+echo "exec /usr/local/bin/startxfce4 --with-ck-launch" >> ~/.xsession
+chmod +x ~/.xsession
+
+reboot
+
+
+

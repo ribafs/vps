@@ -1,0 +1,91 @@
+Configurar o PF como firewall
+
+Checar vulnerabilidades em softwares/auditoria
+
+pkg audit -F
+
+
+nano /etc/rc.conf
+
+pf_enable="YES"
+pf_rules="/etc/pf.conf"
+pf_flags=""
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
+pflog_flags=""
+
+Criar
+nano /etc/pf.conf
+
+interface="vtnet0"
+scrub in all
+block in on $interface
+#allow SSH traffic from our network
+pass in on $interface proto tcp from 177.130.216.50/32 to $interface port 65522
+#allow HTTP (80), and HTTPS (443) to the world
+pass in on $interface proto tcp from any to $interface port 80
+pass in on $interface proto tcp from any to $interface port 443
+# Comabte aos ataques de bruteforce
+# ---- Allow SSH from trusted sources, but block bruteforcers
+pass quick proto tcp from <trusted> to $interface port 65522 \
+flags S/SA keep state \
+(max-src-conn 10, max-src-conn-rate 20/60, \
+overload <bruteforcers> flush global)
+#allow outgoing traffic
+pass out on $interface proto { tcp, udp } all
+
+Ativando as regras
+
+pfctl -nf /etc/pf.conf
+
+Caso apareçam erros, corrija e execute novamente removendo o flag -n
+
+pfctl -f /etc/pf.conf
+
+reboot
+
+Apenas visualizar as regras
+
+pfctl -sr
+
+Remover todas as regras do arquivo pf.conf
+
+pfctl -Fa
+
+
+/etc/rc.d/pf reload
+
+ou
+service pf reload
+
+Veja quem está tentando se conectar ao servidor em tempo real
+
+tcpdump -n -e -ttt -i pflog0
+
+Mostrar logs
+tcpdump -n -e -ttt -r /var/log/pflog
+
+Ver se tem algo na tabela bruteforce
+pfctl -t bruteforcers -T show
+
+Criar WhiteList
+nano /etc/trusted
+
+Adicionar alguns IPs
+
+# Casa
+177.130.216.50
+
+# DNOCS
+
+
+Implementar atualizações automáticas
+nano /etc/crontab
+
+Adicione após a linha
+*/5     *       *       *       *       root    /usr/libexec/atrun
+
+#Esta linha
+@daily root freebsd-update -t freebsd cron
+
+

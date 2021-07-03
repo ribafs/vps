@@ -1,0 +1,26 @@
+Diz ai o ponto forte do FreeBSD em rela-
+ção ao debian.org
+Postado por: Felipe Raposo em novembro 21, 2002 05:41 PM
+
+Amigo, posso dar inumeros:
+
+o filesystem do freebsd eh conservador (UFS), o que nao o leva a perda de dados em caso de crash do sistema, como acontece com o seu debian ou qqer outra distribuicao.
+
+Se vc der uma olhada em quantos advisories de seguranca sairam para o freebsd e comparar com o debian, acho que vc ficara assustado, nao eh a toa que a familia BSD* eh conhecia por sua seguranca.
+
+A facilidade de administracao do sistema, como o cvsup que faz a atualizacao do source sistema inteiro sem qualquer problema. Nao me venha falar de apt-get pq sinceramente aquilo nao presta.
+
+E a colecao do ports? conhece? torna super facil a instalacao de qualquer aplicativo com um simples comando "make install" ele puxa todas dependencias na internet e instala-las sem a menor dificuldade.
+Sinceramente acho que o linux tem inveja do ports :P
+
+A estabilidade do sistema eh outro ponto forte, lembro qdo o ftp.cdrom.com bateu o recorde de transferencia de 2TeraBytes com cerca de 3.000 conexoes simultaneas/diarias, tudo rodando em um freebsd com uma configuracao modesta.
+
+O yahoo usa FreeBSD ha anos, e o defende com unhas e dentes, isso porque nenhum outro sistema conseguiu dar conta do recado.
+
+Agora a propria microsft admite que o usa tb.
+
+Na minha opiniao seria loucura dizer que o linux eh melhor em servidores que o FreeBSD, ja usei debian,slackware,RH, etc e hoje posso dizer com toda certeza que nunca mais volto a usar um linux pelos motivos citados acima, entre outros...
+
+Alem eh claro da grande desorganizacao que eh o linux e suas distribuicoes, basta vc comparar o modelo de desenvolvimento de um BSD* e um linux qualquer que vc vera a diferenca.
+
+Acho que agora deu pra vc abrir a cabeca.

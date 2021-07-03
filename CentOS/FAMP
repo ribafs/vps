@@ -1,0 +1,37 @@
+yum install epel-release
+rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
+
+
+yum -y install httpd
+service httpd restart
+
+yum install  nano unzip wget mc
+nano /etc/httpd/conf/httpd.conf - configurar modrewrite
+
+yum install -y php71ww mod_php71w php71w-gd php71w-mbstring php71w-mysqli php71w-xml php71w-curl php71w-tidy php71w-ctype php71w-tokenizer php71w-simplexml php71w-dom php71w-session php71w-iconv php71w-hash php71w-json php71w-fileinfo php71w-bcmath php71w-zip php71w-zlib php71w-openssl pkg install php71w-pecl-memcached php71w-pecl-APCu
+
+/sbin/iptables -I INPUT -p tcp --dport 80 -j ACCEPT
+/etc/rc.d/init.d/iptables save
+
+yum -y install mysql-server
+service mysqld start
+
+/usr/bin/mysql_secure_installation
+
+chkconfig --level 35 httpd on
+chkconfig mysqld on
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/local/$1";
+echo "";
+chown -R apache:apache /var/www/html/$1;
+find /var/www/html/$1 -type d -exec chmod 775 {} \;
+find /var/www/html/$1 -type f -exec chmod 664 {} \;
+echo "";
+echo "Concluído!";
+
+chmod +x /usr/local/bin/perms
+
+http://192.168.1.10/
+

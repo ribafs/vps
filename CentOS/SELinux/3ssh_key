@@ -1,0 +1,40 @@
+Acesse seu terminal no desktop e execute:
+
+ssh-keygen -t rsa -b 4096
+
+Apenas tecle enter três vezes
+
+Para visualizar a chave execute:
+cat ~/.ssh/id_rsa.pub
+
+Agora salvar no servidor
+
+Acessar o servidor
+
+ssh -p porta ribafs@IP
+
+Execute
+
+su - ribafs
+mkdir .ssh
+chmod 700 .ssh
+cd .ssh
+ssh-keygen -b 1024 -f id_ribafs -t dsa (Enter 2 vezes)
+cat ../.ssh/id_ribafs*.pub > ../.ssh/authorized_keys
+chmod 600 ../.ssh/*
+
+exit
+
+Voltar ao desktop
+
+ssh-copy-id ribafs@IP -p porta
+
+Fornecer a senha do user ribafs no servidor.
+
+Daqui pra frente poderá acessar sem senha, que fica mais prático e mais seguro.
+
+
+Agora configurar o EMP no servidor com:
+
+4centos_emp
+

@@ -1,0 +1,190 @@
+Aplicando SSL ao Nginx
+
+Para ocultar cabeçalhos do nginx
+nano /etc/nginx/nginx.conf
+
+http {
+...
+	# Descomentar a linha abaixo
+    server_tokens off;
+...
+}
+
+service nginx restart
+
+mkdir /etc/nginx/ssl/
+
+openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt
+
+Responda às perguntas:
+
+Country Name (2 letter code) [XX]:BR  
+State or Province Name (full name) []:Ceará
+Locality Name (eg, city) [Default City]:Fortaleza
+Organization Name (eg, company) [Default Company Ltd]:FreeLancer
+Organizational Unit Name (eg, section) []:Free
+Common Name (eg, your name or your server's hostname) []:ribafs.org
+Email Address []:ribafs@gmail.com
+
+ls /etc/nginx/ssl/nginx.crt
+
+openssl dhparam -out /etc/nginx/ssl/dhparam.pem 4096
+
+This is going to take a long time
+Aguarde um bom tempo...
+
+nano /etc/nginx/sites-available/digitalocean
+
+Adicione para o bloco server inicial
+
+server {
+    ...
+    server_name IP; # ou ribafs.org www.ribafs.org
+
+    ### SSL Config
+    listen 443 ssl;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+    ssl_prefer_server_ciphers on;
+    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+    ssl_certificate /etc/nginx/ssl/nginx.crt;
+    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+    if ($request_method !~ ^(GET|HEAD|POST)$ )
+    {
+           return 405;
+    }
+
+... 
+   
+
+Proteção contra ataques Clickjacking
+nano /etc/nginx/nginx.conf
+
+Adicionar ao bloco http
+add_header X-Frame-Options "SAMEORIGIN";
+
+service nginx restart
+
+
+Testar
+
+https://IP
+
+https://IP/administrator
+
+
+Logs
+
+Em caso de problema ver logs
+
+tail -f /var/log/nginx/error.log
+
+
+Agora proteger doretório administrator com senha usando o arquivo
+
+4senha_diretorio
+
+
+
+Instalar o certificado SSL auto-assinado no CentOS 8
+
+Para servidores sem um domínio, apenas com IP
+
+sudo dnf update
+
+sudo dnf install httpd mod_ssl
+
+sudo systemctl enable --now httpd
+
+sudo firewall-cmd --add-port=443/tcp --permanent
+
+sudo firewall-cmd --add-port=80/tcp --permanent
+
+sudo firewall-cmd --reload
+
+sudo openssl req -newkey rsa:4096 -nodes -keyout /etc/pki/tls/private/ribafs.key -x509 -days 365 -out /etc/pki/tls/certs/ribafs.crt
+BR
+CE
+Fortaleza
+RibaFS
+Particular
+143.110.215.113
+ribafs@gmail.com
+
+sudo nano /etc/httpd/conf.d/ssl.conf
+
+ServerName localhost
+
+## Redirect HTTP Traffic to HTTPS
+<VirtualHost *:80>
+    DocumentRoot /var/www/html
+    ServerName localhost
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</VirtualHost>
+
+## Begin SSL configuration
+
+Listen 443 https
+SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
+SSLSessionCache         shmcb:/run/httpd/sslcache(512000)
+SSLSessionCacheTimeout  300
+SSLCryptoDevice builtin
+
+sudo cp /etc/httpd/conf.d/ssl.conf /home/ribafs
+
+<VirtualHost _default_:443>
+ErrorLog logs/ssl_error_log
+TransferLog logs/ssl_access_log
+LogLevel warn
+SSLEngine on
+SSLProtocol -all +TLSv1.3 +TLSv1.2
+SSLOpenSSLConfCmd Curves X25519:secp521r1:secp384r1:prime256v1
+SSLHonorCipherOrder on
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM
+SSLCertificateFile /etc/pki/tls/certs/ribafs.crt
+SSLCertificateKeyFile /etc/pki/tls/private/ribafs.key
+<FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+</FilesMatch>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl_request_log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+SSLCompression off
+#SSLUseStapling on
+#SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+SSLSessionTickets Off
+</VirtualHost>
+
+apachectl configtest
+
+ou
+httpd -t
+
+sudo nano /var/www/html/index.html
+
+<!DOCTYPE html>
+<html>
+<body>
+<h1>centos8.ribafs.com</h1>
+<p>Configuring Apache to use SSL/TLS certificates on CentOS 8</p>
+</body>
+</html>
+
+sudo systemctl restart httpd
+
+curl localhost
+
+https://143.110.215.113
+
+https://kifarunix.com/configure-apache-with-ssl-tls-certificates-on-centos-8/

@@ -1,0 +1,181 @@
+Instalar e Configurar ModSecurity e ModEvasive
+
+ModSecurity é um software open source, um módulo de firewall de aplicação web livre (WAF) do Apache. Com mais de 70% de todos os ataques agora realizados sobre o nível de aplicação web, as organizações precisam de toda a ajuda que podem obter para toronar os seus sistemas seguros.
+
+WAFs são implantados para estabelecer uma camada de segurança externa, para aumentar a segurança, detectar e prevenir ataques antes que eles atinjam as aplicações web. Ele fornece proteção contra uma série de ataques contra aplicações web e permite a monitorização do tráfego HTTP e análise em tempo real, com pouca ou nenhuma mudança na infra-estrutura existente (http://www.jangestre.com/2012/04/ubuntu-1204-lts-64bit-apache2-mod.html).
+
+Instalando o firewall de aplicações ModSecurity e o ModEvasive para prevenir ataques de DDOS
+
+apt-get update
+apt-get upgrade
+
+O apache já está instalado
+apt-get install libxml2 libxml2-dev libxml2-utils libaprutil1 libaprutil1-dev
+
+sudo apt-get -y install libapache2-mod-security2
+
+Verificar modulo instalado
+apachectl -M | grep security2
+
+Após instalar o módulo será habilitado mas as regras não estão configuradas ainda
+
+As regras ficam em
+/etc/apache2/mods-available/security2.conf
+
+sudo cp /etc/modsecurity/modsecurity.conf-recommended /etc/modsecurity/modsecurity.conf
+
+Podemos adicionar regras em conf files em /etc/modsecurity/
+
+<IfModule security2_module>
+        SecDataDir /var/cache/modsecurity
+        IncludeOptional /etc/modsecurity/*.conf
+</IfModule>
+
+nano /etc/modsecurity/modsecurity.conf
+
+O default é DetectOnly
+
+Se mudar para bloquear
+SecRuleEngine On
+
+SecRuleEngine On
+
+Ajustar as duas linhas abaixo
+SecRequestBodyLimit 16384000
+SecRequestBodyInMemoryLimit 16384000
+
+systemctl restart apache2
+
+cd /tmp
+Baixar a última versão estável de 
+https://github.com/SpiderLabs/owasp-modsecurity-crs/releases
+
+wget https://github.com/SpiderLabs/owasp-modsecurity-crs/archive/v3.0.2.tar.gz
+
+mv v3.0.2.tar.gz modsecurity-crs_3.0.2.tar.gz
+tar -zxvf modsecurity-crs_3.0.2.tar.gz
+
+cp -R owasp-modsecurity-crs-3.0.2/* /etc/modsecurity/
+
+cp /etc/modsecurity/crs-setup.conf.example /etc/modsecurity/modsecurity_crs_setup.conf
+cd /etc/modsecurity/rules
+
+nano /etc/apache2/mods-available/security2.conf
+
+Adicione ao final, antes de </IfModule>:
+
+Include "/etc/modsecurity/rules/*.conf"
+
+service apache2 restart
+
+Mod Evasive
+
+Evitar ataques de DDOS (Denial Service).
+
+apt-get install libapache2-mod-evasive
+
+mkdir /var/log/mod_evasive
+chown www-data:www-data /var/log/mod_evasive/
+nano /etc/apache2/mods-available/mod-evasive.conf
+
+Adicione:
+
+<ifmodule mod_evasive20.c>
+DOSHashTableSize 3097
+DOSPageCount 2
+DOSSiteCount 50
+DOSPageInterval 1
+DOSSiteInterval 1
+DOSBlockingPeriod 10
+DOSLogDir /var/log/mod_evasive
+DOSEmailNotify ribafs@gmail.com
+DOSWhitelist 127.0.0.1
+DOSWhitelist 177.130.202.171
+</ifmodule>
+
+Lembrando que o IP 177… é o IP que será liberado, o do meu desktop.
+
+service apache2 restart
+
+Logs
+tail /var/log/apache2/modsec_audit.log
+
+Para adicionar um IP na white list adicione uma linha no arquivo acima:
+DOSWhitelist 162.13.23.127
+
+Devemos adicionar o IP de cada computador que usamos para administrar o servidor.
+
+É bom lembrar que softwares como o mod_evasive e o denyhosts precisam ter em sua whitelist nossos IP de acesso, caso contrário teremos problema. Ainda bem que o Ocean tem uma console via web.
+
+Com isso quando ele considerar algo que mereça mandará para a blacklist e te enviará um e-mail
+
+Para não mais receber os e-mails mude para DOSSystemCommand ao invés de DOSEmailNotify, assim:
+
+nano /etc/apache2/mods-available/mod-evasive.conf
+
+DOSSystemCommand "echo 'mod_evasive HTTP Blacklisted %s more info here:
+www.projecthoneypot.org/ip_%s' | mail -s 'Blocked IP by mod_evasive' root@localhost"
+
+Lista de discussão
+http://sourceforge.net/mailarchive/forum.php?forum_name=mod-security-users 
+Lisra do owasp
+https://www.owasp.org/index.php/Category:OWASP_ModSecurity_Core_Rule_Set_Project 
+http://www.modsecurity.org/ 
+http://sourceforge.net/projects/mod-security/files/modsecurity-apache/ 
+
+
+Liberando sites no mod_security
+
+Após instalar o mod_security e configurar acontece de barrar o acesso a alguns sites.
+
+Observar os logs
+tail /var/log/apache2/error.log
+
+Criar o arquivo:
+nano /etc/modsecurity/rules/whitelist.con
+
+Contendo:
+
+<LocationMatch "/portal/administrator">
+SecRuleRemoveById 981059
+SecRuleRemoveById 981143
+SecRuleRemoveById 981060
+</LocationMatch>
+
+Monitorar os logs
+tail /var/log/apache2/error.log
+tail /var/log/apache2/modsec_audit.log --lines 60 | less
+service apache2 restart
+
+Abrir um site por vez e anotar o ID de cada site bloqueado com falso positivo (indevidamente).
+# Copiados do howtoforge
+SecRuleRemoveById 910006 # Google robot activity - Useful in someways but noisy for sites where you want them crawled
+SecRuleRemoveById 960015 # Request Missing an Accept Header - Allow for Google Reader
+
+Veja que todos do rules/*.conf já são incluidos por padrão.
+
+Observar os logs novamente e tentar acessar cada um dos sites.
+
+Cada site bloqueado anote o ID e adicione ao ignorados e então reinicie o Apache.Assim se vai liberando cada site.
+
+Restartei apache:
+service apache2 restart
+
+
+Testando segurança de sites
+
+Chame:
+http://ribafs.org/index.php?secret_file=/etc/passwd 
+
+Será barrado com o aviso:
+Forbidden
+You don't have permission to access / on this server.
+
+Simulação básica de ataque de SQL Injection
+http://ribafs.org/?id=23' or '1'='1 
+
+Também barrado.
+
+Ao efetuar os testes acima em servidor local eles não foram recusados,mas o segundo recebeu 404 de um site em Joomla com Helix.
+
+

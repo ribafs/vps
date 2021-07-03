@@ -1,0 +1,63 @@
+
+
+pkh delete xinetd ypserv tftp-server telnet-server rsh-server
+
+pkg list
+pkg delete nome
+
+Desabilitar login do root
+
+Desabilitar IPv6 se não usar
+
+Procurando portas escutando na rede
+
+netstat -tulpn
+
+ou
+ss -tulpn
+
+ou
+nmap -sT -O localhost
+
+
+/etc/sysctl.conf file is used to configure kernel parameters at runtime. Linux reads and applies settings from /etc/sysctl.conf at boot time. Sample /etc/sysctl.conf:
+# Turn on execshield
+kernel.exec-shield=1
+kernel.randomize_va_space=1
+# Enable IP spoofing protection
+net.ipv4.conf.all.rp_filter=1
+# Disable IP source routing
+net.ipv4.conf.all.accept_source_route=0
+# Ignoring broadcasts request
+net.ipv4.icmp_echo_ignore_broadcasts=1
+net.ipv4.icmp_ignore_bogus_error_messages=1
+# Make sure spoofed packets get logged
+net.ipv4.conf.all.log_martians = 1
+
+Procurar arquivos e diretórios com 777 e 666:
+
+find /dir -xdev -type d \( -perm -0002 -a ! -perm -1000 \) -print
+
+Procurar arquivos sem dono
+find /dir -xdev \( -nouser -o -nogroup \) -print
+
+Instalar e usar 
+logcheck
+
+Usar
+AIDE
+Lynix
+fail2ban
+denyhosts
+
+Segurança no Apache/Nginx
+
+ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+Options all -Indexes
+Header always unset X-Powered-By
+
+Backups regulares
+
+

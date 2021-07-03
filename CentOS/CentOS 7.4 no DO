@@ -1,0 +1,95 @@
+CentOS 7.4 no DO
+
+Criei o servidor associando a uma chave ssh
+
+Recebi a senha por e-mail
+
+Após ser criado abri o terminal em meu desktop e digitei
+
+ssh root@159.65.239.142
+
+Entrei com root e yes
+
+Copiei a senha do site do DO e colei
+
+Funcionou direitinho e agora eles não pedem mais para repetir a senha enviada por e-mail
+
+Criar a pasta para backup. Sempre antes de alterar qualquer script fazer backup do mesmo
+
+mkdir /root/backup
+
+Atualizei a distribuição com
+yum update
+reboot
+
+Como este servidor foi associado à uma chave ssh seu acesso ocorre com senha apenas na primeira vez,
+nas próximas sem senha.
+Num rebuild do servidor a senha não foi socilitada, acessou com root sem senha.
+
+Criei o usuário ribafs
+
+adduser ribafs
+passwd ribafs
+
+Adicionei ao sudo
+
+Instalar os pacotes abaixo
+yum install nano unzip mc
+
+Backup do sudoers:
+cp /etc/sudoers /root/backup
+
+nano /etc/sudoers
+
+Adicionei a linha seguinte logo abaixo da linha do root
+ribafs	ALL=(ALL)	NNOPASSWD:ALL
+
+Backup do ssh
+cp /etc/ssh/sshd_config /root/backup
+
+Adicionei ao ssh e aproveitei e otimizei:
+
+nano /etc/ssh/sshd_config
+
+Mudei
+LoginGraceTime 30
+PasswordAuthentication no
+AllowUsers ribafs root
+
+Para que o SELinux permita que ribafs acesse via ssh:
+semanage port -a -t ssh_port_t -p tcp 65522
+semanage login -a -s user_u ribafs
+cd /home/ribafs
+restorecon -v
+chcon -R unconfined_u:object_r:user_home_t:s0 /home/ribafs/.ssh/
+semanage fcontext -a -t ssh_home_t /home/ribafs/.ssh/
+restorecon -v /home/ribafs/.ssh/
+
+service sshd restart
+
+Em caso de erro no ssh, usar -vv para debug:
+ssh -vv -p porta user@ip
+
+Efetuei logout
+exit
+
+Acessei agora com ribafs e a nova porta
+ssh -p 10552 ribafs@159.65.239.142
+
+Passei para su
+
+usermod -a -G wheel ribafs
+
+sudo su
+
+Não consegui. O SELinux impediu. Nem mesmo consegui passar para root usando su.
+Para isso alterar a linha adicionada ao sudoers para:
+
+nano /etc/sudoers
+
+ribafs  ALL=(ALL)   TYPE=sysadm_t ROLE=sysadm_r PASSWD: ALL
+
+Para restringir o su no sudoers (não permitir)
+%wheel   ALL=(ALL)   TYPE=sysadm_t ROLE=sysadm_r NOPASSWD: ALL, ! /bin/su
+
+

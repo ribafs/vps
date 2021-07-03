@@ -1,0 +1,11 @@
+Após a instalação do LAMP
+
+Para abrigar apenas um domínio no servidor, podemos usar o virtualhost default (000-default)
+
+Configurar o SSL usando o certbot
+
+Caso pretendamos usar somente este domínio, podemos adicionar estes ajustes na imagem, para que já venha também com isso
+
+Caso pretendamos instalar vários servidores, com um domínio diferente para cada um, não devemos adicionar isso para a imagem
+
+

@@ -1,0 +1,24 @@
+Usar o próprio servidor do CIPI para criar um site
+
+Domain: despertai.net.br
+
+Server IP: 159.203.102.13
+
+SSH Username: cp9fdc085d9
+
+SSH Password: PpiBQxfApfPITGDU9LS4okvQ
+
+MySQL database: cp9fdc085d9
+
+MySQL username: cp9fdc085d9
+
+MySQL password: 6dfJBBGxo9BVbOwgPAwytrAv
+
+Document root: /home/cp9fdc085d9/web/
+
+
+Agora irei conferir os dados acima
+
+ssh cp9fdc085d9@159.203.102.13
+
+

@@ -1,0 +1,7 @@
+Antes de destruir uma vm, execute um power off.
+No momento de destruir, podemos já criar outra vm.
+Para isso usando o Rebuild:
+- Selecionar uma imagem (Ubuntu 20.04)
+- Rebuild
+
+Uma característica do rebuild é que a vm continua com o mesmo ip.

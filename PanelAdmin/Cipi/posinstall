@@ -1,0 +1,82 @@
+Adicionei um user comun e o add ao grupo do sudo
+
+Troquei a porta do ssh para a 65522
+
+Adicionei a porta 65522 ao ufw e deletei a 22
+
+== Criar script para limpar o cache da RAM
+
+nano /usr/local/bin/m
+
+sysctl -w vm.drop_caches=3
+swapoff -a
+swapon -a
+
+chmod +x /usr/local/bin/m
+
+Executar com root
+
+Observe os valores
+free -m
+
+Execute
+m
+
+Execute novamente e compare com os valores anteriores
+free -m
+
+Atualizar
+apt update
+apt upgrade -y
+reboot
+
+Ok, tudo coontinua funcionando. Só que agora acesso com:
+
+ssh -p 65522 cipi@159.89.10.166
+
+
+== Nas máquinas clientes:
+- Copiar aliases
+- Copiar scripts
+- Adicionar ribafs ao www-data
+adduser ribafs www-data
+
+- Também os scripts perms e permsl
+- Criar perms e permsl para conf permissões do www
+
+
+== Recuperando a senha do admin@admin.com para a web
+
+Por algum motivo perdi a senha do root da web
+
+Como é para laravel, imaginei que usava bcrypt, então
+
+Abri um aplicativo com laravel e na view welcome.blade.php
+Adicionei numa posição estratégica
+
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm text-gray-700 underline">Login</a>
+{{dd(bcrypt('zmxn1029C@'))}}
+
+Rodei
+php artisan serve
+
+http://localhost:8000
+
+Então copiei o has gerado para a memória
+
+Acessei o mysql com cipi
+sudo mysql -uroot
+show databases;
+use cipi;
+select * from cipi.users;
+update cipi.users set password='senhagerada'
+
+Beleza. Agora posso a cessar
+http://159.89.10.166
+
+Com
+admin@admin.com
+senhagerada
+
+

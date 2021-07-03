@@ -1,0 +1,13 @@
+Instalação de pacotes pelos ports
+
+São mais atualizados
+
+portsnap fetch
+portsnap extract
+
+Caso os ports já estejam instalados
+portsnap fetch update
+
+Busca
+portsnap search apache
+

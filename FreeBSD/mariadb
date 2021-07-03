@@ -1,0 +1,54 @@
+https://www.cyberciti.biz/faq/how-to-install-mariadb-databases-on-a-freebsd-v10-unix-server/
+
+Instalar e atualizar ports
+
+portsnap fetch update
+portupgrade -a
+
+pkg info | grep mysql
+
+cd /usr/ports/databases/mysql57-server/
+make deinstall clean
+
+cd /usr/ports/databases/mysql57-client/
+make deinstall clean
+rm -rf /var/db/mysql/
+
+ls /usr/ports/databases/ | grep mariadb
+
+cd /usr/ports/databases/mariadb102-server
+make install clean
+
+Para instalar diretamente os binários:
+
+cd /usr/ports
+
+pkg install databases/mariadb102-server
+
+echo 'mysql_enable="YES"' >> /etc/rc.conf
+
+service mysql-server start
+
+mysql_secure_installation
+
+mysql -u user -p
+mysql -h db-hostname-here -u user-name-here -p
+
+Habilitar acesso remoto (não recomendado)
+
+nano /usr/local/etc/my.cnf
+
+[mysqld]
+
+bind-address=YOUR-SERVER-IP
+
+Permitir cliente do mysql
+pass in on $ext_if proto tcp from 192.168.1.200to any port 3306  flags S/SA synproxy state
+
+Abrir a porta 3306 no pf firewall
+pass in on $ext_if proto tcp from any to any port 3306
+
+Ou permitir acesso somente do IP 192.168.1.10:
+pass in on $ext_if proto tcp from 192.168.1.10 to any port 3306
+
+

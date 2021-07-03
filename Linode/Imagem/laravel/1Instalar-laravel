@@ -1,0 +1,51 @@
+composer global require laravel/installer
+
+echo 'export PATH="$PATH:$HOME/.config/composer/vendor/bin"' >> ~/.bashrc
+
+Sair do terminal
+exit
+
+Entrar novamente
+
+cw
+
+l8 laravel-acl
+cd laravel-acl
+npm install && npm run dev && npm audit fix
+
+Copiar o conteúdo do laravel-admin (https://github.com/ribafs/laravel-admin) para este, sobrescrevendo tudo
+
+Criar o banco e configurar em
+
+.env
+
+APP_NAME='Laravel ACL - Demo'
+
+sudo perms laravel-acl
+
+php artisan migrate --seed
+
+php artisan serve
+
+http://localhost:8000
+
+Clique em Área Pública
+
+Experimente navegar
+
+Agora faça login com os 4 users e experimente a navegação
+
+email - super@mail.org senha - 123456
+
+email - admin@mail.org senha - 123456
+
+email - manager@mail.org senha - 123456
+
+email - user@mail.org senha - 123456
+
+Mais testes
+
+https://ribamar.net.br
+
+
+

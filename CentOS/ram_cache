@@ -1,0 +1,11 @@
+Para limpar o cache de RAM a cada hora:
+
+Adicionei ao cron.hourly
+
+nano /etc/cron.hourly/m
+
+#!/bin/bash
+sysctl -w vm.drop_caches=3
+
+chmod +x /etc/cron.hourly/m
+

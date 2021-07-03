@@ -1,0 +1,30 @@
+Verificador DNS Global
+
+A ferramenta permite realizar rápida e facilmente uma pesquisa de DNS para verificar a propagação de DNS e ver informações de qualquer domínio de servidores DNS localizados em muitos países.
+
+Você pode testar as alterações feitas em domínios novos ou existentes que foram atualizadas corretamente sem a necessidade de consultar manualmente os servidores remotos. Isso dá a você uma visão imediata de como os usuários globalmente podem resolver os registros DNS do seu site, e-mail ou outro serviço online.
+O que é DNS e como funciona?
+
+O Domain Name System (DNS) é um sistema usado para converter um nome (como www.google.com) em um endereço IP (como 192.168.2.1) que é usado por computadores para se comunicar em uma rede como a Internet.
+
+Ao visitar um site, seu dispositivo pede o endereço ao servidor DNS local. Se você não visitou recentemente o site, será necessário encaminhar a solicitação para o servidor responsável por gerenciá-la.
+
+Depois que um resultado é retornado, ele é armazenado localmente em um cache DNS para acelerar solicitações futuras. O tempo de armazenamento depende do Time to Live (TTL) configurado.
+O que é propagação de DNS?
+
+Propagação de DNS é o termo comumente usado para verificar o estado atual dos resultados globalmente. Esse processo pode levar apenas alguns minutos ou até 48 horas ou mais.
+
+Tecnicamente, o DNS não se propaga, mas este é o termo com o qual as pessoas se familiarizaram. As solicitações são encaminhadas do resolvedor usado localmente para o servidor de nomes autorizado sob demanda e depois armazenadas em cache para acelerar futuras pesquisas de DNS.
+
+Para sites populares, os resultados podem ser armazenados em cache para pessoas em diferentes partes do mundo. Se você fez alterações recentemente em sua configuração, isso pode significar que algumas pessoas receberão resultados antigos até que o TTL expire.
+Quais registros DNS podem ser verificados?
+
+Você pode realizar verificações de tipos de registro comuns, incluindo:
+
+    A - O tipo mais comum, usado para apontar para um endereço IP.
+    CNAME - nome canônico ou alias, eles apontam para outros registros.
+    MX - Mail Exchanger, são usados ​​para definir servidores de e-mail e suas prioridades.
+    NS - servidor de nomes, estes armazenam o servidor de nomes autorizado.
+    TXT - Texto, normalmente usado para definições de configuração.
+
+Os tipos adicionais que podem ser verificados e geralmente usados ​​em configurações mais avançadas incluem: AAAA, CAA, PTR, SOA e SRV.

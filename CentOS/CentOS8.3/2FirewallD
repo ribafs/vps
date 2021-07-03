@@ -1,0 +1,116 @@
+sudo dnf -y install firewalld
+sudo systemctl enable --now firewalld
+
+sudo systemctl status firewalld
+
+Liberar a porta do SSH
+
+semanage port -l | grep ssh
+
+sudo semanage port -a -t ssh_port_t -p tcp 44422
+
+semanage port -l | grep ssh
+
+Liberar no FirewallD
+
+sudo firewall-cmd --add-port=44422/tcp --permanent
+sudo firewall-cmd --reload
+
+sudo nano /etc/firewalld/firewalld.conf
+
+Mudar a última linha apra
+#AllowZoneDrifting=yes
+AllowZoneDrifting=no
+
+sudo systemctl status firewalld.service
+
+Podemos ver qual zona está atualmente selecionada como padrão, digitando:
+
+    firewall-cmd --get-default-zone
+
+
+firewall-cmd --get-active-zones
+
+sudo firewall-cmd --list-all
+
+sudo firewall-cmd --list-all-zones | less
+
+podemos mover nossa interface eth0 para a zona local, digitando o seguinte:
+
+    sudo firewall-cmd --zone=home --change-interface=eth0
+
+    firewall-cmd --get-services
+
+    sudo firewall-cmd --zone=public --add-service=http
+
+    sudo firewall-cmd --zone=public --list-services
+
+    sudo firewall-cmd --zone=public --add-service=http --permanent
+
+De maneira alternativa, você poderia usar o sinalizador --runtime-to-permanent para salvar a configuração de firewall atualmente em execução na configuração permanente:
+
+    sudo firewall-cmd --runtime-to-permanent
+
+sudo firewall-cmd --zone=public --list-services --permanent
+
+sudo firewall-cmd --zone=public --add-service=https
+sudo firewall-cmd --zone=public --add-service=https --permanent
+
+Add custom port
+
+    sudo firewall-cmd --zone=public --add-port=5000/tcp
+
+sudo firewall-cmd --zone=public --list-ports
+
+sudo firewall-cmd --zone=public --add-port=4990-4999/udp
+
+    sudo firewall-cmd --zone=public --permanent --add-port=5000/tcp
+    sudo firewall-cmd --zone=public --permanent --add-port=4990-4999/udp
+    sudo firewall-cmd --zone=public --permanent --list-ports
+
+Por exemplo, poderíamos copiar desta forma a definição de serviço SSH para usar para nossa definição de serviço exemplo. O nome do arquivo menos o sufixo .xml determinará o nome do serviço dentro da lista de serviços do firewall:
+
+    sudo cp /usr/lib/firewalld/services/ssh.xml /etc/firewalld/services/example.xml
+
+Agora, você pode ajustar a definição encontrada no arquivo que copiou. Primeiro, abra-o em seu editor de texto favorito. Usaremos o vi aqui:
+
+    sudo vi /etc/firewalld/services/example.xml
+
+sudo firewall-cmd --reload
+
+firewall-cmd --get-services
+
+Criando zonas
+
+sudo firewall-cmd --permanent --new-zone=publicweb
+sudo firewall-cmd --permanent --new-zone=privateDNS
+
+sudo firewall-cmd --permanent --get-zones
+
+    firewall-cmd --get-zones
+
+sudo firewall-cmd --reload
+firewall-cmd --get-zones
+
+sudo firewall-cmd --zone=publicweb --add-service=ssh
+sudo firewall-cmd --zone=publicweb --add-service=http
+sudo firewall-cmd --zone=publicweb --add-service=https
+sudo firewall-cmd --zone=publicweb --list-all
+
+    sudo firewall-cmd --zone=privateDNS --add-service=dns
+    sudo firewall-cmd --zone=privateDNS --list-all
+
+    sudo firewall-cmd --zone=publicweb --change-interface=eth0
+    sudo firewall-cmd --zone=privateDNS --change-interface=eth1
+
+--runtime-to-permanent para salvar nossa configuração de tempo de execução inteira permanentemente:
+
+    sudo firewall-cmd --runtime-to-permanent
+
+sudo firewall-cmd --reload
+
+sudo firewall-cmd --zone=publicweb --list-services
+
+sudo firewall-cmd --set-default-zone=publicweb
+
+https://www.digitalocean.com/community/tutorials/how-to-set-up-a-firewall-using-firewalld-on-centos-8-pt

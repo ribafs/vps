@@ -1,0 +1,37 @@
+Para instalar um site ou aplicativo de um cliente
+
+Exemplo
+
+Anes de instalar o cake precisamos:
+
+- Criar um user SSH - john-ssh
+- Criar um banco de dados - sitedb
+- Criar um Domínio 
+    aqui selecione: 
+    - Vhost CakePHP 
+    - versão do PHP
+    - www.domain.com
+    - DocumentRoot -  	/home/cloudpanel/htdocs/www.domain.com
+
+Acesse o diretório apontado no domínio oara o Document Root
+
+Após o login via SSH com john-ssh
+
+cd /home/cloudpanel/htdocs/
+rm www.domain.com
+Atualizar o composer para a versão 2
+
+Resetar as eprmissões
+
+cd /home/cloudpanel/htdocs/
+clpctl system:permissions:reset www.domain.com 775
+
+Instalar o CakePHP 4 na pasta site
+
+php8.0 /usr/local/bin/composer create-project --prefer-dist cakephp/app:~4.2 www.domain.com
+
+Agora já podemos abrir no navegador
+
+http://www.domain.com
+
+

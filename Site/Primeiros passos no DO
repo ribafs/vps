@@ -1,0 +1,26 @@
+Primeiros passos no DO
+
+- Criar a vm/droplet
+- Associar sua chave pública do SSH ao DO
+- Acessar com
+ssh seuuser@IPdaVM
+Adicionar usuário comum
+adduser seuuser
+Adicionar o user ao grupo do sudo
+usermod -aG sudo seuuser
+Conf firewall
+ufw status
+ufw allow http
+ufw allow https
+ufw allow ssh
+
+ufw enable
+ufw status verbose
+
+Instalando o LAMP 20.04 ele já vem com o ufw habilitado e permitindo somente as portas
+22
+80
+443
+
+Caso adicione outra porta para o SSH, remover a 22
+

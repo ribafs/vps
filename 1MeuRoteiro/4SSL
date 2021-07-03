@@ -1,0 +1,180 @@
+SSL com certbot
+
+https://certbot.eff.org
+
+Selecione o servidor web (Apache) e a distribuição (Debian 10)
+
+Acessar o servidor via SSH
+
+Instalar o snap
+https://certbot.eff.org/lets-encrypt/debianbuster-apache
+
+sudo apt update && sudo apt install snapd
+
+Se necessário execute
+sudo apt --fix-broken install
+
+sudo snap install core
+
+sudo snap refresh core
+
+sudo snap install --classic certbot
+
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+== Aqui parar e atualizar o VirtualHost default
+
+VirtualHost default (para server com apenas um domínio)
+
+sudo nano /etc/apache2/sites-available/000-default.conf
+
+<VirtualHost *:80>
+        ServerName ribamar.net.br
+        ServerAlias www.ribamar.net.br
+        ServerAdmin ribafs@gmail.com
+
+        DocumentRoot /var/www/html
+
+        <Directory /var/www/html>
+            Options Indexes FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+
+Ele criará uma configuração para SSL
+
+sudo certbot --apache
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator apache, Installer apache
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): ribafs@gmail.com
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Please read the Terms of Service at
+https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf. You must
+agree in order to register with the ACME server. Do you agree?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: y
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Would you be willing, once your first certificate is successfully issued, to
+share your email address with the Electronic Frontier Foundation, a founding
+partner of the Let's Encrypt project and the non-profit organization that
+develops Certbot? We'd like to send you email about our work encrypting the web,
+EFF news, campaigns, and ways to support digital freedom.
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+(Y)es/(N)o: y
+Account registered.
+
+Which names would you like to activate HTTPS for?
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+1: ribamar.net.br
+2: www.ribamar.net.br
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Select the appropriate numbers separated by commas and/or spaces, or leave input
+blank to select all options shown (Enter 'c' to cancel): 1,2
+
+Congratulations! You have successfully enabled https://ribamar.net.br and
+https://www.ribamar.net.br
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Subscribe to the EFF mailing list (email: ribafs@gmail.com).
+We were unable to subscribe you the EFF mailing list because your e-mail address appears to be invalid. You can try again later by visiting https://act.eff.org.
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/ribamar.net.br/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/ribamar.net.br/privkey.pem
+   Your certificate will expire on 2021-08-15. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again with the "certonly" option. To non-interactively
+   renew *all* of your certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+Configurar renovação
+
+sudo certbot renew --dry-run
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processing /etc/letsencrypt/renewal/ribamar.net.br.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Cert not due for renewal, but simulating renewal for dry run
+Plugins selected: Authenticator apache, Installer apache
+Account registered.
+Simulating renewal of an existing certificate for ribamar.net.br and www.ribamar.net.br
+Performing the following challenges:
+http-01 challenge for ribamar.net.br
+http-01 challenge for www.ribamar.net.br
+Waiting for verification...
+Cleaning up challenges
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+new certificate deployed with reload of apache server; fullchain is
+/etc/letsencrypt/live/ribamar.net.br/fullchain.pem
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations, all simulated renewals succeeded: 
+  /etc/letsencrypt/live/ribamar.net.br/fullchain.pem (success)
+
+Testar
+
+https://ribamar.net.br
+
+Configurar o 
+
+sudo nano /etc/apache2/sites-available/000-default-le-ssl.conf
+
+<IfModule mod_ssl.c>
+<VirtualHost *:443>
+        ServerName ribamar.net.br
+        ServerAlias www.ribamar.net.br
+        ServerAdmin ribafs@gmail.com
+
+        DocumentRoot /var/www/html
+
+        <Directory /var/www/html>
+            Options Indexes FollowSymLinks
+            AllowOverride All
+            Require all granted
+        </Directory>
+
+
+        # Available loglevels: trace8, ..., trace1, debug, info, notice, warn,
+        # error, crit, alert, emerg.
+        # It is also possible to configure the loglevel for particular
+        # modules, e.g.
+        #LogLevel info ssl:warn
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+        # For most configuration files from conf-available/, which are
+        # enabled or disabled at a global level, it is possible to
+        # include a line for only one particular virtual host. For example the
+        # following line enables the CGI configuration for this host only
+        # after it has been globally disabled with "a2disconf".
+        #Include conf-available/serve-cgi-bin.conf
+
+
+Include /etc/letsencrypt/options-ssl-apache.conf
+SSLCertificateFile /etc/letsencrypt/live/ribamar.net.br/fullchain.pem
+SSLCertificateKeyFile /etc/letsencrypt/live/ribamar.net.br/privkey.pem
+</VirtualHost>
+</IfModule>
+
+
+
+aprel
+
+https://www.digitalocean.com/community/questions/forbidden-you-don-t-have-permissions-to-access-on-this-server

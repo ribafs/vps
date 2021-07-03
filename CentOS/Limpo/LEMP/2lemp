@@ -1,0 +1,146 @@
+Instalar pacotes Default do CentOS 7 e epel
+
+
+167.99.90.92
+
+yum update
+reboot
+
+yum install -y epel-release
+
+yum install -y php php-fpm php-mcrypt php-cli php-gd php-curl php-xml php-zip php-mysql php-fileinfo php-mbstring
+
+php -v
+5.4.16
+
+systemctl enable php-fpm
+systemctl start php-fpm
+
+
+NGINX
+yum install -y nginx
+
+systemctl enable nginx
+service nginx start
+
+nginx -v
+1.12.2
+
+
+== Instalar pacotes básicos
+
+yum install -y wget mc unzip mlocate
+
+
+MYSQL
+
+yum install -y mysql-server
+
+service mysqld start
+systemctl enable mysqld
+
+mysql -V
+5.7.21
+
+grep 'temporary password' /var/log/mysqld.log
+
+yum update mysql-server
+
+mysql_secure_installation
+
+
+== Instalar pacotes básicos
+
+yum install -y nano mc unzip mlocate
+
+
+== Criar VirtualHost para nginx
+
+nano /etc/nginx/conf.d/default.conf
+
+server {
+        listen   80;
+
+        root /usr/share/nginx/html;
+        index index.php index.html index.htm;
+        server_name  localhost;
+
+        location / {
+			try_files $uri $uri/ /index.php?$args;
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+              root /usr/share/nginx/www;
+        }
+
+        location ~ .php$ {
+                try_files $uri =404;
+                fastcgi_pass 127.0.0.1:9000;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+                include fastcgi_params;
+        }
+}
+
+service nginx restart
+service php-fpm restart
+
+Abrir portas no iptables
+
+
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 65522 -j ACCEPT
+iptables -A INPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P INPUT DROP
+
+iptables -L -no CentOS 6
+service iptables save
+
+
+nano /usr/share/nginx/html/i.php
+
+http://167.99.90.40/i.php
+
+Esta funcionou:
+http://167.99.90.40
+
+Mas esta, com php:
+http://167.99.90.40/i.php
+
+Não funcionou, mostrou o i.php para download
+
+tail -f /var/log/nginx/error.log
+
+nano /etc/php-fpm.d/www.conf
+
+listen.acl_users = nginx;
+user = nginx;
+group = nginx;
+;listen = 127.0.0.1:9000
+listen = /run/php-fpm/www.sock
+
+adicionar ao início do default.conf:
+
+upstream php-fpm {
+        #server 127.0.0.1:9000;
+        server unix:/run/php-fpm/www.sock;
+}
+
+Comentar a linha abaixo
+# fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+
+systemctl restart php-fpm
+systemctl restart nginx
+
+
+
+Referências
+https://tecadmin.net/install-php-7-nginx-mysql-5-on-centos/
+
+

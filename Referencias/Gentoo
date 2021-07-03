@@ -1,0 +1,113 @@
+Instalação de um servidor LAMP com Gentoo
+
+Este servidor foi criado usando uma box do Vagrant
+Adicionei uma interface para
+192.168.10.10 
+que será acessada pelo meu desktop, mas não rolou. 
+Então vou redirecionar a prota 80 da box para a 8080 do desktop
+Vamos usar mesmo através das portas
+
+desktop	box
+2222 - 	22	ssh
+8080 - 	80	http
+
+A característica forte do Gentoo é que não usa pacotes pré-compilados mas os compila sob demanda.
+
+https://www.tecmint.com/install-lamp-in-gentoo-linux/
+https://linode.com/docs/web-servers/lamp/set-up-a-lamp-server-on-gentoo/
+
+= Cuidados iniciais
+
+Lista de profiles suportados
+eselect profile list
+
+
+== Sobre o Gentoo
+
+https://wiki.gentoo.org/wiki/Upgrading_Gentoo/pt-br
+
+Atualizações
+Filosofia
+
+Aqui na terra do Gentoo, o conceito de atualização é bem diferente em comparação com o resto do mundo Linux. É um fato bem conhecido que o Gentoo nunca mais entrou em contato com a maneira "clássica" de atualizar software: esperar por um novo lançamento, baixá-lo, gravá-lo, colocá-lo no drive de cdrom e então seguir as instruções de atualização.
+
+Os usuários do Gentoo sabem, porém, que este processo é extremamente frustrante para usuários avançados que querem usar as últimas versões. Mesmo usuários avançados de outras distribuições provavelmente compartilham os mesmos sentimentos, dada a popularidade e disseminação de ferramentas como apt ou apt-rpm que torna possível ter atualizações rápidas e frequentes. No entanto, nenhuma distribuição é mais adequada que o Gentoo para satisfazer este tipo de utilizadores exigentes. Desde o começo, o Gentoo foi concebido em torno do conceito de atualizações rápidas e incrementais.
+
+Idealmente, o usuário instala o software uma vez e nunca se importa com lançamentos: basta seguir as instruções em Uma introdução ao Portage no Gentoo handbook que explica como manter o sistema atualizado. Embora essa seja a maneira que as coisas costumam ser, às vezes as mudanças são feitas para o núcleo do sistema que requerem que as atualizações sejam feitas manualmente. 
+
+cat /etc/gentoo-release
+
+cat /etc/*-release
+
+Pacotes que foram instalados
+cat /var/lib/portage/world
+
+== Atualizar
+
+sudo emerge --sync
+sudo emerge --update --deep --with-bdeps=y @world
+
+== Instalar LAMP
+
+Verificar se os pacotes estão atualizados
+emerge --sync
+emerge --update world
+
+Instalar o Apache
+Ver https://wiki.gentoo.org/wiki/Apache
+
+emerge www-servers/apache
+emerge --ask www-servers/apache
+
+Configuração
+/etc/apache2/httpd.conf
+/etc/apache2/modules.d/
+/etc/apache2/vhosts.d/
+
+Iniciar
+/etc/init.d/apache2 start
+
+No boot
+rc-update add apache2 default
+
+Versão
+apache2 -v
+
+Após instalar avisou
+IMPORTANT: config file '/etc/ssh/sshd_config' needs updating.
+ * See the CONFIGURATION FILES and CONFIGURATION FILES UPDATE TOOLS
+ * sections of the emerge man page to learn how to update config files.
+
+ * IMPORTANT: 2 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+Instalar nano
+merge --ask app-editors/nano
+
+Atualizar
+emerge --ask --changed-use --deep @world
+
+
+== Suporte ao PHP
+
+nano /etc/conf.d/apache2
+
+APACHE2_OPTS="... -D PHP"
+
+
+== Instalar MySQL
+
+emerge dev-db/mysql
+
+* IMPORTANT: 2 news items need reading for repository 'gentoo'.
+* Use eselect news read to view new items.
+
+Ao final
+* IMPORTANT: config file '/etc/ssh/sshd_config' needs updating.
+ * See the CONFIGURATION FILES and CONFIGURATION FILES UPDATE TOOLS
+ * sections of the emerge man page to learn how to update config files.
+
+ * IMPORTANT: 3 news items need reading for repository 'gentoo'.
+ * Use eselect news read to view new items.
+
+

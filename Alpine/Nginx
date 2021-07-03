@@ -1,0 +1,99 @@
+apk update
+apk add nginx
+
+Criar novo user e group 'www' para o nginx
+
+adduser -D -g 'www' www
+
+Criar diretório para os arquivos HTML
+
+mkdir /var/www/localhost/htdocs
+chown -R www:www /var/www/localhost/htdocs
+
+
+nano /etc/nginx/http.d/default.conf
+
+# Somente HTTP
+server {
+        listen 80;
+        root /var/www/localhost/htdocs;
+        index index.html;
+        server_name 165.22.187.179;
+}
+
+# Com SSL Auto assinado
+server {
+        etag off;
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        listen 443 ssl http2 default_server;
+        listen [::]:443 ssl http2 default_server;
+        ssl_certificate /etc/ssl/certs/nginx-selfsigned.crt;
+        ssl_certificate_key /etc/ssl/private/nginx-selfsigned.key;
+        add_header X-Frame-Options "SAMEORIGIN";
+        # New root location
+        location / {
+                root /var/www/localhost/htdocs;
+                # return 404;
+        }        # You may need this to prevent return 404 recursion.
+        location = /404.html {
+                internal;
+        }
+}
+
+Testar
+
+http://165.22.187.179
+https://165.22.187.179
+
+Ver
+
+/var/www/localhost/htdocs/index.html
+
+Copiar todo o estatico para
+/var/www/localhost/htdocs
+
+nano /etc/nginx/nginx.conf
+
+/var/www/localhost/htdocs
+
+nginx -t
+
+rc-service nginx start
+rc-update add nginx default
+
+Reforçar a segurança
+
+nano /etc/nginx/http.d/default.conf
+
+Add para a seção server
+
+add_header X-Frame-Options "SAMEORIGIN";
+
+reiniciar e verificar novamente com nikto
+
+Rodar
+
+setup-alpine
+
+Ufw
+
+apk add ufw
+
+ufw enable
+
+ufw allow 80
+
+ufw status verbose
+
+Manter somente a porta 80 aberta
+
+Remover rule
+
+ufw status numbered
+
+ufw delete Nr
+
+ufw status numbered
+
+ufw delete Nr

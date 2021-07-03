@@ -1,0 +1,96 @@
+Após instalar o CIPI num servidor, podemos criar sites neste mesmo servidor
+
+Criar o primeiro site
+
+Domínio - despertai.net.br
+BasePath - /    
+
+Domain: despertai.net.br
+
+Server IP: 45.56.113.182
+
+SSH Username: cpdf969d717
+
+ssh cpdf969d717@45.56.113.182
+
+SSH Password: CHaWQ0NpWsQAFh7HXLIxqSgh
+
+Mudei a senha para zmxnxxxxzzzyyyC@
+
+MySQL database: cpdf969d717
+
+MySQL username: cpdf969d717
+
+MySQL password: k5xLm8KfqYUDSrTJSta5ftMU
+
+mysql -ucpdf969d717 -pk5xLm8KfqYUDSrTJSta5ftMU
+
+Document root: /home/cpdf969d717/web/
+
+Acessar
+http://
+
+
+Criar o primeiro site (site1, mas que é bom nomear adequadamente. O nome do cliente ou do objetivo. É importante ter um cadastro dos clientes e seus sites)
+
+Criar um site chamado - admin-br
+
+Onde instalarei o demo do admin-br
+
+Domínio - deseprtai.net.br
+
+Add a new site
+
+Your site is ready!
+
+Domain: despertai.net.br
+
+Server IP:50.116.43.86
+
+SSH Username: cpc14bce862
+
+SSH Password: EWwsCOnFUUeBhwuLwMZJxBdf
+
+MySQL database: cpc14bce862
+
+MySQL username: cpc14bce862
+
+MySQL password: 8EqwJ4dWL9s04UzrJtN9S9VN
+
+Document root: /home/cpc14bce862/web/
+
+Acessar com
+
+ssh cpc14bce862@50.116.43.86
+
+Ele trabalha instalando os sites na pasta web de cada usuário
+
+Então precisarei instalar assim
+
+/home/cpf60b2d904/web/admin-br - cakephp
+
+Clicar em Manage à direita do nome do domínio
+
+Add alias - www
+
+Generate - Generate SSLs    
+
+
+    IP:
+    139.177.202.148
+    ALIASES:
+    1
+    PHP:
+    7.4
+    DIR:
+    /home/cpf60b2d904/web/public
+
+ To run deploy:
+
+ssh -p 65522 cpf60b2d904@139.177.202.148
+senha - ELgDbvL6mL9OWsHnMGXIjVCP
+
+    sh /home/cpf60b2d904/git/deploy.sh
+
+Habilitar o SSL no Servidor1 com certbot
+

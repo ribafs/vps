@@ -1,0 +1,239 @@
+https://www.vultr.com/docs/how-to-secure-freebsd-with-pf-firewall
+
+Proteger um servidor com FreeBSD usando o OpenBSD firewall pf.
+
+Troque a senha do root
+
+passwd root
+
+Parar e desabilitar o sendmail
+
+/etc/rc.d/sendmail stop
+
+nano /etc/rc.conf
+
+Mudar para que fique assim:
+
+#----------- NETWORKING ------------------------------------------------#
+hostname="ceph.domain1.com" # replace ceph.domain1.com with your domain
+ifconfig_vtnet0="dhcp"
+static_routes=linklocal
+route_linklocal="-net 169.254.0.0/16 -interface vtnet0"
+
+#--------- SERVICES BSD LOCAL ----------------------------------------#
+sshd_enable="YES"
+ntpd_enable="YES"
+
+#pf_enable="YES"
+#pf_rules="/etc/firewall"
+#pf_flags=""
+#pflog_enable="YES"              
+#pflog_logfile="/var/log/pflog"  
+#pflog_flags=""    
+
+sendmail_enable="NONE"
+sendmail_submit_enable="NO"
+sendmail_outbound_enable="NO"
+sendmail_msp_queue_enable="NO"
+
+nano /etc/hosts
+
+::1                     localhost localhost.ceph ceph
+127.0.0.1               localhost localhost.ceph ceph
+108.61.178.110          www.domain1.com       www
+
+Timezone
+bsdconfig
+
+Configurar SSH
+
+nano /etc/ssh/sshd_config
+
+PermitRootLogin no
+
+service sshd restart
+
+reboot
+
+Corrigir ntpd
+
+su
+ntpdate 0.europe.pool.ntp.org
+
+Configurar o Firewall com PF
+
+nano /etc/rc.conf
+
+pf_enable="YES"
+
+O pf.conf contém algumas seções
+
+1. Macros
+2. Tables
+3. Options
+4. Packet normalization
+5. Bandwidth management
+6. Translation
+7. Redirection
+8. Packet filtering
+
+Exemplo simples de pf.conf para proteger um pequeno servidor de internet
+
+interface="em0"
+scrub in all
+block in on $interface
+#allow SSH and POP3 traffic from our network
+pass in on $interface proto tcp from 192.168.1.0/24 to $interface port 22
+pass in on $interface proto tcp from 192.168.1.0/24 to $interface port 110
+#allow SMTP (25), HTTP (80), and HTTPS (443) to the world
+pass in on $interface proto tcp from any to $interface port 25
+pass in on $interface proto tcp from any to $interface port 80
+pass in on $interface proto tcp from any to $interface port 443
+#allow the world to query our DNS server
+pass in on $interface proto tcp from any to $interface port 53
+pass in on $interface proto udp from any to $interface port 53
+#allow outgoing traffic
+pass out on $interface proto { tcp, udp } all
+
+Macros
+
+interface="fxp0"
+serveraddr="192.168.1.2"
+
+scrub in all on $interface
+
+Ativando regras do PF
+
+Use -n flag para checar se um arquivo tem problemas e -f para especificar a rgra do arquivo do PF
+
+pfctl -nf /etc/pf.conf
+
+Caso apareçam erros, corrija e execute novamente removendo o flag -n
+
+pfctl -f /etc/pf.conf
+
+Apenas visualizar as regras
+
+pfctl -sr
+
+Remover todas as regras do arquivo pf.conf
+
+pfctl -Fa
+
+
+
+nano /etc/pf.conf
+
+Adicione. Troque o IP pelo seu
+
+#######################################################################
+me="vtnet0"                
+table <bruteforcers> persist    
+table <trusted> persist file "/etc/trusted"
+icmp_types = "echoreq"          
+junk_ports="{ 135,137,138,139,445,68,67,3222 }"
+junk_ip="224.0.0.0/4"           
+
+set loginterface vtnet0           
+scrub on vtnet0 reassemble tcp no-df random-id
+
+# ---- First rule obligatory "Pass all on loopback"
+pass quick on lo0 all           
+
+# ---- Block junk logs
+block quick proto { tcp, udp } from any to $junk_ip 
+block quick proto { tcp, udp } from any to any port $junk_ports
+
+# ---- Second rule "Block all in and pass all out"
+block in log all                
+pass out all keep state         
+
+############### FIREWALL ###############################################
+# ---- Allow all traffic from my Home
+pass quick proto {tcp, udp} from 1.2.3.4 to $me keep state
+
+# ---- block SMTP out 
+block quick proto tcp from $me to any port 25
+
+# ---- Allow incoming Web traffic
+pass quick proto tcp from any to $me port { 80, 443 } flags S/SA keep state
+
+# ---- Allow my team member SSH access 
+pass quick proto tcp from 1.2.3.5 to $me port ssh flags S/SA keep state
+
+# ---- Block bruteforcers
+block log quick from <bruteforcers>
+
+# ---- Allow SSH from trusted sources, but block bruteforcers
+pass quick proto tcp from <trusted> to $me port ssh \
+flags S/SA keep state \
+(max-src-conn 10, max-src-conn-rate 20/60, \
+overload <bruteforcers> flush global)
+
+# ---- Allow ICMP 
+pass in inet proto icmp all icmp-type $icmp_types keep state
+pass out inet proto icmp all icmp-type $icmp_types keep state
+
+
+Criar
+
+nano /etc/trusted
+
+Adicionar alguns IPs
+
+# Hosting
+1.2.0.0/16
+
+# My friends
+1.2.4.0/24
+
+Marcar portas e IP indesejados
+# ---- Block junk logs
+block quick proto { tcp, udp } from any to $junk_ip 
+block quick proto { tcp, udp } from any to any port $junk_ports
+
+Estes são default
+
+icmp_types = "echoreq"                                            
+set loginterface vtnet0           
+scrub on vtnet0 reassemble tcp no-df random-id
+pass quick on lo0 all
+block in log all                
+pass out all keep state
+
+Comabte aos ataques de bruteforce
+
+# ---- Allow SSH from trusted sources, but block bruteforcers
+pass quick proto tcp from <trusted> to $me port ssh \
+flags S/SA keep state \
+(max-src-conn 10, max-src-conn-rate 20/60, \
+overload <bruteforcers> flush global)
+
+Habilitar o firewall
+
+nano /etc/rc.conf
+
+Descomente
+
+pf_enable="YES"
+pf_rules="/etc/pf.conf"
+pf_flags=""
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
+pflog_flags=""
+
+reboot
+
+/etc/rc.d/pf reload
+
+Veja quem está tentando se conectar ao servidor em tempo real
+
+tcpdump -n -e -ttt -i pflog0
+
+Mostrar logs
+tcpdump -n -e -ttt -r /var/log/pflog
+
+Ver se tem algo na tabela bruteforce
+pfctl -t bruteforcers -T show
+
+

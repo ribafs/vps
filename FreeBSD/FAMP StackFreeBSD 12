@@ -1,0 +1,265 @@
+How to Install FAMP Stack (Apache / MySQL / PHP) on FreeBSD 12
+8-11 minutos
+Howtoforge
+
+The FAMP stack, which is akin to a LAMP stack on Linux, is a collection of open-source software that is typically installed together to enable a FreeBSD server to host dynamic websites and web applications. FAMP is an acronym that stands for FreeBSD (operating system), Apache (HTTP server), MySQL/MariaDB (database server), and PHP (programming language to process dynamic PHP content).
+
+In this tutorial, we'll set up components of a FAMP stack on a FreeBSD 12.1 server using pkg, the FreeBSD package manager.
+Requirements
+
+Before you start this guide, you'll need the following:
+
+    A FreeBSD 12.1.
+    A user with root privileges or sudo user to make configuration changes.
+    Basic familiarity with the FreeBSD system and command-line interface is recommended.
+
+Before you begin
+
+Check the FreeBSD version:
+
+freebsd-version
+# 12.1-RELEASE
+
+Ensure that your FreeBSD system is up to date:
+
+freebsd-update fetch install
+pkg update && pkg upgrade -y
+
+Install the necessary packages:
+
+pkg install -y sudo vim bash curl
+
+Create a new user account with your preferred username. We use johndoe:
+
+adduser
+
+# Username: johndoe
+# Full name: John Doe
+# Uid (Leave empty for default): <Enter>
+# Login group [johndoe]: <Enter>
+# Login group is johndoe. Invite johndoe into other groups? []: wheel
+# Login class [default]: <Enter>
+# Shell (sh csh tcsh nologin) [sh]: bash
+# Home directory [/home/johndoe]: <Enter>
+# Home directory permissions (Leave empty for default): <Enter>
+# Use password-based authentication? [yes]: <Enter>
+# Use an empty password? (yes/no) [no]: <Enter>
+# Use a random password? (yes/no) [no]: <Enter>
+# Enter password: your_secure_password
+# Enter password again: your_secure_password
+# Lock out the account after creation? [no]: <Enter>
+# OK? (yes/no): yes
+# Add another user? (yes/no): no
+# Goodbye!
+
+Run the visudo command and uncomment the %wheel ALL=(ALL) ALL line, to allow members of the wheel group to execute any command:
+
+visudo
+
+# Uncomment by removing hash (#) sign
+# %wheel ALL=(ALL) ALL
+
+Now, switch to your newly created user with su:
+
+su - johndoe
+
+NOTE: Replace johndoe with your username.
+
+Set up the timezone:
+
+sudo tzsetup
+
+Step 1 — Installing Apache 2.4
+
+The Apache web server is currently one of the most popular web servers in the world. It is an excellent pick for hosting a website.
+
+You can install Apache using FreeBSD's package manager, pkg. A package manager allows you to install most software effortlessly from a repository maintained by FreeBSD.
+
+To install Apache, issue the following command:
+
+sudo pkg install -y apache24
+
+Check the version:
+
+httpd -v
+# Server version: Apache/2.4.41 (FreeBSD)
+
+Now, enable and start Apache:
+
+sudo sysrc apache24_enable=yes
+sudo service apache24 start
+
+To check that Apache has started you can run the following command:
+
+sudo service apache24 status
+
+As a result, you'll see something similar to:
+
+# Output
+apache24 is running as pid 17775.
+
+You can verify that Apache was installed and working without errors by visiting your server's public IP address in your web browser. Navigate to http://your_server_IP. You will see the default "It works!" Apache page.
+Step 2 — Installing MySQL 8.0
+
+Now that you have your web server up and running, it is time to install MySQL, the relational database management system. The MySQL server will organize and provide access to databases where your server can store information.AdvertisementAdvertisement
+
+Again, you can utilize pkg to obtain and install your software.
+
+To install MySQL 8.0 using pkg, use this command:
+
+sudo pkg install -y mysql80-client mysql80-server
+
+This command will install the latest version of the MySQL client and server, which is currently 8.x.x.
+
+Check the version:
+
+mysql --version
+# mysql  Ver 8.0.17 for FreeBSD12.0 on amd64 (Source distribution)
+
+Now, enable and start MySQL:Advertisement
+
+sudo sysrc mysql_enable=yes
+sudo service mysql-server start
+
+To check that MySQL has started you can run the following command:
+
+sudo service mysql-server status
+
+You'll view something similar to the following:
+
+# Output
+mysql is running as pid 19171.
+
+As a good practice, you may run the mysql_secure_installation security script that will remove some insecure defaults and slightly limit access to your database system:
+
+sudo mysql_secure_installation
+
+You will be asked to set a password, followed by some other questions. Enter a strong password and then for the rest of the questions press :key_enter: to select the defaults.
+Step 3 — Installing PHP 7.4
+
+PHP is a server-side scripting language designed for web development. PHP is an indispensable component of the FAMP stack. Also, Python or Perl are commonly used instead of PHP. However, PHP as the most popular option is used most often. Together with the database, it will give your web sites or apps dynamic behavior.
+
+Once again leverage the pkg system to install PHP components.
+
+To install PHP 7.4 with pkg, run this command:
+
+sudo pkg install -y php74 php74-mysqli mod_php74
+
+This installs the php74, mod_php74, and php74-mysqli packages.
+
+Check the PHP version:
+
+php --version
+
+# PHP 7.4.1 (cli) (built: Jan  2 2020 01:32:38) ( NTS )
+# Copyright (c) The PHP Group
+# Zend Engine v3.4.0, Copyright (c) Zend Technologies
+
+Copy the sample PHP configuration file into place with this command:AdvertisementAdvertisement
+
+sudo cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+Now, enable and start PHP-FPM:
+
+sudo sysrc php_fpm_enable=yes
+sudo service php-fpm start
+
+To check that PHP-FPM has started you can run the following command:
+
+sudo service php-fpm status
+
+As a result, you'll see something similar to:
+
+# Output
+php_fpm is running as pid 23005.
+
+Installing PHP Modules (Optional)
+
+To enhance the functionality of PHP, you can optionally install some additional modules.
+
+To see currently compiled in PHP modules, you can run this:
+
+php -m
+# [PHP Modules]
+# Core
+# date
+# libxml
+# mysqlnd
+# pcre
+# Reflection
+# SPL
+# standard
+# [Zend Modules]
+
+To search for available PHP modules, you can use this command:
+
+pkg search ^php74-*
+
+The results will be mostly PHP 7.4 modules that you can install:
+
+# Output
+# php74-7.4.0                    PHP Scripting Language
+# php74-Ice37-3.7.2_1            Modern alternative to object middleware such as CORBA/COM/DCOM/COM+
+# php74-aphpbreakdown-2.2.2      Code-Analyzer for PHP for Compatibility Check-UP
+# php74-aphpunit-1.9             Testing framework for unit tests
+# php74-bcmath-7.4.0             The bcmath shared extension for php
+# php74-brotli-0.7.0             Brotli extension for PHP
+# php74-bsdconv-11.5.0           PHP wrapper for bsdconv
+# php74-bz2-7.4.0                The bz2 shared extension for php
+# php74-calendar-7.4.0           The calendar shared extension for php
+# php74-composer-1.8.6           Dependency Manager for PHP
+# php74-ctype-7.4.0              The ctype shared extension for php
+# php74-curl-7.4.0               The curl shared extension for php
+# . . .
+
+If, after researching, you decide that you need to install a package, you can do so by using the pkg install command. Most PHP web applications will require additional modules, so it's good to know how to search for them.
+Step 4 — Configuring Apache to Use PHP Module
+
+Before using PHP, you must configure it to work with Apache.
+
+Run sudo vim /usr/local/etc/apache24/modules.d/001_mod-php.conf and populate the file with the below content:
+
+<IfModule dir_module>
+  DirectoryIndex index.php index.html
+  <FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+  </FilesMatch>
+  <FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+  </FilesMatch>
+</IfModule>
+
+Save the file and exit from vim.
+
+Check Apache's configuration:
+
+sudo apachectl configtest
+
+Because you've made configuration changes in Apache, you have to reload the service for those to be applied. Otherwise, Apache will still work with the earlier configuration:
+
+sudo apachectl restart
+
+Step 5 — Testing PHP Processing
+
+To test that your system is configured correctly for PHP, you can create a very basic PHP script. You'll call this script info.php. By default, the DocumentRoot is set to /usr/local/www/apache24/data. You can create the info.php file under that location by typing:
+
+sudo vim /usr/local/www/apache24/data/info.php
+
+And add this code to that file:
+
+<?php phpinfo(); ?>
+
+Navigate to http://your_server_IP/info.php and you will see the following page:
+
+PHP info on FreeBSD 12
+
+After FAMP stack installation and setup you should remove info.php file to avoid disclosing the information about the server to the public:
+
+sudo rm /usr/local/www/apache24/data/info.php
+
+Conclusion
+
+Congratulations, you've successfully installed a FAMP stack on your FreeBSD 12.1 server. Now you have multiple choices for what to do next. You've installed a platform that will allow you to install most kinds of websites and web software on top of it.
+×
+
+This feature is only available to subscribers. Get your subscription here.

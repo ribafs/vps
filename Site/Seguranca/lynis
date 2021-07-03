@@ -1,0 +1,59 @@
+Melhorando a segurança com Lynis
+
+Executa diversos testes a procura de vulnerabilidade no sistema.
+
+Instalação (abaixo é uma só linha em cada)
+
+Não instalar no Debian
+
+wget -O - http://packages.cisofy.com/keys/cisofy-software-public.key | sudo apt-key add - > /dev/null
+
+echo "deb [arch=amd64] https://packages.cisofy.com/community/lynis/deb/ trusty main" | sudo tee -a /etc/apt/sources.list.d/cisofy-lynis.list
+
+apt-get update
+
+apt install lynis
+
+Atualização
+
+lynis --help
+lynis update info
+
+Executando
+lynis audit system
+
+Guarda os relatórios em
+- Test and debug information      : /var/log/lynis.log
+- Report data                     : /var/log/lynis-report.dat
+
+Dica: Enhance Lynis audits by adding your settings to custom.prf (see /etc/lynis/default.prf for all settings)
+
+Audit remoto
+
+lynis audit system remote ribafs.org
+
+How to perform a remote scan:
+  =============================
+  Target  : ribafs.org
+  Command : ./lynis audit system --quick ribafs.org
+
+  * Step 1: Create tarball
+    mkdir -p ./files && cd .. && tar czf ./lynis/files/lynis-remote.tar.gz --exclude=files/lynis-remote.tar.gz ./lynis && cd lynis
+
+  * Step 2: Copy tarball to target ribafs.org
+    scp -q ./files/lynis-remote.tar.gz ribafs.org:~/tmp-lynis-remote.tgz
+
+  * Step 3: Execute audit command
+    ssh ribafs.org "mkdir -p ~/tmp-lynis && cd ~/tmp-lynis && tar xzf ../tmp-lynis-remote.tgz && rm ../tmp-lynis-remote.tgz && cd lynis && ./lynis audit system --quick ribafs.org"
+
+  * Step 4: Clean up directory
+    ssh ribafs.org "rm -rf ~/tmp-lynis"
+
+  * Step 5: Retrieve log and report
+    scp -q ribafs.org:/tmp/lynis.log ./files/ribafs.org-lynis.log
+    scp -q ribafs.org:/tmp/lynis-report.dat ./files/ribafs.org-lynis-report.dat
+
+  * Step 6: Clean up tmp files (when using non-privileged account)
+    ssh ribafs.org "rm /tmp/lynis.log /tmp/lynis-report.dat"
+
+Enhance Lynis audits by adding your settings to custom.prf (see /etc/lynis/default.prf for all settings)

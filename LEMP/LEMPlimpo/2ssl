@@ -1,0 +1,84 @@
+Aplicando SSL ao Nginx
+
+mkdir /etc/nginx/ssl/
+
+openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:2048 -keyout /etc/nginx/ssl/nginx.key -out /etc/nginx/ssl/nginx.crt
+
+Responda às perguntas:
+
+Country Name (2 letter code) [XX]:BR  
+State or Province Name (full name) []:Ceará
+Locality Name (eg, city) [Default City]:Fortaleza
+Organization Name (eg, company) [Default Company Ltd]:FreeLancer
+Organizational Unit Name (eg, section) []:Free
+Common Name (eg, your name or your server's hostname) []:ribafs.org
+Email Address []:ribafs@gmail.com
+
+ls /etc/nginx/ssl/nginx.crt
+
+openssl dhparam -out /etc/nginx/ssl/dhparam.pem 4096
+
+This is going to take a long time
+Aguarde um bom tempo...
+
+nano /etc/nginx/sites-available/default
+
+Adicione para o bloco server inicial
+
+server {
+    ...
+    server_name IP; # ou ribafs.org www.ribafs.org
+
+		### SSL Config
+		listen 443 ssl;
+	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	    ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+	    ssl_prefer_server_ciphers on;
+	    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+	    ssl_certificate /etc/nginx/ssl/nginx.crt;
+	    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+	    if ($request_method !~ ^(GET|HEAD|POST)$ )
+	    {
+	           return 405;
+	    }
+
+
+Adicionar ao location /
+
+        location / {
+                autoindex on;
+                try_files $uri $uri/ =404;
+        }
+
+... 
+   
+
+Proteção contra ataques Clickjacking
+nano /etc/nginx/nginx.conf
+
+Adicionar ao bloco http
+add_header X-Frame-Options "SAMEORIGIN";
+
+Descomente a linha
+server_tokens off;
+
+service nginx restart
+service php7.0-fpm restart
+
+Testar
+
+https://167.99.80.172
+
+
+Logs
+
+Em caso de problema ver logs
+
+tail -f /var/log/nginx/error.log
+
+
+Agora proteger doretório administrator com senha usando o arquivo
+
+4senha_diretorio
+

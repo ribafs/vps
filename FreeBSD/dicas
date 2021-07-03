@@ -1,0 +1,46 @@
+Mudar editor default para o nano
+setenv EDITOR /usr/local/bin/nano
+
+Atualizar ports no FreeBSD
+
+mkdir /usr/ports
+
+portsnap fetch
+
+portsnap extract
+
+portsnap update
+
+Ver memória
+
+sysctl hw.physmem
+
+free -m
+
+$ sysctl hw.physmem
+$ sysctl hw | egrep 'hw.(phys|user|real)'
+
+ou
+$ grep memory /var/run/dmesg.boot 
+
+Criar iso
+mkisofs -o /path/to/output.iso -R -J /path/to/files/you/want/on/cd
+
+Burn image
+burncd data /path/to/output.iso fixate
+
+Gravar iso no pendrive
+
+http://unetbootin.github.io/
+
+umount /dev/sdf1
+
+dd if=FreeBSD-11.1-RELEASE-amd64-memstick.img of=/dev/sdf1 bs=10240
+
+Reboot, selecione e instale
+
+
+No windows use
+https://rufus.akeo.ie/
+
+

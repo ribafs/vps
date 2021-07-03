@@ -1,0 +1,96 @@
+Cyber Panel
+
+https://cyberpanel.net/docs/
+
+No DigitalOcean com 1 clique (MarketPlane)
+https://marketplace.digitalocean.com/apps/cyberpanel
+
+CyberPanel
+by LiteSpeed Technologies
+
+Version 2.1.1
+
+OS Ubuntu 20.04
+BLOGS AND FORUMS
+
+Description
+
+The CyberPanel image provides a One-Click installer to automatically install OpenLiteSpeed, LSCache, WordPress, Prestashop, Joomla and contains all of the essential features, including HTTP/3 support. It also automates the initial setup for components like Mail service and DNS, to reduce the time it takes to get set up for hosting.
+
+Highlights
+
+    Redis Mass Hosting
+    Imunify360 Integration
+    Git Manager
+    CloudFlare DNS Synchronization
+    Web Based Terminal
+    Docker Manager.
+    Different Level Of users.
+    Auto SSL.
+    FTP Server.
+    Light weight DNS Server (PowerDNS).
+    PHPMYAdmin.
+    Email Support (Rainloop).
+    File Manager.
+    PHP Management.
+    Firewall.
+    One click Backup and Restore.
+    One click conversion from OpenLiteSpeed to LiteSpeed Enterprise.
+    Auto Backups to DigitalOcean Spaces.
+
+Software Included
+CyberPanel
+2.1.1
+GPLv3
+OpenLiteSpeed
+1.6.21
+GPLv3
+PHP
+8.0
+proprietary
+Rainloop
+1.14.0
+AGPLv3
+PowerDNS
+4.1.1
+GPLv2
+Redis
+5.0.7
+BSD
+memcached
+1.5.22
+BSD
+
+https://docs.litespeedtech.com/cloud/cyberpanel/
+
+Support Details
+Supported By:LiteSpeed Technologies
+Hours:24/7
+Support URL:https://docs.litespeedtech.com/cloud/cyberpanel/
+Support Email:support@litespeedtech.com
+
+Additional Links
+HTTP/3 Frequently Asked Questions
+
+Everything you've ever wanted to know about the new HTTP/3 and QUIC application protocol supported by OpenLiteSpeed.
+About LiteSpeed's Superior Performance
+
+Benchmarks comparing the OpenLiteSpeed, nginx and Apache implementations of HTTP/2.
+
+API Creation
+
+In addition to creating a Droplet from the CyberPanel 1-Click App via the control panel, you can also use the DigitalOcean API
+.
+
+As an example, to create a 4GB CyberPanel Droplet in the SFO2 region, you can use the following curl command. You’ll need to either save your API access token
+to an environment variable or substitute it into the command below.
+
+curl -X POST -H 'Content-Type: application/json' \
+     -H 'Authorization: Bearer '$TOKEN'' -d \
+    '{"name":"choose_a_name","region":"sfo2","size":"s-2vcpu-4gb","image":"litespeedtechnol-cyberpanel-20-04"}' \
+    "https://api.digitalocean.com/v2/droplets"
+
+O CyberPnel funciona servido sites/aplicativos para clientes.
+No caso precisamos criar um servidor parrudo, instalar o CyberPanel nele e alí criar vários usuários com dominios e seus sites e emails.
+
+

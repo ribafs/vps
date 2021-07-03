@@ -1,0 +1,76 @@
+Droplet backup remoto
+
+run from remote computer
+
+$ dd if=/dev/sda | gzip -1 - | ssh user@local dd of=image.gz
+
+run from local computer
+
+$ ssh user@remote "dd if=/dev/sda | gzip -1 -" | dd of=image.gz
+
+Live example
+
+$ ssh skinner "dd if=/dev/sda5 | gzip -1 -" | dd of=image.gz
+208782+0 records in
+208782+0 records out
+106896384 bytes (107 MB) copied, 22.7608 seconds, 4.7 MB/s
+116749+1 records in
+116749+1 records out
+59775805 bytes (60 MB) copied, 23.9154 s, 2.5 MB/s
+
+$ ll | grep image.gz
+-rw-rw-r--.   1 saml saml  59775805 May 31 01:03 image.gz
+
+
+ssh userfoo@host "sudo /bin/dd if=/dev/sdX" | dd of=test.dd 
+
+
+I've just used a modified version on a virtual Linux Mint box to clone a physical hard drive on an aging RedHat server.
+
+I ran the following as root on the virtual box:
+
+ssh root@192.168.1.5 "dd if=/dev/cciss/c0d0" | dd of=/dev/sdb
+
+    192.168.1.5 is the physical Red Hat Enterprise Linux 2.1 box.
+    /dev/sdb is a new virtual disk, which when finished cloning will be the basis of a virtual version of the old dying physical box.
+
+========
+How to migrate a droplet from Digital Ocean and mount it on an existing Fuga instance
+Fuga Cloud Fuga Cloud
+23/07/2017
+
+Unfortunately Digital Ocean does not provide a way to directly export a droplet.
+In this tutorial we will explain how to export a Digital Ocean Droplet and mount it on an existing Fuga instance.
+Follow this tutorial if you would like to boot the Droplet to a new Fuga instance.
+
+The tutorial below is derived from this PDF.
+Requirements:
+
+    Root access to the Digital Ocean Droplet.
+    Password for Root on the Digital Ocean Droplet.
+    Destination Storage Location with SSH access enabled.
+    Destination Storage Location with 'qemu-utils' installed.
+
+Procedure:
+
+    Log into the Digital Ocean Droplet to prepare the Droplet for Backup.
+        Reset root's password if you do not already know it.
+    Use DD to zero out any deleted data on the partition, so that compression size of the backup is smaller.
+
+    dd if=/dev/zero of=0bits bs=20M; rm 0bits
+
+    Use DD to byte copy the Digital Ocean partition, feeding it into gzip, and then transfer it over SSH to the Storage Location.
+
+    dd if=/dev/vda1 | gzip -1 - | ssh <user>@<storage_host> dd of=/storage/location/snapshot.image.gz
+
+    Extract the gzipped image.
+
+    gunzip /storage/location/snapshot.image.gz
+
+    At this point you can manually mount the dd image file with the following commands:
+
+    losetup /dev/loop1 /storage/location/snapshot.image
+    mkdir snapshot
+    mount /dev/loop1 snapshot
+
+

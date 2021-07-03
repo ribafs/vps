@@ -1,0 +1,194 @@
+Instalar um site em Joomla na pasta /var/www/html/portal
+
+
+== Instalar algumas extensões
+
+Como o servidor LEMP criado é apenas padrão e não contém todas as extensões necessárias para um site com Joomla, então instalaremos mais algumas.
+
+apt install -y php-bcmath
+
+O Akeeba acusou a falta da extensão mbstring
+
+apt install -y php-mbstring php-zip php-xml
+
+service apache2 restart
+
+
+== Configurações no php.ini
+
+nano /etc/php/7.0/apache2/php.ini
+
+date.timezone = America/Fortaleza
+
+service apache2 restart
+
+
+== Enviar o arquivo portal.zip gerado pelo Akeeba Backup do desktop para a pasta /tmp do servidor
+
+No desktop copiar os dois arquivos para a pasta /home/ribafs
+scp -P porta portal* ribafs@IP:/tmp
+
+
+No servidor
+cd /tmp
+
+== Criar o banco e um usuário dono dele
+
+Executar para mostrar a senha do mysql. Efetuar um duplo clique apenas sobre o que tá entra aspas
+cat /root/.digitalocean_password
+
+Execute
+mysql_secure_installation
+
+Quando ele mostrar:
+Enter password for user root:
+
+Efetue o duplo clique sobre a senha e apenas tecle Shift+Insert
+
+Veja minhas respostas resumidas que foram praticamente todas y, exceto a primeira que foi n
+
+root@lamp-ub:/tmp# mysql_secure_installation
+
+Securing the MySQL server deployment.
+
+Enter password for user root: 
+
+VALIDATE PASSWORD PLUGIN can be used to test passwords
+...
+Press y|Y for Yes, any other key for No: n
+
+Change the password for root ? ((Press y|Y for Yes, any other key for No) : y
+
+New password: 
+
+Re-enter new password: 
+
+Remove anonymous users? (Press y|Y for Yes, any other key for No) : y
+
+Disallow root login remotely? (Press y|Y for Yes, any other key for No) : y
+
+Remove test database and access to it? (Press y|Y for Yes, any other key for No) : y
+
+Reload privilege tables now? (Press y|Y for Yes, any other key for No) : y
+All done! 
+
+
+== Criar o banco de dados do site e um usuário para o mesmmo
+
+mysql -uroot -p
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+\q
+
+
+== Descompactar o arquivo
+
+unzip portal.zip -d /var/www/html/portal
+
+Setar corretamente as permissões
+perms portal
+
+Efetuar ajustes no /var/www/html/portal/configuration.php se necessário.
+
+
+== Instalar o restore do Akeeba
+
+http://IP
+
+Lembre de desabilitar o SSL caso esteja habilitado, visto que ainda não habilitamos o SSL neste servidor.
+
+
+== Melhorando a segurança do site em Joomla
+
+Para melhorar a segurança vamos mover o configuration.php para a papsta /var/www e com nome cfg.php
+mv /var/www/html/portal/configuration.php /var/www/cfg.php
+
+Em seu lugar criemos um arquivo apenas com um require para ele
+nano /var/www/html/portal/configuration.php
+
+<?php
+require_once( dirname( __FILE__ ) . '/../../cfg.php' );
+
+
+== Configurando o Apache para mod_rewrite
+
+nano /etc/apache2/apache2.conf
+
+Onde tem None abaixo mudar para All
+
+<Directory />
+        Options FollowSymLinks
+        AllowOverride All
+        Require all denied
+</Directory>
+
+<Directory /usr/share>
+        AllowOverride All
+        Require all granted
+</Directory>
+
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+</Directory>
+
+Salvar e habilitar
+
+a2enmod rewrite
+
+Alterar o php.ini
+
+Display_errors = Off
+output_buffering = Off
+
+service apache2 restart
+
+
+== Testando
+
+http://IP/portal
+
+Apareceu normalmente o site.
+
+
+Editei o php.ini
+nano /etc/php/7.0/apache2/php.ini
+
+E mudei o display_errors para Off
+
+
+Após reiniciar o Apache
+service apache2 restart
+
+
+== Redirecionar acesso ao raiz para /portal
+
+Removi index.html e info.php do raiz
+
+nano /var/www/html/index.php
+
+<?php
+header('location: portal');
+
+
+Depois de testado o site e configurado novamente para proteger o administrator com SSL
+então efetuar um backup full com o Akeeba Backup para guardar.
+
+
+== Backup e Restore
+
+Agora faça um backup completo com o akeeba e quando terminar restaure por exemplo para a pasta
+/var/www/html/portal2
+
+Crie o banco portal2, pode ser o mesmo user e senha
+
+Restaure pela web:
+
+http://IP/portal2
+
+
+== Agora vou implementar o SSL para usar no administrator usando o arquivo
+
+3ssl_nginx
+

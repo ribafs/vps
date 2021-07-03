@@ -1,0 +1,203 @@
+Acessar o servidor pela primeira vez
+
+Usando o root com a chave do SSH
+O primeiro acesso é via desktop com SSH e usando o root. Mas neste primeiro acesso já crio um usuário e o coloco no grupo do sudo para ficar administrando o servidor com ele.
+
+ssh root@165.232.148.216
+
+Verificar as informações mostradas na tela
+
+  System information as of Tue Mar  2 13:13:34 UTC 2021
+
+  System load:  0.0               Users logged in:       0
+  Usage of /:   5.1% of 24.06GB   IPv4 address for eth0: 165.232.148.216
+  Memory usage: 18%               IPv4 address for eth0: 10.48.0.5
+  Swap usage:   0%                IPv4 address for eth1: 10.124.0.2
+  Processes:    98
+
+1 update can be installed immediately.
+0 of these updates are security updates.
+To see these additional updates run: apt list --upgradable
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+df -h
+
+/dev/vda1        25G  1.3G   23G   6% /
+
+Veja que uma instalação limpa do Ubuntu 20.04 console 1.3 GB de espaço
+
+free -m
+
+              total        used        free      shared  buff/cache   available
+Mem:            981         122         383           0         475         709
+Swap:             0           0           0
+
+Temos 709MB de RAM livre e não temos swap. Como a quantidade de RAM é relativamente pequena é importante criar uma partição de swap de uns 2GB para servir de RAM em caso de necessidade. "Quem não tem cão caça com gato".
+
+Criar user comum
+
+adduser ribafs
+
+Com senha bem forte com xxxxxxxxabcxxxXX
+
+Pode ignorar o Nome completo
+
+Adicionar ao grupo sudo
+
+usermod -aG sudo ribafs
+
+su - ribafs
+
+== Criar backup dos scripts alterados
+
+Criar um antes da alteração, com sufico BK
+E outro após a alteração com o nome original
+
+mkdir backup
+ls
+/home/ribafs/backup
+
+Que guardará os scripts
+
+Ao final da instalação e configurações do servidor usar o script
+
+9Backup/backup-desk.sh
+
+Para copiar todos eles para o desktop na pasta /home/usrer/backup-server
+
+sudo  clear
+
+Configurar SSH
+
+cd
+cp /etc/ssh/sshd_config backup/sshd_configBK
+
+sudo nano /etc/ssh/sshd_config
+
+Porta 55522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+X11Forwarding no
+AllowTcpForwarding no
+AllowUsers ribafs
+
+# AllowGroups administradores
+# DenyUsers amos mibey
+
+MaxAuthTries 3
+Isso significa que após 3 tentativas incorretas de senha, a sessão será encerrada. Isso é útil, especialmente quando você deseja bloquear scripts / programas robóticos que tentam obter acesso ao seu sistema.
+
+
+sudo service ssh restart
+
+cp /etc/ssh/sshd_config backup/sshd_config
+
+Referências
+https://kifarunix.com/allow-deny-specific-users-to-login-via-ssh-on-ubuntu-18-04/
+
+
+== Sincronizar a chave do ssh do desktop para o servidor
+
+Sair do ribafs e voltar para o root
+
+exit
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+
+== Atualizar e reboot
+
+apt update; apt upgrade -y
+
+Quando aparecer (se aparecer)
+
+Configuration file '/etc/systemd/resolved.conf'
+ ==> Modified (by you or by a script) since installation.
+ ==> Package distributor has shipped an updated version.
+   What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer's version
+    N or O  : keep your currently-installed version
+      D     : show the differences between the versions
+      Z     : start a shell to examine the situation
+ The default action is to keep your current version.
+*** resolved.conf (Y/I/N/O/D/Z) [default=N] ? y
+
+Tecle y e Enter
+
+reboot
+
+
+== Criar o script docean no desktop
+
+sudo nano /usr/local/bin/docean
+
+ssh -p 55522 ribafs@165.232.148.216
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-20-04-pt
+
+
+== Firewall
+
+Agora pode fazer login com o ribafs
+
+docean
+
+As informações na tela após o login
+
+  System information as of Tue Mar  2 13:28:31 UTC 2021
+
+  System load:  0.25              Users logged in:       0
+  Usage of /:   6.8% of 24.06GB   IPv4 address for eth0: 165.232.148.216
+  Memory usage: 16%               IPv4 address for eth0: 10.48.0.5
+  Swap usage:   0%                IPv4 address for eth1: 10.124.0.2
+  Processes:    101
+
+0 updates can be installed immediately.
+0 of these updates are security updates.
+
+Instalar e configurar o ufw
+
+O site https://meuip.com.br/ é um dos que mostra online o IP para quem usa em seu desktop internet ADSL como eu
+
+138.122.83.159
+
+sudo ufw allow 80
+sudo ufw allow 443
+#sudo ufw allow from 187.110.233.26 to any port 55522
+sudo ufw allow 55522
+sudo ufw enable
+sudo service ufw restart
+
+sudo ufw status
+
+Configurações
+
+cd
+cp /etc/default/ufw backup
+
+Configurações /etc/default/ufw
+
+
+Reduzir o timeout do root
+
+sudo -i
+
+nano /root/.bashrc
+
+Adicionar ao final
+
+export TMOUT=180
+
+source /root/.bashrc
+
+exit
+
+Agora 3MariaDB
+

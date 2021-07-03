@@ -1,0 +1,101 @@
+Instalar o certificado SSL auto-assinado no CentOS 8
+
+Para servidores sem um domínio, apenas com IP
+
+sudo dnf update
+
+sudo dnf install httpd mod_ssl
+
+sudo systemctl enable --now httpd
+
+sudo firewall-cmd --add-port=443/tcp --permanent
+
+sudo firewall-cmd --add-port=80/tcp --permanent
+
+sudo firewall-cmd --reload
+
+sudo openssl req -newkey rsa:4096 -nodes -keyout /etc/pki/tls/private/ribafs.key -x509 -days 365 -out /etc/pki/tls/certs/ribafs.crt
+BR
+CE
+Fortaleza
+RibaFS
+Particular
+143.110.215.113
+ribafs@gmail.com
+
+sudo nano /etc/httpd/conf.d/ssl.conf
+
+ServerName localhost
+
+## Redirect HTTP Traffic to HTTPS
+<VirtualHost *:80>
+    DocumentRoot /var/www/html
+    ServerName localhost
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</VirtualHost>
+
+## Begin SSL configuration
+
+Listen 443 https
+SSLPassPhraseDialog exec:/usr/libexec/httpd-ssl-pass-dialog
+SSLSessionCache         shmcb:/run/httpd/sslcache(512000)
+SSLSessionCacheTimeout  300
+SSLCryptoDevice builtin
+
+sudo cp /etc/httpd/conf.d/ssl.conf /home/ribafs
+
+<VirtualHost _default_:443>
+ErrorLog logs/ssl_error_log
+TransferLog logs/ssl_access_log
+LogLevel warn
+SSLEngine on
+SSLProtocol -all +TLSv1.3 +TLSv1.2
+SSLOpenSSLConfCmd Curves X25519:secp521r1:secp384r1:prime256v1
+SSLHonorCipherOrder on
+SSLCipherSuite EECDH+AESGCM:EDH+AESGCM
+SSLCertificateFile /etc/pki/tls/certs/ribafs.crt
+SSLCertificateKeyFile /etc/pki/tls/private/ribafs.key
+<FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+</FilesMatch>
+<Directory "/var/www/cgi-bin">
+    SSLOptions +StdEnvVars
+</Directory>
+BrowserMatch "MSIE [2-5]" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog logs/ssl_request_log \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+Header always set X-Frame-Options DENY
+Header always set X-Content-Type-Options nosniff
+SSLCompression off
+#SSLUseStapling on
+#SSLStaplingCache "shmcb:logs/stapling-cache(150000)"
+SSLSessionTickets Off
+</VirtualHost>
+
+apachectl configtest
+
+ou
+httpd -t
+
+sudo nano /var/www/html/index.html
+
+<!DOCTYPE html>
+<html>
+<body>
+<h1>centos8.ribafs.com</h1>
+<p>Configuring Apache to use SSL/TLS certificates on CentOS 8</p>
+</body>
+</html>
+
+sudo systemctl restart httpd
+
+curl localhost
+
+https://143.110.215.113
+
+https://kifarunix.com/configure-apache-with-ssl-tls-certificates-on-centos-8/

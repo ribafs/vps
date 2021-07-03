@@ -1,0 +1,85 @@
+Testando a tradução pt-BR no CyberPanel
+Renomeei o arquivo pt para pt-BR
+
+O prjeto é o de adicionar o CakePHP 3 aos aplicativos a serem instalador pelo CyberPanel
+Tem mais, também já virá com o adminer-br instalado
+
+Para isso instalei o Ubuntu 20.04 numa box do Vagrant
+E nela instalarei os fontes do Cyber de:
+https://github.com/usmannasir/cyberpanel
+
+Para isso preciso capturar a chave do SSH da box e adicionar ao GH
+
+sudo su -
+
+cd ~/
+ssh-keygen -t rsa -b 4096 -C "ribafs@gmail.com"
+Enter
+senha
+repete
+
+Copiar para a RAM
+cat ~/.ssh/id_rsa.pub
+
+Acessar o GH e colar
+
+git clone git@github.com:ribafs/cyberpanel.git cyber
+cd cyber
+sh install.sh
+
+Copiar
+https://github.com/ribafs/cyberpanel/blob/stable/websiteFunctions/templates/websiteFunctions/installJoomla.html
+
+Para
+https://github.com/ribafs/cyberpanel/blob/stable/websiteFunctions/templates/websiteFunctions/installCakePHP3.html
+
+Efetuar os ajustes adicionando CakePHP 3 em:
+
+website.html
+launchChild.html
+applicationInstaller.html
+
+
+###################################################################
+                CyberPanel Successfully Installed                  
+                                                                   
+                Current Disk usage : 5/124GB (5%)                        
+                                                                   
+                Current RAM  usage : 333/1987MB (16.76%)                         
+                                                                   
+                Installation time  : 0 hrs 41 min 0 sec                 
+                                                                   
+                Visit: https://138.122.83.48:8090                  
+                Panel username: admin                              
+                Panel password: *****                              
+https://192.168.33.10:8090
+                Visit: https://138.122.83.48:7080                     
+                WebAdmin console username: admin                   
+                WebAdmin console password: slXG8QfjY4intCLn          
+                                                                   
+                Visit: https://138.122.83.48:8090/rainloop/?admin     
+                Rainloop Admin username: admin                     
+                Rainloop Admin password: DkMJsMzCkks6pt        
+                                                                   
+             Run cyberpanel help to get FAQ info
+             Run cyberpanel upgrade to upgrade it to latest version.
+             Run cyberpanel utility to access some handy tools .
+                                                                   
+              Website : https://www.cyberpanel.net                 
+              Forums  : https://forums.cyberpanel.net              
+              Wikipage: https://docs.cyberpanel.net                
+              Docs    : https://cyberpanel.net/docs/               
+                                                                   
+            Enjoy your accelerated Internet by                  
+                CyberPanel & OpenLiteSpeed 				                     
+###################################################################
+If your provider has a network-level firewall
+Please make sure you have opened following port for both in/out:
+TCP: 8090 for CyberPanel
+TCP: 80, TCP: 443 and UDP: 443 for webserver
+TCP: 21 and TCP: 40110-40210 for FTP
+TCP: 25, TCP: 587, TCP: 465, TCP: 110, TCP: 143 and TCP: 993 for mail service
+TCP: 53 and UDP: 53 for DNS service
+Your provider seems blocked port 25 , E-mail sending may not work properly.
+Would you like to restart your server now? [y/N]: 
+

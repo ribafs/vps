@@ -1,0 +1,10 @@
+Connect a GIT
+
+With Cipi connect a private or public Github repository to your account is very easy!
+Run ssh <app-user>@<server-ip>
+Run rm -rf /home/<app-user>/web (all application web contents will be delete)
+Copy /home/<app-user>/git/deploy.pub into Github SSH Keys
+Run nano /home/<app-user>/git/deploy.sh
+Edit your Git repository name, branch and optional post deploy scripts
+Run sh /home/<app-user>/git/deploy.sh to deploy Git on your server
+You can create a PHP webhook (git ignored) into your /web folder with command with exec commant to deploy.sh

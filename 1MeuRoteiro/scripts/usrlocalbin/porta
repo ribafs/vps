@@ -1,0 +1,6 @@
+if [ -n "$1" ]; then
+        grep -w "$1/tcp" /etc/services
+else
+        echo 'Sintaxe: porta nr'
+fi
+

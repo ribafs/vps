@@ -1,0 +1,28 @@
+## Acessando
+
+ssh root@194.195.213.166
+
+apt update
+
+apt upgrade -y
+
+reboot
+
+ssh root@194.195.213.166
+
+adduser ribafs
+
+zmxnxxxxR@
+
+adduser ribafs sudo
+adduser ribafs www-data
+
+dpkg-reconfigure tzdata
+America
+Fortaleza
+
+date    - Thu 29 Apr 2021 09:55:27 AM -03
+
+== Instalar ufw
+
+

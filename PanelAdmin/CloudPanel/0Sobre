@@ -1,0 +1,59 @@
+https://www.cloudpanel.io/
+
+A maneira mais fácil de executar seu aplicativo PHP na nuvem!
+
+O que é CloudPanel? #
+
+CloudPanel é um painel de controle de servidor moderno com componentes leves para aplicativos PHP com recursos específicos para todas as principais nuvens. Ele foi desenvolvido com mais de dez anos de experiência em hospedagem Magento na nuvem AWS.
+
+Com o CloudPanel, você pode executar seu aplicativo PHP favorito em qualquer nuvem ou servidor dedicado em minutos.
+
+CloudPanel é um painel de controle web de servidor gratuito para PHP, construído para a nuvem para máximo desempenho e segurança.
+
+
+
+Destacando:
+
+Luzes:
+
+- Painel de controle fácil de usar
+- Instalado e funcionando em 60 segundos
+- Suporta todos os aplicativos PHP comuns
+- Com um clique certificado Let's Encrypt
+- Múltiplas versões de PHP
+- Suporte a NGINX
+- Suporte para todas as principais empresas da nuvem: AWS, Digital Ocean, Google Cloud, Microsoft Azure e outros, inclusive localmente com Vagrant
+- Funcionalidades da nuvem
+- Suporta mais de 10 idiomas
+
+Features
+
+- CloudPanel é grátis - para sempre! Sem contrato, custos ocultos, limitações ou restrições.
+- Suporte ao MySQL, Nginx e PHP
+- Múltiplas versões do PHP: PHP 7.1, PHP 7.2, PHP 7.3, PHP 7.4 e PHP 8.0
+- CloudPanel CLI - Interface CLI que fornece comandos para backup e restauração de bancos de dados, desabilitando a autenticação de dois fatores e muito mais.
+- Autenticação em dois fatores - Uma camada adicional de segurança é fornecida com a autenticação de dois fatores para login seguro do CloudPanel.
+
+
+Suporte
+
+https://github.com/cloudpanel-io/cloudpanel-ce/discussions
+https://discord.com/invite/jc4SkZJ
+
+Documentação
+
+https://www.cloudpanel.io/docs/cloudpanel-ce/
+
+Blog
+
+https://www.cloudpanel.io/blog/
+
+Licença
+
+https://www.cloudpanel.io/license-terms/
+
+Não é opensource, mas seu script instalador está disponível
+
+https://installer.cloudpanel.io/ce/v1/install.sh
+
+

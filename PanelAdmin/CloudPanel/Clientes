@@ -1,0 +1,67 @@
+Adicionar um cliente com os seguintes dados
+
+https://192.168.33.10:8443/admin/users
+
+Username - adminbr
+Email - vpsasec@gmail.com
+First name 
+Last
+Password
+
+Sair do admin
+Entrar com adminbr
+
+Adicionar um domínio
+
+ribafs.cf
+
+Criar um banco
+
+adminbr
+adminus
+
+Criar o aplicativo
+
+Acessar o servidor via SSH
+
+Sm ~ cd vagrant/cloudpanel/
+Sm cloudpanel vagrant ssh
+
+########################################################
+###            Welcome to CloudPanel                 ###
+########################################################
+
+* Website:         https://www.cloudpanel.io
+* Documentation:   https://www.cloudpanel.io/docs/cloudpanel-ce/v1/
+* CloudPanel:      https://192.168.33.10:8443/
+* CloudPanel CLI:  clpctl list
+
+Last login: Sat May 22 19:01:26 2021 from 10.0.2.2
+
+
+cd /home/cloudpanel/htdocs/ribafs
+
+Atualizar composer para a versão 2
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '756890a4488ce9024fc62c56153228907f1545c228516cbf63f885e036d37e9a59d27d63f46af1d4d07ee0f76181c7d3') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+
+sudo cp composer.phar /usr/local/bin/composer
+
+composer --version
+
+Instalar o CakePHP 4
+
+Resetar as permissões
+cd /home/cloudpanel/htdocs/
+clpctl system:permissions:reset ribafs 775
+cd ribafs
+composer create-project --prefer-dist cakephp/app:~4.0 admin-br
+
+Acessar
+
+https://ribafs.cf/admin-br
+
+

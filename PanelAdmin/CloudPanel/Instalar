@@ -1,0 +1,13 @@
+CloudPanel
+
+O único requisito é o Debian 10
+Para todos os clouds comuns (Amazon Web Services, Digital Ocean, Google Cloud, and Microsoft Azure) nós temos preparado uma imagem para um lançamento rápido
+
+
+apt update && apt -y upgrade && apt -y install curl wget sudo
+
+curl -sSL https://installer.cloudpanel.io/ce/v1/install.sh | sudo bash
+
+You can now access the CloudPanel via Browser: https://serverIP:8443
+
+

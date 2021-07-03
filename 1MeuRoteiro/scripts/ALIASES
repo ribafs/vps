@@ -1,0 +1,14 @@
+# Meus aliases
+alias c='clear'
+alias ai='sudo apt install $1'
+alias maiores='du -h | egrep -v "\./.+/" | sort -hr' #Maiores arquivos e sub-diretórios do diretório atual
+alias npml='npm install && npm run dev && npm audit fix'
+alias cw='clear;cd /var/www/html;ls'
+alias aptes='apachectl configtest'
+alias apres='sudo service apache2 restart'
+alias aprel='sudo service apache2 reload'
+alias mrel='sudo service mysql reload'
+alias mres='sudo service mysql restart'
+alias ca='php artisan view:clear;php artisan cache:clear;php artisan route:cache;php artisan route:clear;php artisan optimize;php artisan config:cache;composer dumpauto'
+# /Meus
+

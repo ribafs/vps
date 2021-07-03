@@ -1,0 +1,33 @@
+Envio de e-mail
+
+Tanto faz ser pela linha de comando quantos er através de um servidor de e-mail.
+
+Precisamos pedir através de suporte para que liberem nosso servidor.
+Solicitei e somente após 60 dias devo confirmar o pedido para que liberem.
+
+apt-get install mailutils
+
+mail -s "Hello World" ribafs@gmail.com
+Cc: 
+Hi Peter
+How are you
+I am fine
+Good Bye
+<Ctrl+D>
+
+
+mail -s "This is the subject" somebody@example.com <<< 'This is the message'
+
+ou
+echo "This is the body" | mail -s "Subject" -aFrom:Harry\<harry@gmail.com\> someone@example.com
+
+msg em arquivo
+mail -s "Hello World" user@yourmaildomain.com < /home/user/mailcontent.txt
+
+echo "This is the message body" | mail -s "This is the subject" mail@example.com
+
+cc e bcc
+mail -s "Hello World" user1@example.com -c usertocc@example.com -b usertobcc@example.com
+
+
+echo "Teste de e-mail" | mutt -s "This is mutts subject" ribafs@gmail.com

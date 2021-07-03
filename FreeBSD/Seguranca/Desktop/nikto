@@ -1,0 +1,39 @@
+Testando vulnerabilidades web com Nikto
+
+O Nikto é web server scanner escrito em perl usado para detectar vulnerabilidades em servidores web. Ele é muito simples de ser usado e atualizado gerando relatórios em txt, html e csv.
+
+Requer repositório multiverse no /etc/apt/sources.list
+
+sudo apt install nikto
+
+Atualizando os plugins:
+
+nikto -update
+
+Usando o Nikto
+
+nikto -h HOST -p PORT
+nikto -h HOST -p PORT -ssl
+nikto -h ribafs.org
+nikto -C all -host 200.128.X.X -o vitima.txt (mude X.X pelos números desejados)
+
+- C all - Força a checagem de todos os diretórios em busca de cgi
+- host - Ip da vitima
+-o - Gera um arquivo de relatório
+
+Varrendo uma porta de um host:
+nikto -h google.com -p 443
+
+Help
+nikto -H | less
+
+Esta ferramenta tanto ajuda a defender o seu site quanto ajuda para quem quer perceber
+vulnerabilidades em outros sites ou atacar.
+
+Documentação oficial:
+http://cirt.net/nikto2-docs/ 
+
+Exemplos de uso:
+http://cirt.net/nikto2-docs/usage.html
+
+

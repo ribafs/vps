@@ -1,0 +1,167 @@
+Agora estou criando um Servidor com Debian 9.4 Limpo no DO
+Usarei Apache2 ao invés de NGINX
+
+As mudanças são por conta da estabilidade do Debian e de eu configurar com mais facilidade o Apache. A diferença de performance do NGINX para mim não justifica os problemas que tenho tido.
+
+165.227.227.139
+Londres
+1CPU, 1GB RAM e 25GB de disco
+nome - ribafs.org
+
+Criei uma chave ssh e associei a este servidor na criação
+
+Acesso pelo desktop
+
+ssh root@165.227.227.139
+
+Funcionou a chave. Bastou teclar enter após o yes e acessou sem senha.
+
+
+Atualização
+
+apt update
+apt upgrade -y
+reboot
+
+Após criar o servidor usando o destroy/reuild e escolhendo Debian...
+
+Os erros me mostraram que ao usar o Destroy/Rebuild e selecionar outra distribuição não é confiável, pois o sources.list permanece o do Ubuntu.
+
+Então irei destruir o servidor e criar um novo com Debian.
+
+
+== Adicionei o user ribafs
+Criei o group admin
+Adicionei o ribafs ao admin
+Adicionei ele ao sudoers
+Adicionei o ribafs ao ssh e o otimizei
+
+Conectei via terminal como ribafs
+ssh -p 55522 ribafs@165.227.227.139
+
+
+== Adicionar partição de swap com 2GB
+
+dd if=/dev/zero of=/swapfile bs=1M count=2048
+mkswap /swapfile
+chmod 600 /swapfile
+swapon /swapfile
+
+nano /etc/fstab
+/swapfile	swap	swap	defaults	0	0
+
+Testar
+free -m
+
+
+== Enviar o script perms para ajustar as permissões do /var/www/html
+
+Do desktop
+scp -P 55522 perms ribafs@165.227.227.139:/home/ribafs
+
+== Enviar o script m que limpa o cache da RAM
+scp -P 55522 m ribafs@165.227.227.139:/home/ribafs
+
+Acessar o servidor
+cd /home/ribafs
+sudo su
+cp perms /usr/local/bin
+chmod +x /usr/local/bin/perms
+
+cp m /usr/local/bin
+chmod +x /usr/local/bin/m
+
+Executando
+
+perms
+
+m
+
+== Agora irei executar o script 
+deb_ub_lamp.sh
+
+Para instalar o LAMP
+
+No desktop
+
+scp -P 55522 deb_ub_lamp.sh ribafs@165.227.227.139:/tmp
+
+No servidor
+
+cd /tmp
+
+sh deb_ub_lamp.sh
+
+Ele irá interagir poucas vezes
+
+- Na primeira interação ele pede a senha do MariaDB
+Enter current password for root (enter for none):
+		Entre com a senha e enter
+
+Change the root password? [Y/n]
+		Digite n e Enter
+
+Remove anonymous users? [Y/n]
+		Apenas Enter
+
+Disallow root login remotely? [Y/n]
+		Apenas Enter
+
+Remove test database and access to it? [Y/n]
+		Apenas Enter
+
+Reload privilege tables now? [Y/n]
+		Apenas Enter
+
+A próxima interação sugere que alteremos o apache2.conf dando suporte ao mod_rewrite e ao .htaccess
+
+Configurar .htaccess no Apache 2.4 trocando None por All
+e /var/www por /backup/www.
+Aperte ENTER para configurar.
+
+Antes das tags <Directory> digite
+
+ServerName localhost
+
+Mude este trecho assim, apenas trocando None por All:
+
+<Directory />
+        Options FollowSymLinks
+        AllowOverride All
+        Require all denied
+</Directory>
+
+<Directory /usr/share>
+        AllowOverride All
+        Require all granted
+</Directory>
+
+<Directory /var/www/>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+</Directory>
+
+Salve e feche com Ctrl+O e Ctrl+X
+
+
+Saia do menu do script.
+
+Agora já podemos abrir a página default do Apache:
+
+http://165.227.227.139
+
+Ok
+
+php -v
+7.0.27
+
+mysql -V
+10.1.26 MariaDB
+
+apache2 -v
+2.4.25
+
+
+== Agora irei implementar o SSL no Apache
+Usando o arquivo 3ssl

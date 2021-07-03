@@ -1,0 +1,365 @@
+Nginx no CentOS 8.3
+
+
+sudo dnf update
+
+sudo dnf install -y nginx
+
+httpd -v
+
+
+Habiltiar no boot e iniciar
+
+sudo systemctl enable nginx
+
+sudo systemctl start nginx
+
+
+== Configurar para que Nginx suporte PHP
+
+sudo nano /etc/nginx/conf.d/php-fpm.conf
+
+index index.php index.html index.htm;
+ 
+location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_intercept_errors on;
+    fastcgi_index  index.php;
+    include        fastcgi_params;
+    fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    fastcgi_pass   php-fpm;
+}
+
+sudo perms
+
+Criar
+
+nano /usr/share/nginx/html/hello.php
+
+<?php
+    echo "Hello, world!\n";
+
+curl http://localhost/hello.php
+
+Verifique se o socket Unix está rodando
+
+ls -l /run/php-fpm/www.sock
+
+
+== Liberar Nginx no FirewallD
+
+Não liberarei a porta 80, somente a 443
+
+sudo firewall-cmd --permanent --zone=public --add-service=https --add-service=https
+ou
+sudo firewall-cmd --permanent --add-service=https
+
+sudo firewall-cmd --reload
+
+sudo firewall-cmd --permanent --list-all
+
+sudo chown ribafs:apache /var/www/html -R
+
+Verificar se foi habilitado
+
+sudo firewall-cmd --permanent --list-all
+
+Aplicar as alterações
+
+sudo firewall-cmd --reload
+
+
+== Testar
+
+O Nginx está instalado e funcionando. Sites estáticos já podem ser acessados.
+
+Mais a frente habilitaremos o uso do PHP e com bancos de dados PostgreSQL
+
+IP
+
+ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
+
+curl -4 localhost
+
+https://IP
+
+
+== Arquivos e diretórios importantes para o Nginx
+
+Conteúdo
+
+/usr/share/nginx/html: O conteúdo Web em si, que por padrão apenas consiste na página Nginx padrão que você viu antes, é disponibilizado fora do diretório /usr/share/nginx/html. Isso pode ser alterado mudando os arquivos de configuração do Nginx.
+
+Configurações
+
+/etc/nginx: o diretório de configuração do Nginx. Todos os arquivos de configuração do Nginx residem aqui. 
+/etc/nginx/nginx.conf: o arquivo de configuração principal do Nginx. Isso pode ser modificado para fazer alterações na configuração global do Nginx. 
+/etc/nginx/conf.d/: este diretório contém arquivos de configuração de bloco de servidor, onde é possível definir os sites que estão hospedados dentro do Nginx. Uma abordagem típica é ter cada site em um arquivo separado cujo nome provém do domínio do site, como o your_domain.conf. 
+
+Logs do Nginx
+
+/var/log/nginx/access.log: cada pedido ao seu servidor Web é registrado neste arquivo de registro a menos que o Nginx esteja configurado para fazer de outra maneira. 
+/var/log/nginx/error.log: qualquer erro do Nginx será gravado neste registro. 
+
+/etc/php-fpm.d/www.conf
+
+user = nginx
+group = nginx
+
+listen.owner = nginx
+listen.group = nginx
+listen.mode = 0660
+
+Blocos do Servidor
+
+No Apache quando queremos hospedar dois ou mais domínios no mesmo servidor usamos virtualhosts. No Nginx usa-se blocos.
+
+No CentOS 8, os blocos de servidor são definidos em arquivos .conf localizados em 
+
+/etc/nginx/conf.d
+
+
+Adicionar um bloco para o domínio my_domain
+
+Por padrão, o Nginx no CentOS 8 está configurado para disponibilizar documentos vindos de /usr/share/nginx/html. Isso funciona bem para um único site, mas se torna difícil de gerenciar se você estiver hospedando vários sites. Em vez de modificar o /usr/share/nginx/html, vamos criar uma estrutura de diretórios dentro do /var/www para o site my_domain, deixando o /usr/share/nginx/html no lugar como o diretório padrão para ser disponibilizado se um pedido de cliente não corresponder a nenhum outro site.
+
+Criar
+
+sudo mkdir /var/www/my_domain
+
+Criaremos um novo bloco de servidor em /etc/nginx/conf.d/my_domain.conf
+
+Colar
+
+server {
+        listen 443;
+        listen [::]:443;
+
+        root /var/www/my_domain/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name my_domain www.my_domain;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}
+
+Salve e feche
+
+Testar a sintaxe
+
+sudo nginx -t
+
+sudo systemctl restart nginx
+
+
+== Atualizar os contextos no SELinux, para que o Nginx possa disponibilizar o conteúdo do diretório /var/www/my_domain.
+
+O seguinte comando permitirá que sua raiz de documento personalizada seja disponibilizada como conteúdo HTTPS:
+
+chcon -vR system_u:object_r:httpd_sys_content_t:s0 /var/www/my_domain/
+
+
+== Testando
+
+https://IP
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-centos-8-pt
+
+
+== Instruir o SELinux para permitir que o Nginx execute o código PHP via PHP-FPM.
+
+sudo setsebool -P httpd_execmem 1
+
+sudo systemctl restart httpd
+
+sudo nano /var/www/html/info.php
+
+
+
+== Ajustando as Permissões SELinux para Virtual Hosts (Recomendado)
+
+sudo setsebool -P httpd_unified 1
+
+sudo ls -dlZ /var/www/ribafs/log/
+
+drwxr-xr-x. 2 root root unconfined_u:object_r:httpd_sys_content_t:s0 6 Apr 23 23:51 /var/www/ribafs/log/
+
+sudo semanage fcontext -a -t httpd_log_t "/var/www/ribafs/log(/.*)?"
+ 
+sudo restorecon -R -v /var/www/ribafs/log
+ 
+Listar os contextos mais uma vez para ver as alterações:
+
+sudo ls -dlZ /var/www/ribafs/log/
+
+Testando o Virtual Host (Recomendado)
+
+sudo systemctl restart httpd
+ 
+ls -lZ /var/www/ribafs/log
+
+Agora que você tem seu virtual host configurado e as permissões do SELinux atualizadas, o Apache agora irá servir seu nome de domínio. Você pode testar isso navegando para http://IP, onde você deve ver algo assim:
+
+Welcome to IP!
+
+Nginx com PHP
+
+sudo nano /etc/nginx/conf.d/php-fpm.conf
+
+/etc/nginx/default.d/php.conf
+index index.php index.html index.htm;
+ 
+location ~ \.php$ {
+    try_files $uri =404;
+    fastcgi_intercept_errors on;
+    fastcgi_index  index.php;
+    include        fastcgi_params;
+    fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+    fastcgi_pass   php-fpm;
+}
+
+sudo nano /etc/php-fpm.d/www.conf
+
+…
+; RPM: apache user chosen to provide access to the same directories as httpd
+user = nginx
+; RPM: Keep a group allowed to write in log dir.
+group = nginx
+
+server {
+        listen 80;
+        listen [::]:80 ipv6only=on;
+
+        access_log /var/log/nginx/MY-APP-access.log;
+        error_log /var/log/nginx/MY-APP-error.log;
+
+        root /ROOT_OF_APP/public;
+        index index.php index.html index.htm;
+
+        server_name HOST_NAME;
+
+        location / {
+            try_files $uri $uri/ /index.php?$args;
+        }
+
+        location ~* \.php$ {
+            include /etc/nginx/fastcgi_params;
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_index index.php;
+        }
+
+        location = /favicon.ico { log_not_found off; access_log off; }
+        location = /robots.txt  { log_not_found off; access_log off; }
+}
+
+sudo systemctl start php-fpm
+sudo systemctl restart nginx
+
+sudo chown -R testsecvps.testsecvps /usr/share/nginx/html/
+
+perms
+
+nano /usr/share/nginx/html/info.php
+
+<?php
+
+phpinfo();
+
+Testar
+
+Verificar IP do servidor
+curl -4 icanhazip.com
+
+curl http://IP/info.php
+
+http://IP/info.php
+
+Listar módulos de PHP
+
+sudo yum search php-
+sudo yum search php- | grep mysql
+sudo yum search php74- ## for version 7.2 ##
+sudo yum search php74- ## for version 7.3 ##
+sudo yum search php74- ## for version 7.4 ##
+
+Instalar módulos
+
+sudo yum install php-mysqlnd php-gd php-pecl-zip php-mbstring php-xml php-opcache php-pecl-imagick
+
+How to configure PHP 7.x
+You need to edit the following files as per your needs:
+    • /etc/php.ini – PHP’s initialization and config file. Do not modify this file. Instead create custom.ini in /etc/php.d/ directory. 
+    • /etc/php-fpm.conf – Gloable FPM (FastCGI) configuration file. 
+    • /etc/php-fpm.d/www.conf – FastCGI (FPM) www pool config file. 
+    • /etc/php.d/ – PHP modules config file. 
+See best PHP security practices for web apps for more info.
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-centos-8-quickstart-pt
+
+https://ifi.tech/2020/08/21/installation-of-nginx-mysql-and-php-in-centos-8/
+
+
+Enable HTTPS SSL support on Nginx and RHEL 8
+
+sudo nano /etc/nginx/nginx.conf
+
+           server {
+               listen       443 ssl http2 default_server;
+               listen       [::]:443 ssl http2 default_server;
+               server_name  _;
+               root         /usr/share/nginx/html;
+       
+               ssl_certificate "/etc/pki/nginx/server.crt";
+               ssl_certificate_key "/etc/pki/nginx/private/server.key";
+               ssl_session_cache shared:SSL:1m;
+               ssl_session_timeout  10m;
+               ssl_ciphers PROFILE=SYSTEM;
+               ssl_prefer_server_ciphers on;
+       
+               # Load configuration files for the default server block.
+               include /etc/nginx/default.d/*.conf;
+       
+               location / {
+               }
+       
+               error_page 404 /404.html;
+                   location = /40x.html {
+               }
+       
+               error_page 500 502 503 504 /50x.html;
+                   location = /50x.html {
+               }
+           }
+
+Create a directory to hold the SSL certifcate and the private key for the Nginx server: 
+
+mkdir -p /etc/pki/nginx/private/ 
+
+sudo openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/nginx/private/server.key -x509 -days 365 -out /etc/pki/nginx/server.crt
+
+sudo firewall-cmd --zone=public --permanent --add-service=https
+sudo firewall-cmd --reload
+
+sudo systemctl reload nginx
+
+Referências
+
+https://linuxconfig.org/install-nginx-on-redhat-8
+
+
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-centos-8-quickstart-pt
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mariadb-php-lamp-stack-on-centos-8-pt
+https://www.tecmint.com/install-lamp-on-centos-8/
+https://www.linuxbabe.com/redhat/install-lamp-stack-centos-8-rhel-8
+https://phoenixnap.com/kb/how-to-install-lamp-stack-centos-8
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-centos-8-pt

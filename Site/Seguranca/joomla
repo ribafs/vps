@@ -1,0 +1,12 @@
+Melhorando a segurança de sites com Joomla
+
+Se o site está em
+/var/www/html/portal
+
+- Copiar configuration.php para o /var/www com o nome cfg.php
+- Remover todo o conteúdo do /portal/configuration.php e deixar apenas estas duas linhas:
+
+<?php
+require_once( dirname( __FILE__ ) . '/../../cfg.php' );
+
+Obs.: lembre de fazer o backup do arquivo cfg.php, que agora está fora do html.

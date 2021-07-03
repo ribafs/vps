@@ -1,0 +1,18 @@
+Existem opções apra a criação de uma nova droplet
+- Caso seja a primeira a ser criada podemos criar:
+    - Distributions
+    - Containers
+    - Marketplace
+    - Custom images
+
+Nas próximas vezes, caso tenha criado algum snapshot/backup
+
+- Caso seja a primeira a ser criada podemos criar:
+    - Distributions
+    - Containers
+    - Marketplace
+    - Snapshots
+    - Backups
+    - Custom images
+
+

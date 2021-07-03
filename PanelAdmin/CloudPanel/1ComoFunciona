@@ -1,0 +1,11 @@
+CloudPanel
+
+Supore somente a Debian 10
+
+Criar um servidor para instalar o cloudpanel nele
+
+74.207.234.244
+
+Sites dos clientes serão criados todos no servidor com o cloudpanel
+Precisaremos ter espaço, cpu, ram, etc no primeiro servidor para ratear para os clientes
+

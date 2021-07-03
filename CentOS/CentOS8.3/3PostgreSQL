@@ -1,0 +1,50 @@
+PostgreSQL no CentOS 8.3
+
+== Instalação
+
+sudo dnf udpate
+
+Verificar versões existentes nos repositórios
+dnf module list postgresql
+
+Instalar a 12
+sudo dnf install @postgresql:12
+
+Instalar a default
+sudo dnf install postgresql postgresql-server
+
+Criar um novo cluster
+sudo postgresql-setup initdb
+sudo postgresql-setup --initdb
+
+Habilitar no boot e iniciar
+
+sudo systemctl enable postgresql
+sudo systemctl start postgresql
+
+ou
+su - -c "systemctl enable postgresql && systemctl start postgresql"
+
+Checar a versão instalada
+sudo -u postgres psql -c "SELECT version();"
+
+== Acessar
+
+Acessar como postgres
+sudo -i -u postgres
+psql
+\q
+
+Acessando direto o psql
+sudo -u postgres psql
+
+Tabela sem sequence
+\dt
+
+
+Referência
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-postgresql-on-centos-8-pt
+https://www.giulix.net/drupal8
+https://www.howtoforge.com/how-to-install-nextcloud-with-nginx-and-php-fpm-on-centos-8/
+https://linuxize.com/post/how-to-install-postgresql-on-centos-8/
+

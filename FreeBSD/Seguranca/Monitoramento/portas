@@ -1,0 +1,5 @@
+Monitorar portas com ipV4
+
+sockstat -4l
+
+

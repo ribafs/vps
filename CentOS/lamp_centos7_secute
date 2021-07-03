@@ -1,0 +1,227 @@
+https://www.rayheffer.com/wp-content/uploads/2017/09/eBook-Building-a-Secure-Wordpress-Server-LAMP-with-CentOS-7-Ray-Heffer-v1.1.pdf
+
+Criando um Servidor Seguro para o Wordpress com o CentOS 7
+
+List all the currently loaded targets using the following command:
+systemctl list-units -t target
+
+cd /etc/systemd/system/multi-user.target.wants
+ls –al
+
+IPTables
+
+If the default policy is set to drop, then you will lose connectivity to your Linux host, assuming of course you are connected via SSH
+
+systemctl stop iptables
+
+Limpar todas as rules
+iptables -F
+
+Permitir localhost dentro e saindo
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+Configurar SSH para entrar e sair
+iptables -A INPUT -i eth0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+
+Logs para entrada e saída
+
+iptables -N LOGINPUT
+iptables -N LOGOUTPUT
+iptables -A INPUT -j LOGINPUT
+iptables -A OUTPUT -j LOGOUTPUT
+iptables -A LOGINPUT -m limit --limit 4/min -j LOG --log-prefix "DROP
+iptables -A LOGOUTPUT -m limit --limit 4/min -j LOG --log-prefix "DROP
+
+
+Todos os demais tráficos para drop
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+Salvando as regras
+iptables-save > /etc/sysconfig/iptables
+systemctl restart iptables
+
+Limitar mais que 3 conexões num minuto para um IP 
+
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state --state NEW -m 
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state -- NEW -m recent --update --seconds 60 --hitcount 4 --rttl --name SSH -j DROP
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state --state NEW, ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 9922 -m state --state ESTABLISHED -j ACCEPT
+
+Limitando outros tipos de ataque
+
+Drop XMAS packets
+iptables -A INPUT -p tcp --tcp-flags ALL -j DROP
+
+Drop NULL packets
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+Drop Syn-flood
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+Permitir acesso e bloqueio de IP
+
+cp /etc/hosts.allow /root/backup
+cp /etc/hosts.deny /root/backup
+
+Permitir somente que o IP abaixo conecte via ssh
+nano /etc/hosts.allow
+sshd:XX.XX.XX.XX
+
+nano /etc/hosts.deny
+ALL:ALL
+
+Bloqueando IP com iptables
+
+Um IP
+iptables -I INPUT -i eth0 -s XX.XX.XX.XX -j DROP
+
+Toda uma rede
+iptables -I INPUT -i eth0 -s XX.XX.XX.0/24 -j DROP
+
+Permitir HTTP e HTTPS
+
+iptables -A INPUT -i eth0 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+iptables -A OUTPUT -o eth0 -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
+
+iptables -A INPUT -i eth0 -p tcp --sport 80 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 443 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 80 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+Salvar regras e reiniciar
+
+iptables-save > /etc/sysconfig/iptables
+systemctl restart iptables
+
+
+Exemplo de script iptables
+
+# Drop NULL packets
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP
+
+# Block syn flood attack
+iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP
+
+# Block XMAS packets
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP
+
+# SSH Rate-limit new connections (drop if more than 3 attempts in 60 seconds) and allow only established SSH connections
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state --state NEW -m recent --set --name SSH
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state --state NEW -m recent --update --seconds 60 --hitcount 4 --rttl --name SSH -j DROP
+iptables -A INPUT -i eth0 -p tcp --dport 9922 -m state --state NEW, ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 9922 -m state --state ESTABLISHED -j ACCEPT
+
+# Allow SSH for outbound connections
+iptables -A OUTPUT -o eth0 -p tcp --dport 9922 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 9922 -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+# Perform DNS Queries
+iptables -A INPUT -i eth0 -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Allow NTP
+iptables -A OUTPUT -o eth0 -p udp --dport 123 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p udp --sport 123 -m state --state ESTABLISHED -j ACCEPT
+
+# Web Server (HTTP/HTTPS)
+iptables -A INPUT -i eth0 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
+
+# Web Browsing
+iptables -A INPUT -i eth0 -p tcp --sport 80 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 443 -m state --state ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 80 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 443 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT
+
+# Allow Inbound/Outbound to Localhost
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A OUTPUT -o lo -j ACCEPT
+
+#Allow SMTP outbound (sendmail)
+iptables -A INPUT -i eth0 -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+# Log all dropped packets
+iptables -N LOGINPUT
+iptables -N LOGOUTPUT
+iptables -A INPUT -j LOGINPUT
+iptables -A OUTPUT -j LOGOUTPUT
+iptables -A LOGINPUT -m limit --limit 4/min -j LOG --log-prefix "DROP
+iptables -A LOGOUTPUT -m limit --limit 4/min -j LOG --log-prefix "DROP
+
+# Set policies to drop everything else
+iptables -P INPUT DROP
+iptables -P FORWARD DROP
+iptables -P OUTPUT DROP
+
+
+Transferindo arquivos de/para outro servidor
+
+rsync --ignore-existing -prvh -e "ssh -p 22" fred@ip_address:/data/oldsitedir/ /data/.sitedir/
+
+
+== Configurando o SELinux
+
+Mantenha por enquanto ele desabilitado ou em permissive mode.
+
+yum update -y
+
+yum install -y policycoreutils policycoreutils-python selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
+
+Altere o SELinux para permisseive mode e reinicie o servidor.
+
+nano /etc/selinux/config
+
+SELINUX=permissive
+
+ou assim:
+setenforce 0
+
+reboot
+
+Configurar corretamente o contexto para o diretório web 
+
+semanage fcontext -a -t httpd_sys_content_t "/var/www/html(/.*)?" 
+restorecon -Rv /var/www/html
+
+Permitir ssh em outra porta
+semanage port -a -t ssh_port_t -p tcp 9922
+
+Permitir que apache envie e-mail
+setsebool -P httpd_can_sendmail 1
+
+Permitir que apache leia e escreva em certo diretório
+setsebool -P httpd_unified 1
+
+Monitorar problemas
+
+sestatus
+
+Limpar logs e reinicie
+> /var/log/audit/audit.log
+reboot
+
+Checar por problemas
+sealert -a /var/log/audit/audit.log
+
+Permitir que apache conecte via ssh
+setsebool httpd_can_network_connect=1
+
+
+Mudar para enforcing e reiniciar
+
+nano /etc/sysconfig/selinux
+SELINUX=enforced
+
+reboot
+
+

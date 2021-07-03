@@ -1,0 +1,32 @@
+VPS para PHP
+
+0Projeto
+1Servidor
+2SO
+3MariaDB
+4SegurancaSO/
+5AMP
+5.2Scripts/
+6Sites
+6.2SitesApps/
+7SegurancaAMP/
+8SSLeAUTH
+9Backup/
+10Monitoramento/
+11Conteudo
+
+Lançar o conteúdo no despertai
+
+Minhas extensões, inclusive a bíblia nos 3 idiomas
+
+Divulgar no DNOCS os demos das extensões e anotar nos respectivos repositórios
+
+Este servidor está abrigando os domínios ribafs.me e o despertai.net.br, mas resolvi remover o despertai e deixar apenas o ribafs.mr. Remover o respectivo virtualhost do despertai.net e manter o ribafs.conf. Adicionar na pasta /var/www/ribafs a pasta /var/www/ribafs/portal que abrigará o site que está em ribafs.github.io, que será convertido em Joomla e futuramente dará origem a um site estático exportado com o wget.
+
+Desabilitei o despertai.conf
+
+Removi o /var/www/despertai
+
+sudo apres
+
+

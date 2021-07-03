@@ -1,0 +1,102 @@
+ModSecurity
+Instalação e configurações do mod_secutiry no FreeBSD 11 com Apache 2.4
+
+O mod_security é um firewall de aplicativos web (WAF), que pode bloquear ataques genéricos e específicos.
+
+Instalar
+
+pkg install ap24-mod_security
+
+Aparece:
+
+Message from ap24-mod_security-2.9.2_2:
+
+You have installed ModSecurity.
+To enable ModSecurity in Apache, follow the instructions in
+
+ /usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+Most users will use the signatures from the OWASP Core Rule Set (CRS).
+For configuration instructions, see /usr/local/share/doc/mod_security2/README.
+
+Habilitar mod_security no Apache 2.4
+
+nano /usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+#Descomentar as 3 últimas linhas
+
+## module file for mod_security
+##
+## PROVIDE: mod_security2
+## REQUIRE: mod_unique_id
+
+##
+## To enable ModSecurity in Apache, enable the modules
+##  mod_unique_id (in httpd.conf) and
+##  mod_security2 in this config file
+##
+## Additionally, load configuration and rules with an Include line from
+##  /usr/local/etc/modsecurity/*.conf
+##
+## Most users will use the signatures from the OWASP Core Rule Set (CRS).
+## For configuration instructions, see /usr/local/share/doc/mod_security2/README.
+##
+
+## apache modules for mod_security
+LoadModule unique_id_module libexec/apache24/mod_unique_id.so
+LoadModule security2_module libexec/apache24/mod_security2.so
+Include /usr/local/etc/modsecurity/*.conf
+
+apachectl restart
+
+
+Verificar se mod_security está carregado
+
+tail -f /var/log/httpd-error.log
+
+
+Recebendo o conjunto de regras do core
+
+pkg install git
+cd /usr/local/etc/modsecurity 
+git clone https://github.com/SpiderLabs/owasp-modsecurity-crs 
+
+cp owasp-modsecurity-crs/crs-setup.conf.example crs.conf
+
+nano /usr/local/etc/apache24/modules.d/280_mod_security.conf
+
+vim: set filetype=apache:
+##
+## module file for mod_security
+##
+## PROVIDE: mod_security2
+## REQUIRE: mod_unique_id
+
+##
+## To enable ModSecurity in Apache, enable the modules
+##  mod_unique_id (in httpd.conf) and
+##  mod_security2 in this config file
+##
+## Additionally, load configuration and rules with an Include line from
+##  /usr/local/etc/modsecurity/*.conf
+##
+## Most users will use the signatures from the OWASP Core Rule Set (CRS).
+## For configuration instructions, see /usr/local/share/doc/mod_security2/README.
+##
+
+## apache modules for mod_security
+LoadModule unique_id_module libexec/apache24/mod_unique_id.so
+LoadModule security2_module libexec/apache24/mod_security2.so
+Include /usr/local/etc/modsecurity/*.conf
+Include /usr/local/etc/modsecurity/owasp-modsecurity-crs/rules/*.conf
+
+
+Configurar para bloquear
+
+nano /usr/local/etc/modsecurity/modsecurity.conf
+
+#SecRuleEngine DetectionOnly
+SecRuleEngine On
+
+apachectl restart
+

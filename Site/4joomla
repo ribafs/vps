@@ -1,0 +1,60 @@
+Instalar um site em Joomla na pasta /var/www/html
+
+IP do Servidor -  165.227.227.139
+
+== Enviar os arquivo de backup criados pelo componente SimpleBackup do desktop para a pasta /tmp do servidor
+
+No desktop copiar os dois arquivos (portal.zip e portal.sql) para a pasta /home/ribafs
+scp -P porta portal* ribafs@165.227.227.139:/tmp
+
+No servidor
+cd /tmp
+
+
+== Criar o banco e um usuário dono dele
+
+mysql -uroot -p
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION;
+\q
+
+mysql -uroot -p portal < portalxxx.sql
+
+
+== Descompactar o arquivo
+
+cd /tmp
+
+unzip portal*.zip -d /var/www/html
+
+
+== Ajustar permissões do /var/www/html
+
+perms
+
+Executo sempre que faço alguma alteração como root no /var/www/html
+
+
+== Ajustes no php.ini
+
+nano /etc/php/7.0/apache2/php.ini
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+
+
+Efetuar ajustes no /var/www/html/configuration.php se necessário.
+
+
+Removi index.html e i.php do raiz
+rm /var/www/html/index.html
+
+
+== Testar
+
+https://165.227.227.139/
+
+
+Depois de testado o site e configurado novamente para proteger o administrator com SSL
+então efetuar um backup full para guardar. Usarei o componente SimpleBackup
+

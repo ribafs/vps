@@ -1,0 +1,128 @@
+Instalar e configurar
+
+Apache, PHP, MariaDB e outros
+
+== Executar o script que enviamos para o servidor
+
+sudo su
+
+cd root/config
+
+sh install.sh
+
+php -v
+7.3.27
+
+== Atualizar composer para o 2.0
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+php -r "if (hash_file('sha384', 'composer-setup.php') === '756890a4488ce9024fc62c56153228907f1545c228516cbf63f885e036d37e9a59d27d63f46af1d4d07ee0f76181c7d3') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
+php composer-setup.php
+php -r "unlink('composer-setup.php');"
+
+sudo mv composer.phar /usr/bin/composer
+
+composer --version
+
+== Após instalar configure com
+
+scripts/config.txt
+
+
+
+Criar bancos e seus respectivos usuários
+Todos com privilégios restritos, evitar usar all
+
+Criar usuário restrito para laravel-acl demo
+
+create database laravel CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'super@mail.org'@'localhost' IDENTIFIED BY '123456';
+GRANT ALL ON laravel.sessions TO 'super@mail.org'@'localhost';
+GRANT SELECT ON laravel.* TO 'super@mail.org'@'localhost';
+
+create database laravel CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'super@mail.org'@'localhost' IDENTIFIED BY '123456';
+GRANT ALL ON laravel.* TO 'super@mail.org'@'localhost';
+
+Após concluir remover todos os privilégios e deixar soomente select
+REVOKE ALL ON laravel.* FROM 'super@mail.org'@'localhost';
+GRANT SELECT ON laravel.* TO 'super@mail.org'@'localhost';
+GRANT ALL ON laravel.sessions TO 'super@mail.org'@'localhost';
+FLUSH PRIVILEGES;
+
+Configurar o .env com o user super@mail.org com a senha 123456
+
+Efetuar as migrations
+
+Então mudar os privilégios para
+REVOKE ALL ON laravel.* FROM 'super@mail.org'@'localhost';
+GRANT SELECT ON laravel.* TO 'super@mail.org'@'localhost';
+GRANT ALL ON laravel.sessions TO 'super@mail.org'@'localhost';
+
+SHOW PRIVILEGES
+
+SHOW GRANTS;
+SHOW GRANTS FOR CURRENT_USER;
+SHOW GRANTS FOR CURRENT_USER();
+
+
+mysql -uroot -p
+
+Wordpress
+
+CREATE USER 'wp_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `wp_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `wp_db`.* TO `wp_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Opencart
+
+CREATE USER 'oc_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `oc_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `oc_db`.* TO `oc_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Humhub
+
+CREATE USER 'hh_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `hh_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `hh_db`.* TO `hh_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Laravel
+
+CREATE USER 'lv_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `lv_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER ON `lv_db`.* TO `lv_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+CMS Afternoon
+
+CREATE USER 'ca_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `ca_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX ON `ca_db`.* TO `ca_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+\q
+
+Testando
+
+mysql -uwp_us -p
+\q
+
+mysql -uoc_us -p
+\q
+
+mysql -uhh_us -p
+\q
+
+mysql -ulv_us -p
+\q
+
+mysql -uca_us -p
+\q
+

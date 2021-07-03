@@ -1,0 +1,170 @@
+Install PHP 7.4 on FreeBSD 12
+
+In this guide, we are going to learn how to install PHP 7.4 on FreeBSD 12. PHP 7.4, which marks the fourth feature update to the PHP 7 series has just been released as of this writing. It comes with a lot improvements and new features as described on the PHP 7.4 new features page.
+
+You can also check the new changes on PHP 7.4 on PHP 7.4 Changelog.
+
+So how do you install PHP 7.4 on FreeBSD 12? Well, follow through this guide to learn how to.
+Install PHP 7.4 on FreeBSD 12
+Run System Update
+
+To begin, update your system packages.
+
+pkg update
+
+pkg upgrade
+
+Install PHP 7.4 from FreeBSD Repositories
+
+There are two ways in which PHP 7.4 can be installed on a FreeBSD 12 box; from FreeBSD ports or FreeBSD package repositories. In this guide, PHP 7.4 is installed from FreeBSD package repos by executing the command below;
+
+pkg install php74
+
+Updating FreeBSD repository catalogue...
+FreeBSD repository is up to date.
+All repositories are up to date.
+The following 3 package(s) will be affected (of 0 checked):
+
+New packages to be INSTALLED:
+ php74: 7.4.0
+ libargon2: 20190702
+ pcre2: 10.33
+
+Number of packages to be installed: 3
+
+The process will require 35 MiB more space.
+5 MiB to be downloaded.
+
+Proceed with this action? [y/N]: y
+
+Verifying Installed PHP Version on FreeBSD 12
+
+The command above installed PHP 7.4. However, you can still verify this by running either of the commands below;
+
+pkg info php74
+
+php74-7.4.0
+Name           : php74
+Version        : 7.4.0
+Installed on   : Fri Jun 21 20:38:37 2019 EAT
+Origin         : lang/php74
+Architecture   : FreeBSD:12:amd64
+Prefix         : /usr/local
+Categories     : devel lang www
+Licenses       : PHP301
+Maintainer     : tz@FreeBSD.org
+WWW            : https://www.php.net/
+Comment        : PHP Scripting Language
+Options        :
+	CGI            : on
+	CLI            : on
+	DEBUG          : off
+	DTRACE         : on
+	EMBED          : on
+	FPM            : on
+	IPV6           : on
+	LINKTHR        : on
+	MYSQLND        : on
+	PHPDBG         : off
+	ZTS            : off
+Shared Libs required:
+	libxml2.so.2
+	libargon2.so.0
+Shared Libs provided:
+	libphp7.so
+Annotations    :
+	FreeBSD_version: 1200086
+	cpe            : cpe:2.3:a:php:php:7.4.0:::::freebsd12:x64
+	repo_type      : binary
+	repository     : FreeBSD
+Flat size      : 27.5MiB
+Description    :
+PHP, which stands for "PHP: Hypertext Preprocessor" is a widely-used Open
+Source general-purpose scripting language that is especially suited for
+Web development and can be embedded into HTML.  Its syntax draws upon C,
+Java, and Perl, and is easy to learn.  The main goal of the language is to
+allow web developers to write dynamically generated webpages quickly, but
+you can do much more with PHP.
+
+WWW: https://www.php.net/
+
+Similarly;
+
+php -v
+
+PHP 7.4.0 (cli) (built: Nov 30 2019 01:12:56) ( NTS )
+Copyright (c) The PHP Group
+Zend Engine v3.4.0, Copyright (c) Zend Technologies
+
+If you have web server installed, you can similarly verify PHP 7.4 installation by creating a PHP test file as shown below.
+
+For example, if you have Apache installed, simply create a PHP 7.4 test file on the document root folder as follows.
+
+echo '<?php phpinfo(); ?>' > /usr/local/www/apache24/data/info.php
+
+Note that Apache can only process PHP files. Hence, ensure that you have mod_php modules installed.
+
+pkg install mod_php74
+
+Next, you need to tell Apache to process PHP files by creating a php.conf configuration file under /usr/local/etc/apache24/Includes/ with the following contents;
+
+vim /usr/local/etc/apache24/Includes/php.conf
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    <FilesMatch "\.phps$">
+        SetHandler application/x-httpd-php-source
+    </FilesMatch>
+</IfModule>
+
+Save the file and restart Apache for the changes to take effect.
+
+service apache24 restart
+
+On the browser, enter the address, http://server_IP_address/info.php to verify PHP installation.
+
+Install PHP Modules/Extensions on FreeBSD 12
+
+If you need to extend the functionality of PHP on FreeBSD 12 box, you can install the modules/extensions by running the command;
+
+pkf install php74-module-name
+
+Where module-name represents the PHP 7.4 module or extension that you need to install.
+
+For example, the command below installs various PHP 7.4 modules/extensions for various functionalities.
+
+pkg install php74 php74-mysqli php74-mbstring php74-zlib php74-curl php74-gd php74-json
+
+Updating FreeBSD repository catalogue...
+FreeBSD repository is up to date.
+All repositories are up to date.
+The following 11 package(s) will be affected (of 0 checked):
+
+New packages to be INSTALLED:
+	php74-mysqli: 7.4.0
+	php74-mbstring: 7.4.0
+	php74-zlib: 7.4.0
+	php74-curl: 7.4.0
+	php74-gd: 7.4.0
+	php74-json: 7.4.0
+	oniguruma: 6.9.3
+	curl: 7.66.0
+	libgd: 2.2.5_2,1
+	webp: 1.0.3_1
+	giflib: 5.1.9
+
+Number of packages to be installed: 11
+
+The process will require 13 MiB more space.
+3 MiB to be downloaded.
+
+Proceed with this action? [y/N]: y
+
+Conclusion
+
+Well, that marks the end of our simple tutorial on how to install PHP 7.4 on FreeBSD 12. If you have any web application that you need to run on a FreeBSD 12 box, you check our other articles on how to setup LAMP or LEMP stack by following the links below;
+
+Install Nginx, MySQL, PHP (FEMP) Stack on FreeBSD 12

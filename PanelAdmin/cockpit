@@ -1,0 +1,64 @@
+http://cockpit-project.org/
+
+Starting containers, storage administration, network configuration, inspecting logs and so on.
+
+A service started via Cockpit can be stopped via the terminal. Likewise, if an error occurs in the terminal, it can be seen in the Cockpit journal interface.
+
+You can monitor and administer several servers at the same time. Just add it easily and your server will look after its buddies.
+
+sudo yum update
+sudo yum install cockpit
+sudo service start cockpit
+
+Configuração
+
+cp /etc/cockpit/cockpit.conf /root/backup
+
+nano /etc/cockpit/cockpit.conf
+
+[WebService]
+Origins = https://somedomain1.com https://somedomain2.com:9090
+
+/etc/systemd/system/cockpit.socket.d/listen.conf 
+
+sudo semanage port -a -t websm_port_t -p tcp 9999
+
+sudo semanage port -m -t websm_port_t -p tcp 443
+
+sudo firewall-cmd --permanent [--zone=ZONE] --add-port=443/tcp
+
+sudo systemctl enable cockpit.socket
+
+Customizar privilégios
+
+Para que um usuário tenha privilégios para gerenciar as atividades do cockpit ele precisa pertencer ao grupo wheel
+
+cp -Ra /etc/polkit-1/rules.d /root/backup
+
+nano /etc/polkit-1/rules.d
+
+Exemplo: placing the following polkit rule to /etc/polkit-1.rules.d/10-operators.rule allows all users in the operators group to start, stop, restart and otherwise manage systemd services:
+
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.systemd1.manage-units") {
+        if (subject.isInGroup("operators")) {
+            return polkit.Result.YES;
+        }
+    }
+});
+
+In order to allow a certain group to perform any administrative action you could add a rule like this:
+
+polkit.addAdminRule(function(action, subject) {
+    return ["unix-group:operators"];
+});
+
+
+Cockpit provides a standard shell in a terminal. This shell and the processes running in it have the same privileges as if the user had logged in via SSH.
+
+Para limpar todas as informações de problemas do SELinux
+
+sudo killall setroubleshootd
+sudo rm -rf /var/lib/setroubleshoot/*
+
+

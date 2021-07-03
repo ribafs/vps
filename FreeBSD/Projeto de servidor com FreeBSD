@@ -1,0 +1,83 @@
+Projeto de servidor com FreeBSD
+
+Que usuários serão criados
+Que softwares serão instalados
+Que aplicativos serão instalados
+
+Habilitar SSH, mudar porta e desabilitar acesso de root
+
+Habilitar firewall e liberar somente as portas necessárias
+Habilitar o firewall:
+
+nano /etc/rc.conf
+
+firewall_enable="YES"
+firewall_type="SIMPLE"
+firewall_logging="YES"
+kern_securelevel_enable="YES"
+kern_securelevel="3"
+check_quotas="YES"
+
+Reforçar com fail2ban, sshguard, lynis, etc
+
+Usar SSL e autenticação para o administrator
+
+Desabilitar demais serviços não usados
+
+Logar todas as exceções
+
+debyhosts
+
+/etc/hosts.deny
+ALL:ALL
+
+/etc/host.allow
+SSH:IPCasa
+SSH:IPDnocs
+
+Atualização do sistema
+reboot
+
+Proteger contra set-uid
+
+nano /etc/fstab
+
+/dev/ad... /home  e /var ufs
+
+rw,nosuid,userquota
+
+/etc/sysctl.conf
+
+icmp.bmcastecho=0
+
+Harden executables
+
+chflags -F schg /kernel
+chflags -F schg /bin /sbin
+
+Desabilitar CGI do HTTP
+
+Remover
+telneet, ftp e finger
+
+Monitorando logs
+
+Syslog-ng w/regex
+Swatch - perl
+LogSurfer
+LogSentry -tail logfile | grep | mail
+
+Tripwire/AIDE
+Systrace
+
+Snort
+ACID
+
+inet.conf - honeypot
+
+Enviar e-mail para
+
+Subject - subscribe
+freebsd-security-notifications@FreeBSD.org
+
+

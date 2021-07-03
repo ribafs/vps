@@ -1,0 +1,83 @@
+Servidor para o Cipi
+
+Deixar estas configurações para após tudo funcionando
+Inicialmente deixar tudo redondo, depois as configurações/otimizações
+
+1GB RAM
+25 GB de disco
+1 vCPU
+1TB transf
+Região - Atlanta, GA
+IP - 45.79.195.21
+
+Ubuntu 20.04
+
+Este servidor não terá um domínio associado a ele. Usarei apenas o IP
+
+
+ssh root@45.79.195.21
+
+root - zmxnxxxxzzzyyyC@
+
+Primeiro acesso
+
+1) Atualizar
+
+apt update
+apt install unzip
+apt upgrade -y && reboot
+
+ssh root@45.79.195.21
+
+2) Criar usuário e copiar a chave do SSH para ele e add grupo do Apache e ao do sudo
+
+adduser ribafs && adduser ribafs sudo
+zmxnxxxxzzzyyyR@
+
+Pretendo administrar o cipi com este usuário futuramente e não com o root e alterarei a porta do SSH para uma alta
+
+Copiar chave do SSH do root para o ribafs com rsync
+
+Como root
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+3) Otimizar SSH
+
+nano /etc/ssh/sshd_config
+
+#Porta 65522
+LoginGraceTime 30
+#PermitRootLogin no
+#PasswordAuthentication no
+MaxAuthTries 3
+X11Forwarding no
+AllowUsers root ribafs
+
+# Como este servidor será administrado somente por mim ou por outro administrador, poderei futuramente deixar somente com o ribafs e desab o root
+
+service ssh restart
+
+4) Configurar o ufw
+
+O cipi já cuida de configurar as regras do ufw
+Para testar não vou nem habilitar, pois acredito que ele habilita, pois usa o sudo
+
+5) Ajustar timezone (America, Fortaleza)
+
+dpkg-reconfigure tzdata
+
+6) Customizar o Prompt somente do ribafs
+
+su - ribafs
+
+nano ~/.bashrc
+
+    PS1='Sc ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\W\[\033[00m\] '
+
+source ~/.bashrc
+
+Talvez seja prudente aumentar o swap e mais ainda aumentar a RAM, se necessário
+
+exit
+

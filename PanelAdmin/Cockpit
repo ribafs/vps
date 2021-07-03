@@ -1,0 +1,15 @@
+Instalar Cockpit
+
+sudo dnf install cockpit
+
+sudo systemctl start cockpit.socket
+sudo systemctl enable --now cockpit.socket
+sudo systemctl status cockpit.socket
+ps auxf|grep cockpit
+
+Abrir, após instalar o certbot
+
+https://143.110.215.113:9090
+
+https://www.tecmint.com/install-cockpit-web-console-in-centos-8/
+

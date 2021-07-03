@@ -1,0 +1,6 @@
+# Device                       Mountpoint              FStype   Options         Dump    Pass#
+/dev/gpt/swap0                 none                    swap     sw              0       0
+fdesc                          /dev/fd                 fdescfs  rw              0       0
+proc                           /proc                   procfs   rw,noauto       0       0
+fdesc /dev/fd fdescfs rw 0 0
+md99 none swap sw,file=/swapfile,late 0 0

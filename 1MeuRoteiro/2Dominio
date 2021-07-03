@@ -1,0 +1,18 @@
+Um único domínio na hospedagem
+
+- Criar o servidor na hospedagem
+- Mudar o DNS na adminsitração do domínio
+- Editar o domínio e trocar o IP pelo do Servidor
+
+
+ribamar.net.br - 192.53.127.248
+	
+CNAME Record
+
+blog.ribamar.net.br
+	
+portfolio.ribamar.net.br
+
+www.ribamar.net.br
+	
+

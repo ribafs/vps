@@ -1,0 +1,39 @@
+ls -la /usr/local/CyberPanel
+
+Command Line Interface
+
+CyberPanel comes with a command line interface for people who love to work in terminal, almost anything that you can do in the control panel interface can be done via CLI.
+What you can do?
+
+1. Create websites and child domains.
+
+2. Create DNS zones and records.
+
+3. Create and restore backups.
+
+4. Issue SSL certificates.
+
+5. And more!
+
+2 – Reset admin password via command line
+Created OnOctober 18, 2018
+Last Updated OnOctober 18, 2018
+byusmannasir
+Print	
+
+    Main	
+    CyberPanel	
+    2 - Users	
+    2 - Reset admin password via command line	
+
+< All Topics
+
+Reset admin password using
+adminPass newpassword
+
+This will reset password for username “admin”, where the “newpassword” is your new password.
+Tags:
+
+    reset password cyberpanel
+
+

@@ -1,0 +1,121 @@
+https://www.digitalocean.com/community/tutorials/how-to-install-wordpress-with-nginx-on-a-freebsd-10-1-server
+
+O WordPress é o CMS mais popular do mundo e também o software mais popular do mundo.
+
+Instalação do Wordpress num servidor com FreeBSD 10.1 usando Nginx como servidor web. O Nginx é um poderoso servidor web que é eficiente para manipular uma grande quantidade de conexões concorrentes.
+
+Será a instalação de um FEMP, FreeBSD, Nginx, MySQL e PHP.
+
+Vamos considerar que já temos o FEMP instalado. Na dúvida veja
+https://www.digitalocean.com/community/tutorials/how-to-install-an-nginx-mysql-and-php-femp-stack-on-freebsd-10-1
+
+O objetivo aqui é instalar a última versão do Wordpress no FreeBSD.
+
+Exsite um pacote instalável do Wordpress mas configurado para PHP 5.4.
+
+Vamos instalar a última versão do WP.
+
+Instalar
+pkg install php56-xml php56-hash php56-gd php56-curl php56-tokenizer php56-zlib php56-zip
+
+rehash
+
+service php-fpm restart
+
+mysql -u root -p
+
+CREATE DATABASE wordpress;
+
+CREATE USER wordpressuser@localhost IDENTIFIED BY 'password';
+
+GRANT ALL PRIVILEGES ON wordpress.* TO wordpressuser@localhost;
+
+FLUSH PRIVILEGES;
+
+exit
+
+cd ~
+fetch http://wordpress.org/latest.tar.gz
+
+tar xzvf latest.tar.gz
+
+rm latest.tar.gz
+cd wordpress
+
+cp wp-config-sample.php wp-config.php
+
+nano wp-config.php
+
+. . .
+
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+
+/** MySQL database username */
+define('DB_USER', 'wordpressuser');
+
+/** MySQL database password */
+define('DB_PASSWORD', 'password');
+
+. . .
+
+Copiar para o www
+rsync -avP ~/wordpress /usr/local/www
+
+chown -R www:www /usr/local/www/wordpress
+
+
+Configurar Nginx
+nano /usr/local/etc/nginx/nginx.conf
+
+user  www;
+worker_processes  2;
+error_log /var/log/nginx/error.log info;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  example.com www.example.com;
+        root /usr/local/www/nginx;
+        index index.php index.html index.htm;
+
+        location / {
+            try_files $uri/ $uri/ =404;
+        }
+
+        error_page      500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/local/www/nginx-dist;
+        }
+
+        location ~ \.php$ {
+                try_files $uri =404;
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                fastcgi_pass unix:/var/run/php-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $request_filename;
+                include fastcgi_params;
+        }
+    }
+}
+
+nginx -t
+
+service nginx restart
+
+Testar
+http://example.com
+
+

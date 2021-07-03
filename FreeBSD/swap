@@ -1,0 +1,11 @@
+Adicionar swap de 1GB
+
+Ver o swap existente em GB, caso exista
+swapinfo -g
+
+truncate -s 1G /swapfile
+chmod 0600 /swapfile
+sh -c 'echo "md99 none swap sw,file=/swapfile,late 0 0" >> /etc/fstab'
+swapon -aqL
+swapinfo -g
+

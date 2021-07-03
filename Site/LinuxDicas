@@ -1,0 +1,6 @@
+Pesquisar um processo
+ps ax | grep nomeprocesso
+
+Matar um processo pelo nome
+sudo pkill mysqld
+

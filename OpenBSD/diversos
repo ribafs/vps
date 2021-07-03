@@ -1,0 +1,32 @@
+Recuperar senha do root
+
+Efetue um reboot em single user mode
+
+Quando aparecer o prompt
+
+boot -s
+
+monte as aprtições / e /usr
+
+fsck -p / && mount -uw /
+fsck -p /usr && mount /usr
+
+E mude a senha com
+passwd root
+
+
+
+Usando OpenNTP
+
+Para ajustar o tempo no servidor
+
+pool.ntp.org
+
+ln -fs /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+
+Codificação de Caractres
+
+nano ~/.profile
+
+export LC_CTYPE="en_US.UTF-8"

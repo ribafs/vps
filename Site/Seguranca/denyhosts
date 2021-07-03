@@ -1,0 +1,21 @@
+Usando DenyHosts
+Scannear logs e banir hosts suspeitos
+
+Denyhosts – bloqueia ataques de SSH adicionando entradas ao /etc/hosts.dny. Também avisa ao administrador sobre hosts suspeitos, ataques de usuários e logins suspeitos.
+
+No Debian não está nos repositórios
+apt install denyhosts
+
+Após instalar edite o
+nano /etc/denyhosts.conf
+
+E atualize seu e-mail e outras configurações que desejar.
+
+ADMIN_EMAIL = ribafs@gmail.com
+SMTP_HOST = localhost
+SMTP_PORT = 25
+#SMTP_USERNAME=foo
+#SMTP_PASSWORD=bar
+SMTP_FROM = DenyHosts nobody@localhost
+#SYSLOG_REPORT=YES
+service denyhosts restart

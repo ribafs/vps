@@ -1,0 +1,119 @@
+Caso encontre algo estranho no servidor nas pastas:
+/tmp
+/usr/local/sbin
+
+A única maneira de recuperar um servidor atacado é:
+- reinstalar o servidor do zero
+- após a instalação executar o mtree e guardar o relatório
+    mtree -x -ic -K cksum -K md5digest -K sha256digest -p / -X /home/ribafs/mtree-exclude > /tmp/mtree_primeiro.out
+- realizar a atualizaçção do servidor e reboot
+- ativar o firewall configurado e outros softwares que auxiliam a segurança
+- testar o backup dos dados: sites, bancos, etc
+- restaurar o backup
+- torcer para que as falhas de segurança que permitiram o ataque tenham sido corrigidas
+- após finalizar a instalação, configurações e recuperação doo backup e testes, executar novamente o mtree
+
+Em caso de ataque fique à vontade para enviar um e-mail para FreeBSD-security@FreeBSD.org avisando. Descreva o que está acontecendo e porque você acredita que foi invadido.
+
+Executando mtree
+
+mtree -x -ic -K cksum -K md5digest -K sha256digest -p / -X /home/ribafs/mtree-exclude > /tmp/mtree_final.out
+
+Podemos customizar este comando: rodando apenas em uma partição ou no disco inteiro, eliminando algum checksum, etc.
+
+Compare os relatórios primeiro e final.
+
+Forma simples:
+
+mtree -f savedspec -f newspec > mtree.differences
+
+Lembre que o FreeBSD te envia e-mail diariamente dando um status básico sobre o servidor.
+Caso tenha alguma suspeita investique.
+
+
+Ver o que está rodando
+
+lsof -i (if installed)
+netstat -an -f inet
+ps -auxw | more
+sockstat -4
+fstat (with grep, read man page)
+
+
+Monitorando a rede
+
+nmap
+nagios
+snort
+ntop
+
+/etc/syslog.conf
+
+Swatch
+
+
+Monitorar arquivos modificados
+find /var/www/html -type f -ctime -1 -exec ls -ls {} \;
+
+Podemos colocar no cron para que seja executado a cada madrugada e nos envie um e-mail.
+
+Procurar arquivos com 666
+find /var/www/html -xdev -perm +o=w ! \( -type d -perm +o=t \) ! -type l -print
+
+Procurar diretórios com 777
+find /var/www/html -type d -perm -o+w -exec ls -ld {} \;
+
+Procurar contas sem senha
+awk -F: '($2 == "") {print}' /etc/shadow
+
+
+Busca por backdoors
+
+grep -iR 'c99' /var/www/html/
+grep -iR 'r57' /var/www/html/
+find /var/www/html/ -name \*.php -type f -print0 | xargs -0 grep c99
+grep -RPn "(passthru|shell_exec|system|base64_decode|fopen|fclose|eval)" /var/www/html/
+
+
+Cheque por arquivos e diretórios ocultos 
+Outros exemplos de busca que ajudam a localizar exploits ou arquivos/pastas inesperadas:
+find /home -type f | xargs grep -l MultiViews 
+find . -type f | xargs grep -l base64_encode <<< this can produce false positives, it is valid in many mail/graphics scripts 
+find . -type f | xargs grep -l error_reporting 
+. no Linux é o diretório atual
+find / -name "[Bb]itch[xX]" 
+find / -name "psy*" 
+ls -lR | grep rwxrwxrwx > listing.txt 
+
+
+Monitorando o servidor
+
+Memória RAM e swap
+freecolor -om
+
+Logs
+
+/var/log/httpd-access.log
+/var/log/httpd-error.log
+/var/log/httpd-ssl_request.log
+/var/log/messages.log
+/var/log/pflog
+/var/log/security
+
+tcpdump -n -e -ttt -i pflog0
+
+tcpdump -netttr /var/log/pflog -vv "tcp and port 80"
+
+tcpdump -n -e -ttt -r /var/log/pflog
+
+tcpdump -n -e -ttt -i pflog0
+
+tcpdump -n -e -ttt -r /var/log/pflog port 80
+
+tcpdump -n -e -ttt -r /var/log/pflog port 80 and host 192.168.1.3
+
+tcpdump -n -e -ttt -i pflog0 host 192.168.4.2
+
+tcpdump -n -e -ttt -i pflog0 inbound and action block and on wi0
+
+This display the log, in real-time, of inbound packets that were blocked on the wi0 interface. 

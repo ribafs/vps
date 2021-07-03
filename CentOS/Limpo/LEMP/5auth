@@ -1,0 +1,103 @@
+Proteger diretório com senha pelo Nginx
+
+Instalar 
+apt install apache2-utils
+
+htpasswd -c /etc/nginx/.htpasswd ribafs
+
+cat /etc/nginx/.htpasswd
+
+Editar o arquivo do site default e alterar assim deixando como abaixo:
+
+nano /etc/nginx/sites-available/ribafs.conf
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server ipv6only=on;
+
+        root /var/www/html;
+        index index.php index.html index.htm;
+
+        auth_basic           "Área Restrita";
+        auth_basic_user_file /etc/nginx/.htpasswd;
+
+        # Make site accessible from http://localhost/
+        server_name 46.101.58.212;
+
+		### SSL Config
+		listen 443 ssl;
+	    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	    ssl_ciphers 'EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH';
+	    ssl_prefer_server_ciphers on;
+	    ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+	    ssl_certificate /etc/nginx/ssl/nginx.crt;
+	    ssl_certificate_key /etc/nginx/ssl/nginx.key;
+
+	    if ($request_method !~ ^(GET|HEAD|POST)$ )
+	    {
+	           return 405;
+	    }
+
+        location / {
+                auth_basic      off;
+                # First attempt to serve request as file, then
+                # as directory, then fall back to displaying a 404.
+                #try_files $uri $uri/ =404;
+                try_files $uri $uri/ /portal/index.php?$args;
+                # Uncomment to enable naxsi on this location
+                # include /etc/nginx/naxsi.rules
+        }
+
+        error_page 404 /404.html;
+        error_page 500 502 503 504 /50x.html;
+        location = /50x.html {
+                root /usr/share/nginx/html;
+        }
+
+        #Adicionar para o administrator, para que somente meus dois IPs possam acessar
+        location /portal/administrator/ {
+                auth_basic            "Restrito";
+                auth_basic_user_file  /etc/nginx/.htpasswd;
+        }
+
+        location ~ \.php$ {
+                auth_basic      off;
+                include snippets/fastcgi-php.conf;
+                fastcgi_pass unix:/run/php/php7.0-fpm.sock;
+        }
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #       deny all;
+        #}
+}
+
+
+Reiniciar o nginx
+service nginx restart
+
+Testar:
+https://IP/administrator
+
+Precisei entrar com login e senha duas vezes mas funcionou.
+
+Crédito
+https://www.nginx.com/resources/admin-guide/restricting-access-auth-basic/
+
+
+Agora vou efetuar uma nova cópia dos scripts de configuração para a pasta /root/backup
+
+cd /root/backup
+tar czpvf lempub1604.tar.gz *
+cp ub1604lemp.tar.gz /home/ribafs
+chown ribafs /home/ribafs/ub1604lemp.tar.gz
+
+No desktop
+
+scp -P porta ribafs@IP:/home/ribafs/ub1604* .
+
+Guardar bem estes scripts para em caso de alteração com problema poder restaurar.
+
+

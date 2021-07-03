@@ -1,0 +1,107 @@
+Criação de Sites
+
+== ribafs.me
+
+Wordpress
+
+Opencart
+
+Laravel
+
+Humhub
+
+CMS Afternoon - um bem simples CMS
+
+
+Editar o index.html para que mosotre os softwares instalados:
+
+wp - wordpress
+oc - opencart
+lv - laravel
+hh - humhub
+ca - cms afternoon
+
+sudo permsr
+
+ls -la
+
+
+Criação dos bancos e usuários respectivos:
+
+			Usuários 	Bancos
+wordpress	wp_us		wp_db	
+opencart	oc_us		oc_db
+laravel		lv_us		lv_db
+humhub		hh_us		hh_db
+cms aft		ca_us		ca_db
+
+mysql -uroot -p
+
+Wordpress
+
+CREATE USER 'wp_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `wp_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `wp_db`.* TO `wp_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Opencart
+
+CREATE USER 'oc_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `oc_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `oc_db`.* TO `oc_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Humhub
+
+CREATE USER 'hh_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `hh_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES ON `hh_db`.* TO `hh_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+Laravel
+
+CREATE USER 'lv_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `lv_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER ON `lv_db`.* TO `lv_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+
+CMS Afternoon
+
+CREATE USER 'ca_us' IDENTIFIED BY 'senha';
+
+CREATE DATABASE `ca_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX ON `ca_db`.* TO `ca_us`@localhost IDENTIFIED BY 'senha';
+FLUSH PRIVILEGES;
+\q
+
+Testando
+
+mysql -uwp_us -p
+\q
+
+mysql -uoc_us -p
+\q
+
+mysql -uhh_us -p
+\q
+
+mysql -ulv_us -p
+\q
+
+mysql -uca_us -p
+\q
+
+
+
+== Veja 6.2SitesApps/Sites/1projeto e tutoriais
+
+
+== despertai.net.br
+
+Joomla
+
+

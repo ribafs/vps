@@ -1,0 +1,80 @@
+Criar alguns scripts para agilizarem as atividades e as tornarem menos enfadonhas
+
+== Criar os scripts ubin e umod no servidor
+
+ubin
+
+sudo nano /usr/local/bin/ubin
+sudo nano /usr/local/bin/$1
+sudo chmod +x /usr/local/bin/ubin
+
+umod
+
+ubin umod
+sudo chmod +x /usr/local/bin/$1
+sudo chmod +x /usr/local/bin/umod
+
+Adicionar ribafs ao www-data
+
+sudo adduser ribafs www-data
+
+Crie no servidor os scripts permsd e permsr
+
+perms
+
+ubin perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/$1";
+echo "";
+find /var/www/$1/ -type d -exec chmod 775 {} \;
+find /var/www/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/$1/ -type f -exec chmod 664 {} \;
+chown -R ribafs:www-data /var/www/$1/
+echo "";
+echo "Concluído!";
+
+umod perms
+
+
+ubin permsd
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/despertai/$1";
+echo "";
+find /var/www/despertai/$1/ -type d -exec chmod 775 {} \;
+find /var/www/despertai/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/despertai/$1/ -type f -exec chmod 664 {} \;
+chown -R ribafs:www-data /var/www/despertai/$1/
+echo "";
+echo "Concluído!";
+
+umod permsd
+
+ubin permsr
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/ribafs/$1";
+echo "";
+find /var/www/ribafs/$1/ -type d -exec chmod 775 {} \;
+find /var/www/ribafs/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/ribafs/$1/ -type f -exec chmod 664 {} \;
+chown -R ribafs:www-data /var/www/ribafs/$1/
+echo "";
+echo "Concluído!";
+
+umod permsr
+
+ubin myip
+echo $(wget -qO - https://api.ipify.org)
+umod myip
+
+
+Adicionar os aliases em Scripts/aliases
+
+Ao .bashrc do ribafs
+
+

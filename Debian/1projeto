@@ -1,0 +1,80 @@
+Servidor no Linode com Debian 10
+
+Criar chave ssh no desktop
+
+ssh-keygen -b 4096
+
+
+1 CPU Core
+
+25 GB Storage
+
+1 GB RAM
+
+194.195.213.166
+
+Este servidor, debian-testes, será para divulgar demos, cms, framework, mobile, etc. Para demos de projetos, repositórios que quero mostrar para alguém, um cliente, etc.
+
+joomla - site com joomla
+static-cms - site exportado com o static-cms
+opencart - opencart
+humhub - humhub
+cms-afternoom - cms afternoon
+
+CakePHP
+laravel-acl - laravel-acl demo
+lumen
+fuelphp - http://fuelphp.com/
+yii
+
+Criação dos bancos e usuários respectivos:
+
+		        	Usuários 	Bancos
+joomla            	jo_us		jo_db	
+scms      	sc_us		sc_db	
+laravel-acl-demo	lad_us		lad_db	
+wordpress       	wp_us		wp_db	
+opencart        	oc_us		oc_db
+laravel     		lv_us		lv_db
+humhub	        	hh_us		hh_db (Criar o grupo php-brasil e convidar os colegas do PHP Brasil apra testarem o Humhub)
+cms afternoom       ca_us		ca_db
+
+
+Instalar o Joomla na pasta portal e restaurar lá o backup do ribafs do meu desktop (antes corrigir sobre, deixando tudo no Joomla)
+
+ribamar.net.br/portal - Joomla
+ribamar.net.br/scms - Usando o CMS Estático
+
+
+## Acessando
+
+ssh root@194.195.213.166
+
+Após o domínio propagar usar o mesmo
+
+ssh -p 44422 ribafs@ribamar.net.br
+
+apt update
+
+apt upgrade -y
+
+reboot
+
+ssh root@194.195.213.166
+
+adduser ribafs
+
+zmxnxxxxD@
+
+adduser ribafs sudo
+adduser ribafs www-data
+
+dpkg-reconfigure tzdata
+America
+Fortaleza
+
+date    - Thu 29 Apr 2021 09:55:27 AM -03
+
+== Instalar ufw
+
+

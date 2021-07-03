@@ -1,0 +1,656 @@
+Instalando WordPress no CentOS 8 com SELinux
+
+Eu realmente não os culpo por não gostarem do SELinux, parece que é a opinião da maioria. Mas eu espero mudar isso! Se eu consigo fazê-lo funcionar e jogar bem com meu site WordPress, então você também pode. A razão de eu usar o SELinux não é para tornar minha vida mais difícil (embora isso possa ser verdade às vezes!), mas isso me ajuda melhor a entender o funcionamento interno do CentOS 8, enquanto fornece níveis de segurança. 
+
+Premissas
+
+Para o restante deste guia, assumirei que você sabe como usar o nano ou outro editor de texto, e você tem um conhecimento básico do sistema operacional Linux.
+
+Considerações sobre Segurança
+
+Aqui estão os principais requisitos de segurança que abordarei com este guia:
+
+SELinux aplicará políticas de segurança
+FirewallD fornecerá funcionalidade de firewall
+O TCP Wrapper será configurado para aumentar a segurança
+Autenticação de 2 fatores para WordPress
+Certificados SSL devem ser usados com Certbot ​​e o HTTP irá redirecionar para HTTPS
+FTP não é permitido e todas as transferências de arquivos devem ser criptografadas durante o transporte (arquivo SSL/SSH transferir)
+• Vários sites (hosts virtuais) com usuários SFTP chrootados (presos) em seu próprio diretório.
+• Autenticação baseada em chave SSH (desative o acesso root via SSH)
+• O MySQL será gerenciado a partir de SSH (sem phpMyAdmin!)
+
+Agora, apenas algumas palavras sobre o TCP Wrapper antes que alguém surte. É velho. Realmente velho. Não protege todos os serviços em execução no servidor e usa a biblioteca libwrap que foi criada em 1990. No entanto, leva um piscar de olhos para configurar, então pense nisso como uma dessas travas de segurança que sua avó usa na porta da frente. Não há mal nenhum em usá-lo.
+
+Eu realmente preciso usar o SELinux?
+
+Entendo. SELinux é uma dor, especialmente se você tentou nos dias do CentOS / RHEL 4. Oh meu, eu pensei em jogar tudo pela janela naquela época. Mas não é realmente tão ruim, então ignore os comentários negativos e aprenda a implementá-los corretamente.
+
+A NSA (National Security Agency) criou o SELinux junto com a Red Hat, que continua a ser o contribuidor principal. É um sistema de controle de acesso obrigatório (MAC) que define um sistema fixo (direcionado) de política de acesso. Por exemplo, se uma política impede que um usuário ou processo acesse um diretório então será evitado pelo SELinux. 
+
+Para os fins deste guia, vou me concentrar na política direcionada, uma vez que a outra opção de usar o MLS (Segurança em vários níveis) não está no escopo deste guia.
+
+Uma política direcionada inclui uma lista de processos que serão protegidos (ou confinados) pelo SELinux, e qualquer coisa que não seja direcionada não será confinada e usará o Controle de Acesso Discricionário (DAC) modelo. Quase todos os processos que escutam na rede (como httpd, sshd) são confinados pelo SELinux.
+
+Ao confinar o processo, se for comprometido por um invasor, isso reduz muito o que eles podem fazer.
+
+IMPORTANTE
+
+Antes de o SELinux ser habilitado, os pacotes precisarão ser instalados e o LAMP e o WordPress serão configurado. O SELinux não será configurado até o final. As razões para isso ficarão claras mais tarde.
+
+Parte 1: Implantando um novo servidor virtual privado (VPS). Quando você tem uma nova máquina virtual instalada e funcionando com o CentOS 8, a primeira coisa a fazer é certifique-se de que está atualizado. Você inicialmente precisará de acesso ao seu servidor usando o SSH.
+
+Primeiro, faça login como root e aplique as atualizações mais recentes:
+
+check-update
+dnf update -y
+
+Protegendo o acesso
+
+Criar uma chave SSH no desktop e exportar para o DO
+Usar esta chave na criação do servidor
+
+Adicionar um novo usuário
+
+Uma conta de usuário padrão será usada para administrar o servidor. O acesso root via SSH será desabilitado e sempre que os privilégios de root forem necessários, sudo será usado. Neste exemplo, um usuário chamado ribafs será adicionado. ribafs é o administrador do sistema.
+
+useradd ribafs
+passwd ribafs
+
+Adicionar ao grupo wheel
+
+usermod -aG wheel ribafs
+
+dnf install -y nano
+
+nano /etc/ssh/sshd_config
+
+Porta 44422
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+AllowUsers ribafs
+X11Forwarding no
+
+sudo ausearch -c 'sshd' --raw | audit2allow -M my-sshd
+
+sudo semodule -i my-sshd.pp
+
+sudo systemctl restart sshd
+
+Sincronizar a chave SSH do root com a do ribafs
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+Pacotes úteis
+
+dnf install -y wget ntp epel-release unzip yum-cron
+
+Instalar o AMP
+
+Configurações básicas do servidor
+
+Configurando yum-cron para atualizações automáticas
+
+Habilite o serviço yum-cron para garantir que ele seja iniciado automaticamente.
+
+systemctl enable yum-cron
+
+nano /etc/yum/yum-cron.conf
+
+update_cmd = security
+apply_updates = yes
+
+Isso é o que vai acontecer diariamente. Você pode opcionalmente configurar /etc/yum/yum-cron-hourly.conf, que como o nome sugere, é executado a cada hora. Por padrão, a configuração por hora não faz download ou aplique qualquer coisa.
+
+systemctl start yum-cron
+
+Lista de pacotes instalador
+
+/var/log/yum.log
+
+nano /etc/ntp.conf
+
+server 0.centos.pool.ntp.org iburst
+server 1.centos.pool.ntp.org iburst
+server 2.centos.pool.ntp.org iburst
+server 3.centos.pool.ntp.org iburst
+
+systemctl enable ntpd
+systemctl start ntpd
+
+Configurar timezones
+
+timedatectl list-timezones
+timedatectl set-timezone
+'America/Fortaleza'
+
+Instalar e configurar o FirewallD
+
+Instalar e configurar o fail2ban
+
+Fail2ban funciona adicionando endereços IP dinamicamente ao firewall que falharam em um determinado número de tentativas de login. É muito fácil de instalar e configurar.
+
+dnf install -y fail2ban
+
+systemctl enable fail2ban
+
+nano /etc/fail2ban/jail.local
+
+[DEFAULT]
+# Set a 1 hour ban
+bantime = 3600
+
+# Override /etc/fail2ban/jail.d/00-firewalld.conf:
+banaction = iptables-multiport
+
+[sshd]
+enabled = true
+
+https://www.digitalocean.com/community/tutorials/how-to-protect-ssh-with-fail2ban-on-centos-7
+
+
+Instalar e configurar mariadb
+
+MariaDB (que substitui o MySQL) já foi instalado como parte do pacote principal instalação. Para iniciar no momento da inicialização, o serviço precisa ser habilitado.
+
+systemctl enable mariadb
+
+systemctl start mariadb
+
+mysql_secure_installation
+
+mysql -uroot -p
+
+Criar usuário com privilégios restritos e banco
+
+
+SFTP (transferência de arquivo SSH)
+
+Este é o caminho a seguir. Esqueça o FTP. SSH já está configurado, para usá-lo efetivamente para transferência de arquivos (SFTP) chroot, ou jail, será usado para confinar o usuário ao seu diretório pessoal.
+
+Para cada site que está sendo hospedado, adicione uma conta de administrador do site para SFTP. O acesso SSH será desativado para cada desses usuários. Gosto de usar nomes de usuário aleatórios para cada site que não podem ser adivinhados com muita facilidade.
+
+useradd username -d /data/.sitehome/wordpress001/
+
+(Você receberá um aviso se você criou o diretório, você pode ignorar isso.)
+Se você já adicionou o usuário, pode simplesmente modificar o diretório inicial usando:
+
+usermod -m -d /data/.sitehome/ username
+
+1) Primeiro adicione um grupo chamado ‘sshonly’
+groupadd sshonly
+
+2) Adicione o usuário a ser chrootado a esse grupo. Um novo nome de usuário será criado para o primeiro site ‘Cw001’ para o site cloudwire.info.
+usermod -aG sshonly cw001
+
+3) Edite /etc/ssh/sshd_config e altere a linha do SubSistema de:
+sftp /usr/libexec/openssh/sftp-server para: Subsistema sftp
+
+interno-sftp
+Observação: isso não altera o acesso SSH.
+
+4) Adicione o seguinte ao final de sshd_config:
+Match Group sshonly
+ChrootDirectory% h
+ForceCommand internal-sftp
+X11Forwarding no
+AllowTcpForwarding no
+
+5) Reinicie o SSHD
+systemctl restart sshd
+
+6) Altere o grupo do diretório raiz e todos os subdiretórios para ‘sshonly’.
+chgrp sshonly /data/.sitehome/wordpress001/ -R
+
+Nota: Se você precisar modificar uma conta de usuário existente com um novo diretório inicial, use o seguinte
+
+comando: usermod -m -d /data/.sitehome/wordpress001/ cw001
+
+Tudo dentro do diretório do site deve pertencer à nova conta de usuário (por exemplo, cw001).
+
+Não dê a eles a propriedade do diretório do site em si, apenas de tudo dentro dele.
+chown cw001 * -R
+
+Observação: as etapas 2 a 4 acima garantem que o usuário não possa fazer login no host usando SSH, mas pode usar SFTP.
+
+
+Configurações do Apache
+
+Se você ficou comigo até aqui no guia, dê um tapinha nas costas. Não sério, faça isto. Vá e pegue outro café, mude a lista de reprodução do Spotify e vamos acabar com essa fera de um servidor web!
+
+1) Habilite o daemon http.
+systemctl enable httpd
+
+2) Edite httpd.conf 
+nano /etc/httpd/conf/httpd.conf e altere a seguinte linha:
+
+ServerName X.X.X.X: 80 (especifique o endereço IP ou o nome do host de seus servidores aqui)
+
+3) Adicione a entrada VirtualHost para o site padrão na parte inferior do httpd.conf. Eu não chamo isso de página. Se alguém acessar o servidor com o endereço IP ou não puder ser correspondido por um cabeçalho HTTP, em seguida, ele exibirá DocumentRoot como uma página padrão.
+
+# Load Default VirtualHost
+<VirtualHost *:80>
+	DocumentRoot /data/.sitedir/not-yet/web
+	<Directory /data/.sitedir/not-yet/web>
+		AllowOverride None
+		Require all granted
+	</Directory>
+</VirtualHost>
+
+Salve e feche
+
+systemctl start httpd
+
+
+Observação: certifique-se de que todos esses diretórios existam e os caminhos estejam corretos, caso contrário, o HTTPD falhará para iniciar.
+
+Nesta fase, se tudo estiver configurado corretamente, ao iniciar o HTTPD e navegar até o IP do seu servidor você deve receber o conteúdo de 
+
+/data/.sitehome/not-yet/webroot/, 
+
+você deve ter o index.html lá. Eu tenho uma página padrão "Ainda não!" Que uso desde os anos 1990, e como sou nostálgico, decidi mantê-lo todos esses anos. Vamos experimentar! Se funcionar, então prossiga para adicionar o primeiro site. Adicionando nosso primeiro site (VirtualHost) para CloudWire.info
+
+Cada site precisa de uma entrada VirtualHost. Até agora, apenas a página padrão que é exibida para HTTP (TCP porta 80) foi configurada. Eu gosto de manter as coisas organizadas, então, em vez de adicionar várias entradas VirtualHost no httpd.conf, entradas ‘Include’ serão usadas que apontam para um arquivo em /etc/httpd/vhosts/. Isto é onde o arquivo de configuração VirtualHost para cada site será armazenado.
+
+Para este exemplo, acabei de registrar cloudwire.info e configurar o DNS para apontar para o endereço IP do novo servidor.
+
+1) Para começar, na parte inferior do httpd.conf adicione um ‘Include’ apontando para o arquivo VirtualHost.
+
+Dê ao arquivo um nome significativo, este é apenas um exemplo abaixo.
+
+Include /etc/httpd/vhost/cloudwire.info.conf
+
+2) Em seguida, crie o arquivo vhost 
+
+nano /etc/httpd/vhost/cloudwire.info.conf
+
+O diretório vhost não existe, então você precisará criá-lo.
+
+<VirtualHost *:80>
+	ServerAdmin admin@cloudwire.info
+	DocumentRoot /data/.sitehome/cloudwire.info/webroot
+	ServerName www.cloudwire.info
+	ServerAlias cloudwire.info
+	ScriptAlias /cgi-bin/ /data/.sitehome/cloudwire.info/cgi-bin/
+	
+	<Directory /data/.sitehome/cloudwire.info/web>
+		Options FollowSymLinks
+		AllowOverride All
+		Require all granted
+	</Directory>
+</VirtualHost>
+
+3) Salve e feche
+
+systemctl restart httpd
+
+
+Configurar o SSL com o Certbot
+
+
+Instalar o Wordpress
+
+1) Navegue até o seu diretório inicial (conta sysadmin)
+
+cd /home/ribafs
+
+2) Baixar a última versão do Wordpress
+
+wget https://br.wordpress.org/latest-pt_BR.zip
+unzip latest-pt_BR.zip
+rm latest-pt_BR.zip
+cp wordpress/* /data/.sitehome/clourwire.info/web/ -R
+
+4) Mova o arquivo de configuração de amostra um nível acima (/home/.sitehome/cloudwire.info/) e copie-o novo wp-config.php. Nunca coloque o arquivo de configuração em um local acessível publicamente.
+
+mv wp-config-sample.php ../
+cd ..
+cp wp-config-sample.php wp-config.php
+
+5) Edite wp-config.php (nano wp-config.php) e configure o nome do banco de dados, nome de usuário e senha conforme criado na Parte 2. Se você migrou seu banco de dados WordPress de outro VPS (Parte 3), digite os detalhes do banco de dados WordPress aqui.
+
+define('DB_NAME', 'database_name_here');
+define('DB_USER', 'username_here');
+define('DB_PASSWORD', 'password_here');
+
+6) Por fim, você deve adicionar chaves exclusivas que o WordPress usará para autorização e criptografia. Na verdade, existe um gerador de sal online que gera essa configuração para você.
+
+define('AUTH_KEY', 'put your unique phrase here');
+define('SECURE_AUTH_KEY', 'put your unique phrase here');
+define('LOGGED_IN_KEY', 'put your unique phrase here');
+define('NONCE_KEY', 'put your unique phrase here');
+define('AUTH_SALT', 'put your unique phrase here');
+define('SECURE_AUTH_SALT', 'put your unique phrase here');
+define('LOGGED_IN_SALT', 'put your unique phrase here');
+define('NONCE_SALT', 'put your unique phrase here');
+
+7) Navegue até o URL do seu site (por exemplo, http://cloudwire.info) e você verá um página de boas-vindas. Você precisará inserir algumas informações básicas e, de maneira importante, criar para seu WordPress usuário e senha. Quando estiver pronto, selecione ‘Instalar WordPress’.
+
+Parabéns, você configurou seu primeiro Site WordPress!
+
+Protegendo o WordPress
+
+A segurança do WordPress provavelmente justifica uma postagem de blog por si só, mas posso fornecer alguns dicas para ajudá-lo a bloqueá-lo o suficiente para que você esteja seguro de ataques de força bruta e limite o Vetor de ataque do WordPress para vulnerabilidades. Nada é 100% seguro. Se houver uma vulnerabilidade de 0 dia no WordPress então os dedos cruzaram no FirewallD, SELinux e mantendo o servidor atualizado com yum-cron basta.
+
+Não fico mais surpreso quando dou uma olhada em outros blogs e vejo como eles são inseguros. Aqui estão meus 10 principais problemas de segurança que eu trataria imediatamente (sem ordem específica):
+
+1. Uso excessivo de plug-ins
+2. Plug-ins desatualizados
+3. Vulnerabilidades do tema
+4. WordPress está desatualizado
+5. Senha de administrador fraca
+6. Sem autenticação de 2 fatores (use o Google Authenticator, é grátis!)
+7. Nome de usuário de administrador revelado em postagens de blog (não poste blogs com sua conta de administrador!)
+8. Usando HTTP (inseguro) em vez de HTTPS
+9. Acesso ao wp-admin desprotegido
+10. Usar FTP em vez de SSH mais seguro (SFTP) para transferências de arquivos
+
+Pode ser muito tentador quando você começa a usar o WordPress para experimentar novos plug-ins e temas. Eles podem estar abertos a vulnerabilidades de segurança e fornecer uma maneira fácil de alguém querendo hackear seu site. Um pouco de vigilância pode ajudar muito. 
+
+Pesquise bugs conhecidos e falhas de segurança em quaisquer temas ou plug-ins baixados e não se empolgue muito. Quanto mais plug-ins você instalou, mais chance de ser mordido.
+
+A maioria dessas práticas recomendadas de segurança são apenas bom senso e as outras estão bem documentadas em outro lugar. Para os fins deste guia, vou me concentrar nos últimos três (8, 9 e 10).
+
+Redirecionando HTTP para HTTPS usando o módulo de reescrita
+
+Visto que os certificados SSL já foram instalados (na parte 4), um redirecionamento SSL precisa ser criado em .htaccess. Se você acessar 
+http://, ele será redirecionado automaticamente para https://.
+
+1. Edite ‘.htaccess’ no diretório raiz da web (nano /data/.sitehome/cloudwire.info/web/.htaccess).
+Este arquivo já deve existir para WordPress, se não for criá-lo.
+
+2. Adicione o seguinte, substituindo-o pelo seu próprio URL:
+# SSL Redirect
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://www.cloudwire.info/$1 [R,L]
+</IfModule>
+
+Protegendo o WordPress Admin (wp-admin) com .htaccess
+
+Alguns dizem que a ofuscação não oferece nenhum benefício de segurança, então não há nenhuma vantagem real em renomeando wp-login.php para outra coisa. Como não confio em muitos plug-ins, usar um plug-in para renomear parece uma espada de dois gumes. Em vez disso, prefiro usar .htaccess para impedir o acesso de fontes não autorizadas para wp-login.php e o diretório wp-admin.
+
+1. Crie .htaccess em seu diretório wp-admin (nano /data/.sitehome/cloudwire.info/web/wp-admin/.htaccess)
+
+2. Adicione o seguinte, substituindo X.X.X.X pelo (s) seu (s) endereço (s) IP. Endereços IP adicionais podem estar na lista branca em novas linhas.
+
+Order Deny,Allow
+Deny from all
+Allow from X.X.X.X
+Allow from X.X.X.X
+
+
+Nota: Se o seu endereço IP mudar e você ficar bloqueado, você precisará conectar-se ao servidor com SSH e atualize isso.
+
+Protegendo wp-login.php com .htaccess 
+
+Como uma medida adicional, podemos fazer o mesmo para restringir acesso ao arquivo wp-login.php que reside em seu diretório raiz da web.
+
+1. Edite ‘.htaccess’ no diretório raiz da web (vi /data/.sitehome/cloudwire.info/web/.htaccess).
+Este arquivo já deve existir para WordPress, se não for criá-lo.
+
+2. Adicione o seguinte, substituindo X.X.X.X pelo seu endereço IP.
+<Files wp-login.php>
+	order deny,allow
+	Deny from all
+	Allow from X.X.X.X
+</Files>
+
+Configurando SFTP para WordPress
+
+Na parte 5, você já aprendeu como usar SSH para transferências de arquivos SFTP e usar 'chroot' para  restringir o acesso ao diretório de sites. WordPress suporta conexões FTP, FTPS (SSL) e SSH2.
+Ao atualizar o WordPress ou instalar um plug-in, você verá o seguinte:
+
+1. Altere o nome do host para o endereço IP ou nome do host do seu servidor e lembre-se de especificar a porta SSH, pois não está usando o padrão (cloudwire.info:9922)
+2. Escolha SSH2 como o tipo de conexão
+3. Digite o nome de usuário e a senha do administrador do site (consulte a parte 5)
+4. Deixe as chaves de autenticação em branco (veja a nota)
+Observação: como mencionei na parte 1, você precisará configurar o WordPress para usar chaves de autenticação se você desabilita a autenticação de senha SSH. Isso requer que as chaves pública e privada estejam instaladas no servidor WordPress, o que eu acho uma ideia terrível. Uma opção é temporariamente habilite a autenticação de senha para SSH para quando o WordPress precisar.
+
+
+SELinux
+
+Se você chegou até aqui, espero que tudo esteja funcionando como deveria. Você pode criar vários sites, hospedar WordPress, transferir arquivos usando SFTP e o host é seguro com IPtables.
+
+Há um motivo pelo qual salvei o SELinux para o fim. Pegue outro café, e enquanto você está de pé e sobre pegar um bloco de notas, uma caneta, coloque o telefone no modo silencioso e fique confortável. Não, realmente, esta próxima etapa é onde a maioria das pessoas abandona o SELinux e o coloca novamente em "desativado" Você não faria isso agora, faria vocês? Fique comigo!
+
+Nota: Se você usa Linode, por padrão o kernel não inclui SElinux. Isso é fácil de corrigir, apenas siga seu guia sobre como usar um kernel fornecido pela distribuição.
+
+Configurando o modo permissivo
+
+Não se preocupe, o SELinux ainda não vai impor nada!
+
+1) Primeiro, instale os pacotes necessários para SELinux:
+
+dnf install -y policycoreutils policycoreutils selinux-policy selinux-policy-targeted libselinux-utils setroubleshoot-server setools setools-console mcstrans
+
+2) Próximo SELinux para o modo 'permissivo' e reinicie:
+
+Antes de realmente aplicar as políticas do SELinux, é importante testar o SELinux com o modo "permissivo" primeiro. O SELinux registrará a atividade em /var/log/audit/audit.log, começando com “SELinux is preventing”, que será útil para solucionar problemas de quaisquer processos, arquivos ou diretórios que de outra forma seriam
+restrito.
+
+/var/log/audit/audit.log
+
+nano /etc/sysconfig/selinux
+Mude para ‘permissive’
+
+SELINUX=permissive
+
+reboot
+
+Como funciona o SELinux
+
+Antes de prosseguir, irei explicar como o SELinux funciona da maneira mais simples possível. Isto é notório por ser um tópico complicado, mas realmente não deveria ser.
+
+A configuração do SELinux está contida em /etc/sysconfig/selinux, e você pode ver se está executando usando o comando sestatus ou getenforce. Se você digitar sestatus, verá que será definido como 'disabled', '‘enforced’,' ou 'permissive'. Ao definir SELinux como permissive, que é a primeiro
+etapa, ele não aplicará nenhuma política, mas irá registrá-las. Isso é muito útil antes de ligá-lo, pois permitirá que você veja o que ele restringiria.
+
+Contexto e rótulos do SELinux
+
+Para entender como o SELinux realmente funciona, é importante entender o conceito de SELinux contexto e rótulos. A etiquetagem permite arquivos, processos, sockets, diretórios, portas TCP e UDP e muitos outros, a serem rotulados com um contexto SELinux. No momento em que escrevi isso, eu verifiquei e lá são 4729 tipos listados. Não se preocupe, não se espera que você memorize todos eles!
+
+Você pode usar seinfo -t para listar todos os tipos de contexto SELinux, mas se você combiná-lo com grep você pode restringir a pesquisa. 
+
+Experimente, 
+
+seinfo -t | grep httpd_sys
+
+Isso vai te mostrar tudo de os tipos de contexto começando com httpd_sys. Isso será útil mais tarde, ao solucionar problemas SELinux.
+
+Imagine que o Apache, hospedando sua nova loja online, seja realmente semelhante a uma fachada de loja real.
+Os visitantes podem ver o seu site abrindo a porta (porta 80/443) e dando uma olhada no que está lá dentro.
+Excelente! Agora imagine um guardião dentro da loja chamado SELinux. Eles esperam que os visitantes abram as portas 80 e 443, e está tudo bem. Mas o monstrinho simplesmente impediu que os visitantes olhassem seu produto. Por que!? Bem, você não rotulou seu produto (arquivos) com o rótulo correto, então SELinux os impediu de ler.
+
+Forbidden
+You don't have permission to access / on this server.
+
+O contexto SELinux para arquivos e diretórios são rotulados com atributos estendidos no arquivo de sistema e tudo o mais é gerenciado pelo kernel. Uma vez que este é um servidor web executando o Apache,
+
+O SELinux espera um rótulo que forneça ao Apache acesso ao diretório /var/www/ e todos os arquivos dentro dele.
+Dê uma olhada em /var/www/ using ls -aZ. Isso listará todos os arquivos no diretório de trabalho.
+
+cd /var/www
+ls -aZ
+
+Observação: os rótulos usam o seguinte formato: 
+
+usuário: função: tipo: nível, 
+
+mas para o modo direcionado e o escopo de neste guia, vou ignorar os outros e focar apenas no tipo.
+
+Usando ls -aZ, você pode ver que o tipo do diretório html está definido como httpd_sys_content_t:
+
+drwxr-xr-x. root root system_u:object_r:httpd_sys_content_t:s0 html
+
+Neste exemplo, user: role: type: level para o diretório html é:
+
+User: system_u
+Role: object_r
+Type: httpd_sys_content_t
+Level: s0
+
+O SELinux reconhece o rótulo de tipo e permite que o Apache (httpd) leia o arquivo.
+Mas espere! Este servidor será configurado com vários sites e não usará o padrão
+localização /var/www/html. Dê uma olhada no contexto SELinux para o novo local /data/.sitedir/.
+
+cd /data/.sitedir/
+ls -aZ
+
+O tipo é definido como default_t, e se o Apache tentar ler arquivos deste local, o SELinux irá prevenir porque não foi rotulado corretamente. Você pode ver porque o SELinux pode ser uma dor, mas também muito poderoso. Mostrarei como definir httpd_sys_content_t no novo local do diretório da web em um momento.
+
+Um booleano, com o nome de George Boole, é um valor verdadeiro ou falso. Existem 301 booleanos no momento em que este artigo foi escrito, e semelhante a usar seinfo -t para listar tipos, getsebool -a pode ser usado para listar todos eles. Os valores booleanos podem ser definidos usando o comando setsebool -P (-P significa persistente para que seja gravado no disco), e você pode especificar um '1' ou '0' (ligado / desligado).
+
+Para ajudá-lo a entender os booleanos SELinux, pode ser útil listar os relevantes para um servidor Apache.
+Usando 
+
+semanage boolean -l | grep httpd
+
+configurações booleanas que contêm a palavra ‘Httpd’ e listado. Isso listará cerca de 42, junto com sua descrição. Aqui está um exemplo:
+
+httpd_enable_cgi (on , on) Allow httpd to enable cgi
+httpd_graceful_shutdown (on , on) Allow httpd to graceful shutdown
+httpd_builtin_scripting (on , on) Allow httpd to builtin scripting
+httpd_unified (off , off) Allow httpd to unified
+httpd_can_sendmail (off , off) Allow httpd to can sendmail
+httpd_can_network_connect (off , off) Allow httpd to network connect
+
+Existem três que se destacam:
+
+httpd_unified
+
+httpd_unified está desligado por padrão com CentOS / RHEL 7. Isso significa que SELinux exigirá o rótulo de tipo de arquivo / diretório httpd_sys_rw_content_t se o Apache for necessário para gravar nesse diretório. Pra WordPress incluiria o diretório wp-uploads. Com versões anteriores (CentOS 6), httpd_unified está ligado, e o Apache pode ler, escrever e executar em arquivos / diretórios com o httpd_sys_content_t label.httpd_can_sendmail
+
+Outro booleano httpd_can_sendmail diz que permite ao Apache (httpd) enviar e-mail. WordPress geralmente exige isso para enviar e-mails para novos usuários, comentários e assim por diante.
+
+httpd_can_network_connect
+
+Por padrão, está desativado. Configurá-lo como 'ligado' permitirá que o Apache (httpd) se conecte à rede. Isto é necessário se os scripts em execução no Apache precisarem se conectar a serviços remotos (por exemplo, RSS ou wget).
+
+Nota: Para ver quais booleanos httpd estão ativados, use 
+
+semanage boolean -l | grep httpd | grep -v off
+
+Grep - v inverte os resultados. Como a lista contém a palavra ‘ativado’ para a configuração padrão, não posso usar isso, então
+Estou dizendo qualquer coisa que não contenha a palavra ‘off’. Configurando o SELinux para jogar bem com
+
+Apache e WordPress
+
+O Apache está rodando e algumas coisas mudaram, então é hora de contar ao SELinux sobre essas mudanças.
+
+Etapa 1: Definir o contexto SELinux correto para os diretórios da web
+
+Lembra que eu disse que os diretórios do seu site precisam de httpd_sys_content_t? Vamos configurar isso agora no diretório que contém todos os diretórios do site:
+
+semanage fcontext -a -t httpd_sys_content_t "/data/.sitehome(/.*)?" # restorecon -Rv /data/.sitehome
+
+semange é outro comando útil que pode ser usado para ler e definir configurações na rede portas, interfaces, módulos SELinux, contexto de arquivo e booleanos. restorecon -Rv irá definir esta segurança contexto recursivamente (-R) e produzirá quaisquer alterações no tipo (-v).
+
+Etapa 2: permitir SSH na porta não padrão Outra mudança é a porta SSH padrão de 22 para 9922. Novamente, usando semanage, a nova porta pode
+ser especificado.
+
+semanage port -a -t ssh_port_t -p tcp 9922
+
+Etapa 3: permitir que o Apache use o Sendmail
+
+Desta vez, o comando setsebool será usado para definir o booleano para httpd_can_sendmail como 1. Este permitirá que o Apache (httpd) envie e-mail.
+
+setsebool P httpd_can_sendmail 1
+
+Etapa 4 (opcional): permitir que o Apache leia e grave diretórios com tipos de arquivo httpd_sys_content
+
+Conforme mencionado anteriormente, o booleano httpd_unified é desativado por padrão com CentOS / RHEL 7.
+Isso fortalece a segurança, pois todos os arquivos e diretórios que precisam ser gravados pelo Apache requer o contexto httpd_sys_rw_content_t. No entanto, para WordPress, isso pode impedir os usuários de upload de arquivos ou instalação de plug-ins. Se você decidir habilitar isso e permitir leitura, gravação e execução, em seguida, use o seguinte comando:
+
+setsebool -P httpd_unified 1
+
+Solução de problemas SELinux
+
+Primeiro, verifique o status do SELinux e certifique-se de que ele esteja definido como permissivo, o que você fez no início da parte 7.
+
+sestatus
+
+Verifique se o SELinux está ativado, se a política está "direcionada" e se o modo está definido como "permissivo":
+
+Status do SELinux: habilitado
+
+Nome da política carregada: direcionada
+
+Modo atual: permissivo
+
+Ao solucionar problemas do SELinux, pode ser útil limpar o log de auditoria e reinicializar. Isso vai torne mais fácil ler os registros e não se confunda com entradas mais antigas enquanto você está solucionando problemas no modo permissivo.
+
+1) Limpe o audit.log e reinicie
+/var/log/audit/audit.log
+reboot
+
+2) Use o comando sealert para verificar se há problemas no audit.log
+sealert -a /var/log/audit/audit.log
+
+Nota: Você pode executar um resumo dos relatórios de log de auditoria usando aureport -a. Isso fornecerá um resumo de relatórios do log de auditoria (/var/log/audit/audit.log). Você pode verificar os registros de hoje usando 
+
+aureport -a -ts hoje.
+
+Depois de executar o comando sealert, na parte superior do relatório, você verá algo semelhante a: 100% feito encontrou 7 alertas em 
+/var/log/audit/audit.log
+
+A saída pode parecer muito longa no início, mas não se preocupe! Depois de começar a olhar para cada relatório você verá que é realmente muito útil. Ele começará com "SELinux está impedindo" e fornecerá um nível de confiança para cada correção sugerida. Vou listar alguns problemas comuns, junto com as etapas que você precisará levar para resolver o problema.
+
+Problema 1: SELinux está impedindo audispd de obter acesso getattr no arquivo /etc/ld.so.cache.
+
+Isso forneceu uma solução fácil, detalhada ali mesmo no relatório:
+
+Se você quiser corrigir o rótulo. O rótulo padrão de /etc/ld.so.cache deve ser ld_so_cache_t. Então você pode correr restorecon. Fazer:
+
+/sbin/restorecon -v /etc/ld.so.cache
+
+Problema 2: SELinux está impedindo audispd de abrir acesso ao arquivo /etc/ld.so.cache.
+
+Isso está vinculado ao primeiro problema e a mesma correção é sugerida, portanto, passaremos para o próximo.
+
+Problema 3: O SELinux está impedindo que / usr / sbin / sedispatch execute o acesso ao arquivo sedispatch.
+
+Isso tinha um nível de confiança de 100%, com a correção sugerida abaixo:
+
+ausearch -c '/ usr / sbin / sedispatch' --raw | audit2allow -M my-
+
+sedispatch
+
+semodule -i my-sedispatch.pp
+
+Problema 4: SELinux está impedindo / usr / sbin / httpd de acesso name_connect no tcp_socket porta 9922.)
+
+Na verdade, isso é necessário, pois o FTP não é usado para atualizar o WordPress ou instalar plug-ins, e o Apache precisa se conectar em SSH.
+
+setsebool httpd_can_network_connect = 1
+
+Enxague e repita. Pode ser necessário fazer isso algumas vezes, implementando a correção, limpando o log, reinicializando. Quando estiver satisfeito de que não há mais problemas relatados pelo SELinux, você pode agora defina-o como ‘ativado’!
+vi / etc / sysconfig / selinux
+
+Altere o SELinux para ‘Enforcing’ e reinicie.
+
+SELINUX = Enforcing (: wq)
+reboot
+
+Assim que o servidor for inicializado, faça login e verifique getenforce, que deve relatar ‘Enforcing’.
+
+Conclusão
+
+Meu objetivo com este guia é fazer com que você configure um servidor web seguro com CentOS 8, rodando WordPress para vários sites. Não tomei atalhos em relação à segurança e, embora concorde que a usabilidade é importante, espero que você possa ver que habilitar o SELinux não significa ‘não usável’.
+
+Principais vantagens: seguindo este guia, que você agora tem:
+
+Uma compreensão básica do SELinux e de como configurá-lo para "aplicar" em seu servidor web.
+Aprendeu como usar FirewallD e usá-lo para proteger seu servidor.
+Hospede seu blog no WordPress usando HTTPS (SSL)
+Hospede vários sites usando VirtualHost no Apache e configure nosso novo WordPress fictício site, cloudwire.info!
+• Forneceu aos administradores do site a transferência segura de arquivos SFTP, restringindo-os a seus próprios sites diretório.
+• Aprendeu como usar o yum-cron para manter o host com atualizações automáticas.
+
+Referências
+
+https://www.rayheffer.com/building-secure-wordpress-server-lamp-centos-7-selinux/
+
+

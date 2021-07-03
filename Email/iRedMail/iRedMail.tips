@@ -1,0 +1,223 @@
+Admin of domain ribafs.org:
+
+    * Account: postmaster@ribafs.org
+    * Password: senha
+
+    You can login to iRedAdmin with this account, login name is full email address.
+
+First mail user:
+    * Username: postmaster@ribafs.org
+    * Password: senha
+    * SMTP/IMAP auth type: login
+    * Connection security: STARTTLS or SSL/TLS
+
+    You can login to webmail with this account, login name is full email address.
+
+* Enabled services: rsyslog  postfix mysql nginx php7.0-fpm uwsgi dovecot clamav-daemon amavis clamav-freshclam sogo memcached fail2ban cron
+
+
+SSL cert keys (size: 2048):
+    - /etc/ssl/certs/iRedMail.crt
+    - /etc/ssl/private/iRedMail.key
+
+Mail Storage:
+    - Mailboxes: /var/vmail/vmail1
+    - Mailbox indexes:
+    - Global sieve filters: /var/vmail/sieve
+    - Backup scripts and backup copies: /var/vmail/backup
+
+Nginx:
+    * Configuration files:
+        - /etc/nginx/nginx.conf
+        - /etc/nginx/sites-available/00-default.conf
+        - /etc/nginx/sites-available/00-default-ssl.conf
+    * Directories:
+        - /etc/nginx
+        - /var/www/html
+    * See also:
+        - /var/www/html/index.html
+
+php-fpm:
+    * Configuration files: /etc/php/7.0/fpm/pool.d/www.conf
+    * Socket: /var/run/php-fpm.socket
+
+uWSGI:
+    * Configuration files: /etc/uwsgi/apps-available
+    * Logrotate config file: /etc/logrotate.d/uwsgi
+    * Socket for iRedAdmin: /var/run/uwsgi_iredadmin.socket
+
+PHP:
+    * PHP config file for Apache: /etc/php/7.0/fpm/php.ini (not exist if you're running Nginx)
+    * PHP config file for Nginx:  (not exist if you're running Apache)
+    * Disabled functions: apache_setenv,posix_uname,eval,pcntl_wexitstatus,posix_getpwuid,xmlrpc_entity_decode,pcntl_wifstopped,pcntl_wifexited,pcntl_wifsignaled,phpAds_XmlRpc,pcntl_strerror,ftp_exec,pcntl_wtermsig,mysql_pconnect,php_uname,proc_nice,pcntl_sigtimedwait,posix_kill,pcntl_sigprocmask,fput,phpinfo,system,phpAds_remoteInfo,ftp_login,inject_code,posix_mkfifo,highlight_file,escapeshellcmd,show_source,pcntl_wifcontinued,fp,pcntl_alarm,pcntl_wait,ini_alter,posix_setpgid,parse_ini_file,ftp_raw,pcntl_waitpid,pcntl_getpriority,ftp_connect,pcntl_signal_dispatch,pcntl_wstopsig,apache_child_terminate,ini_restore,ftp_put,passthru,proc_terminate,posix_setsid,pcntl_signal,pcntl_setpriority,proc_get_status,phpAds_xmlrpcEncode,pcntl_exec,ftp_nb_fput,ftp_get,phpAds_xmlrpcDecode,pcntl_sigwaitinfo,shell_exec,pcntl_get_last_error,ftp_rawlist,pcntl_fork,posix_setuid
+
+MySQL:
+    * Root user: root, Password: "zmxn1029M@" (without quotes)
+    * Bind account (read-only):
+        - Username: vmail, Password: LnAmQvg74WlJk3czyM6zhfM9oZQCw2
+    * Vmail admin account (read-write):
+        - Username: vmailadmin, Password: f7PBSvGyVAhQOk6ZG0qL3FTEvfAzMk
+    * Config file: /etc/mysql/my.cnf
+    * RC script: /etc/init.d/mysql
+
+Virtual Users:
+    - /root/iRedMail-0.9.7/samples/iredmail/iredmail.mysql
+    - /root/iRedMail-0.9.7/runtime/*.sql
+
+Backup MySQL database:
+    * Script: /var/vmail/backup/backup_mysql.sh
+    * See also:
+        # crontab -l -u root
+
+Postfix:
+    * Configuration files:
+        - /etc/postfix
+        - /etc/postfix/aliases
+        - /etc/postfix/main.cf
+        - /etc/postfix/master.cf
+
+    * SQL/LDAP lookup config files:
+        - /etc/postfix/mysql
+
+Dovecot:
+    * Configuration files:
+        - /etc/dovecot/dovecot.conf
+        - /etc/dovecot/dovecot-ldap.conf (For OpenLDAP backend)
+        - /etc/dovecot/dovecot-mysql.conf (For MySQL backend)
+        - /etc/dovecot/dovecot-pgsql.conf (For PostgreSQL backend)
+        - /etc/dovecot/dovecot-used-quota.conf (For real-time quota usage)
+        - /etc/dovecot/dovecot-share-folder.conf (For IMAP sharing folder)
+    * Syslog config file:
+        - /etc/rsyslog.d/1-dovecot.conf (present if rsyslog >= 8.x)
+    * RC script: /etc/init.d/dovecot
+    * Log files:
+        - /var/log/dovecot/dovecot.log
+        - /var/log/dovecot/sieve.log
+        - /var/log/dovecot/lmtp.log
+        - /var/log/dovecot/lda.log (present if rsyslog >= 8.x)
+        - /var/log/dovecot/imap.log (present if rsyslog >= 8.x)
+        - /var/log/dovecot/pop3.log (present if rsyslog >= 8.x)
+        - /var/log/dovecot/sieve.log (present if rsyslog >= 8.x)
+    * See also:
+        - /var/vmail/sieve/dovecot.sieve
+        - Logrotate config file: /etc/logrotate.d/dovecot
+
+ClamAV:
+    * Configuration files:
+        - /etc/clamav/clamd.conf
+        - /etc/clamav/freshclam.conf
+        - /etc/logrotate.d/clamav
+    * RC scripts:
+            + /etc/init.d/clamav-daemon
+            + /etc/init.d/clamav-freshclam
+
+service clamav-daemon restart
+service clamav-freshclam restart
+
+DNS record for DKIM support:
+
+; key#1 1024 bits, i=dkim, d=ribafs.org, /var/lib/dkim/ribafs.org.pem
+dkim._domainkey.ribafs.org.    3600 TXT (
+  "v=DKIM1; p="
+  "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDvz6EUyYUL1PiG8Y8F3F5z4xd9"
+  "l3NvB8sXze+lRYsH24+iHgJ37GaFJS4+4WbNmlw7CDZy89vtFFfS6oiCj6mtNLmq"
+  "G4efU32SlwwuiyRijjzVP9BTJEledD8hZ5z6VpXKSL6rw8a3byqiaiDQ4HYYnRIF"
+  "sMFTQCS39GQMbcabkwIDAQAB")
+Amavisd-new:
+    * Configuration files:
+        - /etc/amavis/conf.d/50-user
+        - /etc/postfix/master.cf
+        - /etc/postfix/main.cf
+    * RC script:
+        - /etc/init.d/amavis
+    * MySQL Database:
+        - Database name: amavisd
+        - Database user: amavisd
+        - Database password: JXWXdKEtgF2qNKAIn6D3O0PH14RfRn
+        - SQL template: /root/iRedMail-0.9.7/samples/amavisd/amavisd.mysql
+
+SpamAssassin:
+    * Configuration files and rules:
+        - /etc/mail/spamassassin
+        - /etc/mail/spamassassin/local.cf
+
+iRedAPD - Postfix Policy Server:
+    * Version: 2.1
+    * Listen address: 127.0.0.1, port: 7777
+    * SQL database account:
+        - Database name: iredapd
+        - Username: iredapd
+        - Password: anivAiLVVbltZ7ujhtxXNLxLGico7h
+    * Configuration file:
+        - /opt/iredapd/settings.py
+    * Related files:
+        - /opt/iRedAPD-2.1
+        - /opt/iredapd (symbol link to /opt/iRedAPD-2.1
+
+iRedAdmin - official web-based admin panel:
+    * Version: 0.8
+    * Root directory: /opt/www/iRedAdmin-0.8
+    * Config file: /opt/www/iRedAdmin-0.8/settings.py
+    * Web access:
+        - URL: https://mail.ribafs.org/iredadmin/
+        - Username: postmaster@ribafs.org
+        - Password: senha
+    * SQL database:
+        - Database name: iredadmin
+        - Username: iredadmin
+        - Password: 07h8Q1iHU9YAh9XP0EW0feekdAx0Bp
+    * See also:
+        - /etc/nginx/conf.d/iredadmin.conf
+
+Roundcube webmail: /opt/www/roundcubemail-1.3.0
+    * Config file: /opt/www/roundcubemail-1.3.0/config
+    * Web access:
+        - URL: http://mail.ribafs.org/mail/ (will be redirected to https:// site)
+        - URL: https://mail.ribafs.org/mail/ (secure connection)
+        - Username: postmaster@ribafs.org
+        - Password: senha
+    * SQL database account:
+        - Database name: roundcubemail
+        - Username: roundcube
+        - Password: wIPgAeoqFsRLAG6UdXEMQ1vBPUqQ8V
+    * See also:
+        - /etc/nginx/conf.d/roundcubemail.conf (Apache)
+        - Cron job: crontab -l -u root
+
+SOGo Groupware:
+    * Web access: httpS://mail.ribafs.org/SOGo/
+    * Main config file: /etc/sogo/sogo.conf
+    * Apache config file: /etc/nginx/conf.d/SOGo.conf
+    * Nginx template file: /etc/nginx/templates/sogo.tmpl
+    * Database:
+        - Database name: sogo
+        - Database user: sogo
+        - Database password: WYo3D7fyKeTrHe73QAhNS7K0wmnOix
+    * SOGo sieve account (Warning: it's a Dovecot Master User):
+        - file: /etc/sogo/sieve.cred
+        - username: sogo_sieve_master@not-exist.com
+        - password: 1ac34rHQ9rUDeViSaaU30OO5T6fQll
+    * See also:
+        - cron job of system user: sogo
+
+Awstats:
+    * Configuration files:
+        - /etc/awstats
+        - /etc/awstats/awstats.web.conf
+        - /etc/awstats/awstats.smtp.conf
+        - /etc/nginx/awstats.users
+        - /etc/nginx/conf.d/awstats.conf - Available if you're running Apache
+    * Login account:
+        - Username: postmaster@ribafs.org, password: senha
+    * URL:
+        - Apache:
+            - https://mail.ribafs.org/awstats/awstats.pl?config=web
+            - https://mail.ribafs.org/awstats/awstats.pl?config=smtp
+        - Nginx:
+            - https://mail.ribafs.org/awstats/
+            - https://mail.ribafs.org/awstats/awstats.smtp.html
+            - https://mail.ribafs.org/awstats/awstats.web.html
+    * Crontab job:
+        shell> crontab -l root
+    * Command used to add a new user, or reset password for an existing user:
+        htpasswd /etc/nginx/awstats.users username

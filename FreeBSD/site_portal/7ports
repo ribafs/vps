@@ -1,0 +1,64 @@
+FreeBSD Ports
+
+Uma grande vantagem de instalar programas via ports é o fato de podermos customizar as opções de instalação.
+
+Caso não haja nenhuma necessidade de customização na instalação a opçãoo é o pkg.
+
+portsnap fetch
+portsnap extract
+portsnap update
+portsnap fetch update
+
+Instalar apache24 atualizado
+
+cd /usr/ports
+
+make search name=apache24
+
+Mostrou
+apache24-2.4.33
+
+Enquanto que o instalado pelo pkg é o apache24-2.4.29, que tem vulnerabilidades
+
+cd /usr/ports/www/apache24
+
+pkg delete apache24
+
+make install
+make clean
+
+Reinstalei o mod_php
+
+pkg install mod_php71
+
+service apache24 restart
+
+Rodando checagem de vulnerabilidades
+
+pkg audit -F
+
+Agora mostrou que não existe vulnerabilidade
+
+Listar ports
+portmaster -l
+
+Checar pacotes instalados
+
+pkg install portmaster
+
+cd /usr/ports/ports-mgmt/portmaster
+sudo make install clean
+
+portmaster -L
+
+
+Removendo ports
+
+cd /usr/ports/sysutils/lsof
+make deinstall
+
+Atualizar tudo
+
+portmaster -a
+
+

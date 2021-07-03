@@ -1,0 +1,5 @@
+# Lista as portas se serviços abertas
+grep -w "$1/tcp" /etc/services
+
+# Usar
+# porta 80

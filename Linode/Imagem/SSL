@@ -1,0 +1,27 @@
+SSL com certbot
+
+https://certbot.eff.org
+
+Selecione o servidor web (Apache) e a distribuição (Debian 10)
+
+Acessar o servidor via SSH
+
+Instalar o snap
+https://certbot.eff.org/lets-encrypt/debianbuster-apache
+
+sudo apt update
+sudo apt install snapd
+
+sudo snap install core; sudo snap refresh core
+
+sudo snap install --classic certbot
+
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+sudo certbot --apache
+
+sudo certbot renew --dry-run
+
+Testar
+
+https://dominio

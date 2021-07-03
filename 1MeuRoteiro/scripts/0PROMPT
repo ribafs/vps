@@ -1,0 +1,15 @@
+== Customizar o Prompt de comandos
+
+nano .bashrc
+
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\W\[\033[00m\] '
+
+    # ribafs (Loc de Local)
+    PS1='Loc ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\W\[\033[00m\] '
+
+    # root
+    PS1='Sv ${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\W\[\033[00m\] '
+
+Original
+PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+

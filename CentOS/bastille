@@ -1,0 +1,55 @@
+Bastille
+
+https://help.ubuntu.com/community/BastilleLinux
+
+sudo apt-get install bastille
+
+Reveretendo alterações do Bastille
+sudo RevertBastille
+
+
+Reforçando a segurança do Ubuntu dom Bastille
+https://www.unixmen.com/how-to-harden-your-linux-servers-security-with-bastille/
+https://itandsecuritystuffs.wordpress.com/2014/04/08/hardening-linux-ubuntu-12-04-using-bastille/
+
+Atualmente o bastille suporta a maioria das distribuições
+
+Testar antes numa box do vagrant
+
+Execute
+
+sudo netstat -pl
+
+Varrer portas abertas
+sudo nmap -n -sS -p1-65535 -sV --version-all -O -T5 -vv localhost
+
+Usar o desktop
+sudo nmap -n -sS -p1-65535 -sV --version-all -O -T5 -vv seusite.com
+
+Instalação
+
+sudo apt-get install bastille
+
+- Internet Site - usar caso o servidor não seja servidor de e-mail
+
+- dominio
+
+Iniciar
+
+sudo bastille -c
+
+Checando configurações do firewall
+/etc/Bastille/bastille-firewall.cfg
+
+sudo iptables -L -n -v –line-numbers
+
+Habilitar complexidade de senhas
+
+nano /etc/pam.d/common-password
+
+password        requisite                       pam_cracklib.so retry=3 minlen=8 difok=3
+
+Habilitar histórico de senhas
+sudo sh -c 'cat /dev/null >> opasswd'
+
+

@@ -1,0 +1,61 @@
+http://167.99.84.122
+
+nano /etc/nginx/sites-available/default
+
+        location / {
+                try_files $uri $uri/ /portal/index.php?$args;
+        }
+
+no location php
+
+fastcgi_intercept_errors on;
+
+service nginx restart
+
+Adicionar algumas extensões
+
+apt install -y php7.0-xml php7.0-zip
+
+Enviar os arquivos de backup do desktop para a pasta /tmp do servidor
+
+portal.zip
+portal.sql
+
+Instalar na pasta /var/www/html/portal
+
+cd /tmp
+
+Criar o banco e o usuário e importar o script para o banco
+
+Mostrar senha do mysql
+cat /root/.digitalocean_password
+
+Reforçar segurança
+mysql_secure_installation
+
+mysql -uroot -p
+
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION;
+
+apt install -y unzip mc
+
+unzip portal.zip -d /var/www/html/portal
+
+Mudar as permissões do portal. Criar o script
+
+nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+chown -R www-data:www-data /var/www/html/$1;
+find /var/www/html/$1 -type d -exec chmod 2755 {} \;
+find /var/www/html/$1 -type f -exec chmod 2644 {} \;
+echo "";
+echo "Concluído!";
+
+chmod +x /usr/local/bin/perms
+
+

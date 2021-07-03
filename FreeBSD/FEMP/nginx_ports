@@ -1,0 +1,44 @@
+https://www.vultr.com/docs/installing-nginx-on-freebsd
+
+
+Para uma instalação recente e limpa instalar a árvore dos ports
+
+portsnap fetch extract
+
+Aguarde alguns minutos
+
+Atualize o pkg
+
+cd /usr/ports/ports-mgmt/pkg
+make reinstall
+
+make clean
+
+
+== Nginx
+
+Configurar, compilar e instalar
+
+cd /usr/ports/www/nginx
+make config-recursive
+
+Receberá um popup para configuração. Quando os módulos aparecerem escolha:
+HTTP_GZIP_STATIC, HTTP_SSL, HTTP_DAV_EXT. Outros popups que aparecerem podem ser deixados com os valores default.
+
+make install
+
+make clean
+
+Configurar autostart
+
+nano /etc/rc.conf
+
+nginx_enable="YES"
+
+service nginx start
+
+Configurações no diretório
+
+/usr/local/etc/nginx/
+
+

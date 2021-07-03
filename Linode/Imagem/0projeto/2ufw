@@ -1,0 +1,29 @@
+Enviar a pasta Scripts para /root
+
+Compactar toda a pasta imagem e enviar para o servidor.
+Acessar o terminal na pasta
+
+scp imagem.tar.gz root@45.56.107.114:/root
+
+Manter no servidor compactado, pois no linode se cobra pelo tamanho
+
+## Instalar ufw no debian
+
+apt install ufw
+
+Liberar somente as portas SSH, HTTP e HTTPS
+
+ufw allow 22
+ufw allow 65522
+ufw allow 80
+ufw allow 443
+
+Quando criar o servidor remover a porta 22
+
+ufw enable
+
+ufw status
+
+Configurar o SSH
+
+

@@ -1,0 +1,16 @@
+
+Criar domínio
+
+Sempre criar associado com um tempalte
+
+Criar banco
+
+Criar banco
+Criar user
+Senha
+
+Não usar _ nos nomes do banco e do user
+
+Após isso já poderá acessar o banco via ssh ou via adminer
+
+

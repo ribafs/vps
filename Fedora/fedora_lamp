@@ -1,0 +1,152 @@
+LAMP com Fedora
+
+Criar o servidor
+
+Acessar via ssh com root
+
+ssh root@IP
+
+Criar uma pasta para guardar um backup de todo script que precisar alterar
+mkdir /root/back
+
+Desabilitar inicialmente o SELinux
+
+cp /etc/selinux/config /root/back
+
+nano /etc/selinux/config
+Mudar para Disabled
+reboot
+
+Criar usuário comum
+
+adduser ribafs
+passwd ribafs
+
+Adicionar ao grupo do root
+gpasswd -a ribafs wheel
+
+Copiar a cheve pública do ssh do seu desktop para o servidor
+
+exit
+ssh-copy-id ribafs@IP
+
+Ele pedirá a senha de ribafs no servidor
+
+Acesse agora sem senha com
+
+ssh ribafs@IP
+
+Mude para root
+
+su
+
+Atualiza o Fedora
+dnf update
+dnf install nano mc unzip mlocate
+
+Atualizar o banco de dados do locate
+updatedb
+
+Desabilite login do root via ssh e faça outros ajustes
+
+cp /etc/ssh/sshd_config /root/back
+
+nano /etc/ssh/sshd_config
+
+PermitRootLogin no
+PasswordAuthentication no
+LoginGrace 30
+
+Adicionar ao final
+AllowUsers ribafs
+
+systemctl reload sshd
+
+Configurar timezone
+ls /usr/share/zoneinfo/
+ln -sf /usr/share/zoneinfo/America/Fortaleza /etc/localtime
+
+Usar um Firewall
+Decidir se firewalld ou iptables
+
+Se iptables:
+dnf install -y iptables-services
+systemctl enable iptables
+systemctl start iptables
+iptables -L
+
+Inicialmente deve mostrar:
+
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+ACCEPT     all  --  anywhere             anywhere             state RELATED,ESTABLISHED
+ACCEPT     icmp --  anywhere             anywhere
+ACCEPT     all  --  anywhere             anywhere
+ACCEPT     tcp  --  anywhere             anywhere             state NEW tcp dpt:ssh
+REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+REJECT     all  --  anywhere             anywhere             reject-with icmp-host-prohibited
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Para guardar permenentemente estas regras:
+/usr/libexec/iptables/iptables.init save
+
+Permitir portas 80 e 443
+
+cp /etc/sysconfig/iptables /root/back
+
+nano /etc/sysconfig/iptables
+
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 22 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 80 -j ACCEPT
+-A INPUT -p tcp -m state --state NEW -m tcp --dport 443 -j ACCEPT
+-A INPUT -j REJECT --reject-with icmp-host-prohibited
+
+/usr/libexec/iptables/iptables.init save
+
+systemctl restart iptables
+
+== Instalar Apache
+
+dnf update
+dnf install httpd
+systemctl start httpd.service
+
+Testar
+
+http://IP
+
+
+== MariaDB
+
+Instalar
+dnf install mysql mysql-server
+systemctl start mariadb.service
+
+
+== PHP
+
+Instalar
+dnf install php php-mysqlnd
+dnf search php-
+
+Outros pacotes
+php-bcmath php mcrypt mcrypt php-mcrypt php-mysqlnd php php-gd php-pear curl php-curl;
+php-zip php-gettext php-fpm php-auth php-xml php-xsl;
+
+systemctl restart httpd.service
+
+Testando
+
+nano /var/www/html/info.php
+
+<?php
+phpinfo();
+
+http://IP
+
+

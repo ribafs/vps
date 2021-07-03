@@ -1,0 +1,33 @@
+== Criação de um usuário restrito 
+
+mysql_secure_installation
+
+A maior restrição é conceder somente o privilégio de SELECT
+
+mysql -uroot -p
+
+CREATE USER 'laravel_us'@'localhost' IDENTIFIED BY 'senhaforte';
+CREATE DATABASE `laravel_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+CREATE USER 'cake_us'@'localhost' IDENTIFIED BY 'senhaforte';
+CREATE DATABASE `cake_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `cake_db`.* TO `cake_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+REVOKE ALL ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+GRANT ALL PRIVILEGES ON `laravel_db`.sessions TO `laravel_us`@localhost IDENTIFIED BY 'zmxn1029L@';
+GRANT SELECT ON `laravel_db`.* TO `laravel_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+Caso tenha problemas ao remover privilégios, remova o user e crie novamente mas somente com SELECT e e tudo em sessions
+
+REVOKE ALL ON `cake_db`.* TO `cake_us`@localhost IDENTIFIED BY 'senhaforte';
+GRANT SELECT ON `cake_db`.* TO `cake_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+
+Os privilégios abaixo são suficientes para o CMS Joomla
+
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP, INDEX, ALTER, LOCK TABLES, CREATE TEMPORARY TABLES, GRANT ON `ribafs_db`.* TO `ribafs_us`@localhost IDENTIFIED BY 'senhaforte';
+

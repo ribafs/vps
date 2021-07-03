@@ -1,0 +1,126 @@
+https://www.howtoforge.com/tutorial/how-to-install-mysql-server-with-phpmyadmin-on-freebsd-11/
+
+Instalar
+
+FreeBSD 11.0-RELEASE
+apache24-2.4.25_1
+mysql57-server-5.7.17
+mod_php70-7.0.14
+php70-7.0.14
+php70-extensions-1.1
+phpMyAdmin-4.6.5.2
+WordPress 4.7
+
+
+== Atualizar
+portsnap fetch
+portsnap extract
+
+
+== Apache
+
+cd /usr/ports/www/apache24
+make config-recursive install distclean
+
+
+== Habilitar no boot
+sysrc apache24_enable=YES
+
+
+== MySQL
+
+cd /usr/ports/databases/mysql57-server
+make config-recursive install distclean
+
+
+== Habilitar no boot
+
+sysrc mysql_enable=YES
+
+
+== Iniciar
+service mysql-server start
+
+
+== Segurança
+
+Se instalado um pacote FAMP haverá o arquivo com a senha:
+cat /root/.mysql_secret
+
+mysql_secure_installation
+
+
+== PHP
+
+cd /usr/ports/lang/php70
+make config-recursive install distclean
+
+cd /usr/ports/lang/php70-extensions/
+make config-recursive
+
+cd /usr/ports/www/mod_php70
+make config-recursive install distclean
+
+cd /usr/ports/databases/phpmyadmin/
+make config-recursive install distclean
+
+cp /usr/local/etc/php.ini-development /usr/local/etc/php.ini
+
+
+== Configurar Apache
+
+nano /usr/local/etc/apache24/httpd.conf 
+
+Mude
+
+DirectoryIndex index.html index.php
+
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+Alias /phpmyadmin "/usr/local/www/phpMyAdmin"
+
+<Directory "/usr/local/www/phpMyAdmin">
+Options None
+AllowOverride None
+Require all granted
+</Directory>
+
+mkdir /usr/local/www/phpMyAdmin/config && chmod o+w /usr/local/www/phpMyAdmin/config
+
+chmod o+r /usr/local/www/phpMyAdmin/config.inc.php
+
+http://your-hostname-or-IP-address/phpmyadmin/setup
+
+mv /usr/local/www/phpMyAdmin/config/config.inc.php /usr/local/www/phpMyAdmin 
+
+rm -r /usr/local/www/phpMyAdmin/config chmod o-r /usr/local/www/phpMyAdmin/config.inc.php
+
+chmod o-r /usr/local/www/phpMyAdmin/config.inc.php
+
+service apache24 restart
+service mysql-server restart
+
+cd ~
+fetch http://wordpress.org/latest.tar.gz
+tar -zxvf latest.tar.gz 
+
+cp ~/wordpress/wp-config-sample.php ~/wordpress/wp-config.php
+
+// ** MySQL settings - You can get this info from your web host ** //
+/** The name of the database for WordPress */
+define('DB_NAME', 'wordpress');
+/** MySQL database username */
+define('DB_USER', 'root');
+/** MySQL database password */
+define('DB_PASSWORD', 'your-mysql-password');
+
+mv ~/wordpress/ /usr/local/www/apache24/data/
+
+
+

@@ -1,0 +1,281 @@
+FreeBSD Ports
+
+Uma grande vantagem de instalar programas via ports é o fato de podermos customizar as opções de instalação.
+
+Caso não haja nenhuma necessidade de customização na instalação a opçãoo é o pkg.
+
+portsnap fetch
+portsnap extract
+portsnap update
+portsnap fetch update
+
+Instalar apache24 atualizado
+
+cd /usr/ports
+
+make search name=apache24
+
+Mostrou
+apache24-2.4.33
+
+Enquanto que o instalado pelo pkg é o apache24-2.4.29, que tem vulnerabilidades
+
+cd /usr/ports/www/apache24
+make install clean
+
+
+cd /usr/ports
+git clone https://github.com/miwi-fbsd/miwi-ports.git git-ports-php7
+cd git-ports-php7
+rsync -av ./* ../
+portsnap fetch extract
+
+
+
+Ports
+
+stat -x /usr/ports/UPDATING
+
+stat -x /usr/ports/UPDATING > ~/last_update
+
+whereis wget
+
+cd /usr/ports
+
+make search name=apache
+
+Instalar ports com make
+
+sudo make config
+sudo make fetch
+sudo make checksum
+sudo make depends
+sudo make extract
+sudo make patch
+sudo make configure
+sudo make build
+sudo make install
+
+sudo make config-recursive install distclean
+
+Removendo port instalado
+
+cd /usr/ports/ports-mgmt/portmaster
+sudo make deinstall
+sudo make rmconfig
+sudo make rmconfig-recursive
+
+sudo make reinstall distclean
+
+Listar ports
+portmaster -l
+
+Checar pacotes instalados
+
+pkg install portmaster
+
+cd /usr/ports/ports-mgmt/portmaster
+sudo make install clean
+
+portmaster -L
+
+
+
+The base system of FreeBSD includes Portsnap. This is a fast and user-friendly tool for retrieving the Ports Collection and is the recommended choice for most users. This utility connects to a FreeBSD site, verifies the secure key, and downloads a new copy of the Ports Collection. The key is used to verify the integrity of all downloaded files.
+
+    To download a compressed snapshot of the Ports Collection into /var/db/portsnap:
+
+    # portsnap fetch
+
+    When running Portsnap for the first time, extract the snapshot into /usr/ports:
+
+    # portsnap extract
+
+    After the first use of Portsnap has been completed as shown above, /usr/ports can be updated as needed by running:
+
+    # portsnap fetch
+    # portsnap update
+
+    When using fetch, the extract or the update operation may be run consecutively, like so:
+
+    # portsnap fetch update
+
+
+----
+Installing Ports
+
+This section provides basic instructions on using the Ports Collection to install or remove software. The detailed description of available make targets and environment variables is available in ports(7).
+Warning:
+
+Before compiling any port, be sure to update the Ports Collection as described in the previous section. Since the installation of any third-party software can introduce security vulnerabilities, it is recommended to first check https://vuxml.freebsd.org/ for known security issues related to the port. Alternately, run pkg audit -F before installing a new port. This command can be configured to automatically perform a security audit and an update of the vulnerability database during the daily security system check. For more information, refer to pkg-audit(8) and periodic(8).
+
+Using the Ports Collection assumes a working Internet connection. It also requires superuser privilege.
+
+To compile and install the port, change to the directory of the port to be installed, then type make install at the prompt. Messages will indicate the progress:
+
+# cd /usr/ports/sysutils/lsof
+# make install
+>> lsof_4.88D.freebsd.tar.gz doesn't seem to exist in /usr/ports/distfiles/.
+>> Attempting to fetch from ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/.
+===>  Extracting for lsof-4.88
+...
+[extraction output snipped]
+...
+>> Checksum OK for lsof_4.88D.freebsd.tar.gz.
+===>  Patching for lsof-4.88.d,8
+===>  Applying FreeBSD patches for lsof-4.88.d,8
+===>  Configuring for lsof-4.88.d,8
+...
+[configure output snipped]
+...
+===>  Building for lsof-4.88.d,8
+...
+[compilation output snipped]
+...
+
+===>  Installing for lsof-4.88.d,8
+...
+[installation output snipped]
+...
+===>   Generating temporary packing list
+===>   Compressing manual pages for lsof-4.88.d,8
+===>   Registering installation for lsof-4.88.d,8
+===>  SECURITY NOTE:
+      This port has installed the following binaries which execute with
+      increased privileges.
+/usr/local/sbin/lsof
+#
+
+Since lsof is a program that runs with increased privileges, a security warning is displayed as it is installed. Once the installation is complete, the prompt will be returned.
+
+Some shells keep a cache of the commands that are available in the directories listed in the PATH environment variable, to speed up lookup operations for the executable file of these commands. Users of the tcsh shell should type rehash so that a newly installed command can be used without specifying its full path. Use hash -r instead for the sh shell. Refer to the documentation for the shell for more information.
+
+During installation, a working subdirectory is created which contains all the temporary files used during compilation. Removing this directory saves disk space and minimizes the chance of problems later when upgrading to the newer version of the port:
+
+# make clean
+===>  Cleaning for lsof-88.d,8
+#
+
+Note:
+
+To save this extra step, instead use make install clean when compiling the port.
+
+
+Removing Installed Ports
+
+Installed ports can be uninstalled using pkg delete. Examples for using this command can be found in the pkg-delete(8) manual page.
+
+Alternately, make deinstall can be run in the port's directory:
+
+# cd /usr/ports/sysutils/lsof
+make deinstall
+===>  Deinstalling for sysutils/lsof
+===>   Deinstalling
+Deinstallation has been requested for the following 1 packages:
+
+	lsof-4.88.d,8
+
+The deinstallation will free 229 kB
+[1/1] Deleting lsof-4.88.d,8... done
+
+It is recommended to read the messages as the port is uninstalled. If the port has any applications that depend upon it, this information will be displayed but the uninstallation will proceed. In such cases, it may be better to reinstall the application in order to prevent broken dependencies.
+
+
+Upgrading Ports
+
+Over time, newer versions of software become available in the Ports Collection. This section describes how to determine which software can be upgraded and how to perform the upgrade.
+
+To determine if newer versions of installed ports are available, ensure that the latest version of the ports tree is installed, using the updating command described in either Procedure 4.1, “Portsnap Method” or Procedure 4.2, “Subversion Method”. On FreeBSD 10 and later, or if the system has been converted to pkg, the following command will list the installed ports which are out of date:
+
+# pkg version -l "<"
+
+For FreeBSD 9.X and lower, the following command will list the installed ports that are out of date:
+
+# pkg_version -l "<"
+
+Important:
+
+Before attempting an upgrade, read /usr/ports/UPDATING from the top of the file to the date closest to the last time ports were upgraded or the system was installed. This file describes various issues and additional steps users may encounter and need to perform when updating a port, including such things as file format changes, changes in locations of configuration files, or any incompatibilities with previous versions. Make note of any instructions which match any of the ports that need upgrading and follow these instructions when performing the upgrade.
+
+
+Upgrading Ports Using Portmaster
+
+ports-mgmt/portmaster is a very small utility for upgrading installed ports. It is designed to use the tools installed with the FreeBSD base system without depending on other ports or databases. To install this utility as a port:
+
+# cd /usr/ports/ports-mgmt/portmaster
+# make install clean
+
+Portmaster defines four categories of ports:
+
+    Root port: has no dependencies and is not a dependency of any other ports.
+
+    Trunk port: has no dependencies, but other ports depend upon it.
+
+    Branch port: has dependencies and other ports depend upon it.
+
+    Leaf port: has dependencies but no other ports depend upon it.
+
+To list these categories and search for updates:
+
+# portmaster -L
+===>>> Root ports (No dependencies, not depended on)
+===>>> ispell-3.2.06_18
+===>>> screen-4.0.3
+        ===>>> New version available: screen-4.0.3_1
+===>>> tcpflow-0.21_1
+===>>> 7 root ports
+...
+===>>> Branch ports (Have dependencies, are depended on)
+===>>> apache22-2.2.3
+        ===>>> New version available: apache22-2.2.8
+...
+===>>> Leaf ports (Have dependencies, not depended on)
+===>>> automake-1.9.6_2
+===>>> bash-3.1.17
+        ===>>> New version available: bash-3.2.33
+...
+===>>> 32 leaf ports
+
+===>>> 137 total installed ports
+        ===>>> 83 have new versions available
+
+This command is used to upgrade all outdated ports:
+
+# portmaster -a
+
+Note:
+
+By default, Portmaster makes a backup package before deleting the existing port. If the installation of the new version is successful, Portmaster deletes the backup. Using -b instructs Portmaster not to automatically delete the backup. Adding -i starts Portmaster in interactive mode, prompting for confirmation before upgrading each port. Many other options are available. Read through the manual page for portmaster(8) for details regarding their usage.
+
+If errors are encountered during the upgrade process, add -f to upgrade and rebuild all ports:
+
+# portmaster -af
+
+Portmaster can also be used to install new ports on the system, upgrading all dependencies before building and installing the new port. To use this function, specify the location of the port in the Ports Collection:
+
+# portmaster shells/bash
+
+More information about ports-mgmt/portmaster may be found in its pkg-descr.
+
+
+Ports and Disk Space
+
+Using the Ports Collection will use up disk space over time. After building and installing a port, running make clean within the ports skeleton will clean up the temporary work directory. If Portmaster is used to install a port, it will automatically remove this directory unless -K is specified. If Portupgrade is installed, this command will remove all work directories found within the local copy of the Ports Collection:
+
+# portsclean -C
+
+In addition, outdated source distribution files accumulate in /usr/ports/distfiles over time. To use Portupgrade to delete all the distfiles that are no longer referenced by any ports:
+
+# portsclean -D
+
+Portupgrade can remove all distfiles not referenced by any port currently installed on the system:
+
+# portsclean -DD
+
+If Portmaster is installed, use:
+
+# portmaster --clean-distfiles
+
+By default, this command is interactive and prompts the user to confirm if a distfile should be deleted.
+
+In addition to these commands, ports-mgmt/pkg_cutleaves automates the task of removing installed ports that are no longer needed.

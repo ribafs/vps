@@ -1,0 +1,19 @@
+Detectar Intrusões com PSAD
+
+PSAD é uma coleção de 3 pequenos daemons do sistema, que rodam para analisar mensagens de log do iptables para detectar scanneamento de portas e outros tráficos suspeitos.
+
+Instalação
+
+apt install psad
+
+Configuração básica
+
+nano /etc/psad/psad.conf
+
+EMAIL_ADDRESSES – mude para seu e-mail
+ENABLE_AUTO_IDS - se Y o psad agirá automaticamente
+ENABLE_AUTO_IDS_EMAILS - se Y psad mandará um e-mail em cada suspeita
+
+service psad restart
+
+

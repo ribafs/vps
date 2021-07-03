@@ -1,0 +1,36 @@
+systemctl stop firewalld
+systemctl disable firewalld
+systemctl mask firewalld
+
+Para remover o link simbólico
+rm /etc/systemd/system/firewalld.service
+
+yum install -y iptables-services
+systemctl enable iptables.service
+systemctl start iptables
+
+Mostrar regras atuais
+iptables -L
+ou
+iptables -L --line-numbers
+
+iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --dport 65522 -j ACCEPT
+iptables -A INPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -p tcp -m multiport --dports 80,443 -m conntrack --ctstate ESTABLISHED -j ACCEPT
+iptables -P OUTPUT ACCEPT
+iptables -P INPUT DROP
+
+iptables -L -no CentOS 6
+service iptables save
+
+No CentOS 7
+/usr/libexec/iptables/iptables.init save
+
+
+iptables -A INPUT -p tcp --dport 65522 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+
+Guardadas as regras aqui
+/etc/sysconfig/iptables

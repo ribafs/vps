@@ -1,0 +1,120 @@
+
+
+Verificar portas
+
+apk add lsof
+
+echo "shortname" > /etc/hostname
+
+Ativar
+hostname -F /etc/hostname
+
+/etc/hosts
+192.168.1.150   shortname.domain.com
+
+DNS
+
+/etc/resolv.conf
+
+nameserver 8.8.8.8
+nameserver 8.8.4.4
+
+nameserver 2001:470:20::2
+
+/etc/network/interfaces
+
+iface eth0 inet static
+        address 192.168.1.150
+        netmask 255.255.255.0
+        gateway 192.168.1.1
+
+Since Alpine 3.13 must be:
+
+iface eth0 inet static
+        address 192.168.1.150/24
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+
+iface eth0 inet static
+        address 192.168.1.150
+       netmask 255.255.255.0
+        gateway 192.168.1.1
+
+iface eth0 inet6 static
+        address 2001:470:ffff:ff::2
+        netmask 64
+        gateway 2001:470:ffff:ff::1
+        pre-up echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+
+Take care since Alpine 3.13 must be as:
+
+auto lo
+iface lo inet loopback
+
+auto eth0
+
+iface eth0 inet static
+        address 192.168.1.150/24
+        gateway 192.168.1.1
+
+iface eth0 inet6 static
+        address 2001:470:ffff:ff::2/64
+        gateway 2001:470:ffff:ff::1
+        pre-up echo 0 > /proc/sys/net/ipv6/conf/eth0/accept_ra
+
+For iptables
+
+    Set iptables to start on reboot
+
+         rc-update add iptables 
+    Write the firewall rules to disk
+
+         /etc/init.d/iptables save
+    If you use Alpine Local Backup:
+        Save the configuration
+
+             lbu ci 
+
+Activating Changes and Testing Connectivity
+
+Changes made to /etc/network/interfaces can be activated by running:
+
+/etc/init.d/networking restart
+
+If you did not get any errors, you can now test that networking is configured properly by attempting to ping out:
+
+ping www.google.com
+
+ifconfig
+
+iproute2
+
+You may wish to install the 'iproute2' package (note that this will also install iptables if not yet installed)
+
+apk add iproute2
+
+This provides the 'ss' command which is IMHO a 'better' version of netstat.
+
+Show listening tcp ports:
+
+ss -tl
+
+Show listening tcp ports and associated processes:
+
+ss -ptl
+
+Show listening and established tcp connections:
+
+ss -ta
+
+Show socket usage summary:
+
+ss -s
+
+Show more options:
+
+ss -h
+

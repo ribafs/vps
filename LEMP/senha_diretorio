@@ -1,0 +1,57 @@
+Proteger diretório com nhinx
+
+Instalar
+apt install -y apache2-utils
+
+htpasswd -c /etc/nginx/.htpasswd ribafs
+
+cat /etc/nginx/.htpasswd
+
+Editar o default.conf e alterar assim deixando assim:
+
+nano /etc/nginx/sites-available/default
+
+server {
+    listen	 80;
+    server_name  localhost;
+
+    # note that these lines are originally from the "location /" block
+    root   /usr/share/nginx/html;
+    index index.php index.html index.htm;
+
+    auth_basic           "Administrator’s Area";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+
+    location / {
+        auth_basic	off;
+        try_files $uri $uri/ /portal/index.php?$args;
+        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+    }
+
+    error_page 404 /404.html;
+    error_page 500 502 503 504 /50x.html;
+
+    location = /50x.html {
+        root /usr/share/nginx/html;
+    }
+
+    location ~ \.php$ {
+        auth_basic	off;
+        fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location /adminer.php {
+        auth_basic            "Restrito";
+        auth_basic_user_file  /etc/nginx/.htpasswd;
+    }
+
+}
+
+service nginx restart
+service php7.0-fpm restart
+
+Crédito
+https://www.nginx.com/resources/admin-guide/restricting-access-auth-basic/

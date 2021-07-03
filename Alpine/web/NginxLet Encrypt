@@ -1,0 +1,102 @@
+Sem usar um domínio, mas apenas um IP
+
+apk update
+apk add netcat-openbsd bc curl wget git bash openssl
+apk add libressl
+cd /tmp/
+git clone https://github.com/Neilpang/acme.sh.git
+cd acme.sh/
+sudo -i
+./acme.sh --install
+source ~/.bashrc
+acme.sh
+
+D=/var/www/localhost/htdocs
+mkdir -vp ${D}/.well-known/acme-challenge/
+chown -R nginx:nginx ${D}/.well-known/acme-challenge/
+chmod -R 0555 ${D}/.well-known/acme-challenge/
+
+apk install libressl
+mkdir -p /etc/nginx/ssl/letsencrypt/IP/
+cd /etc/nginx/ssl/letsencrypt/IP/
+openssl dhparam -dsaparam -out dhparams.pem 4096
+
+acme.sh --issue -w $D -d IP -k 4096
+
+nano /etc/nginx/conf.d/ssl.ribafs.conf
+
+## START: SSL/HTTPS IP ###
+server {                                        
+    listen 443 http2;
+    server_name IP; 
+    ssl on;
+    ssl_certificate /etc/nginx/ssl/letsencrypt/IP/IP.cer;
+    ssl_certificate_key /etc/nginx/ssl/letsencrypt/IP/IP.key;
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:50m;
+    ssl_session_tickets off;
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_ciphers ECDH+AESGCM:DH+AESGCM:ECDH+AES256:DH+AES256:ECDH+AES128:DH+AES:ECDH+3DES:DH+3DES:RSA+AESGCM:RSA+AES:RSA+3DES:!aNULL:!MD5:!DSS;
+    ssl_dhparam /etc/nginx/ssl/letsencrypt/IP/dhparams.pem;
+    ssl_prefer_server_ciphers on;
+ 
+    ## Improves TTFB by using a smaller SSL buffer than the nginx default
+    ssl_buffer_size 8k;
+ 
+    ## Enables OCSP stapling
+    ssl_stapling on;
+    resolver 8.8.8.8;
+    ssl_stapling_verify on;
+ 
+    ## Send header to tell the browser to prefer https to http traffic
+    #add_header Strict-Transport-Security max-age=31536000;
+ 
+    ## SSL logs ##
+    access_log /var/log/nginx/IP_ssl_access.log;
+    error_log /var/log/nginx/IP_ssl_error.log;
+    #-------- END SSL config -------##
+ 
+   root /var/www/localhost/htdocs;
+   index         index.html index.htm index.php;
+   server_name   IP;
+   # configure php
+   location ~ \.php$ {
+              fastcgi_pass      127.0.0.1:9000;
+              fastcgi_index     index.php;
+              include           fastcgi.conf;
+    }
+    # rest of your config ##
+}                                               
+## END SSL IP ######
+
+acme.sh --installcert -d IP \
+--keypath /etc/nginx/ssl/letsencrypt/IP/IP.key \
+--fullchainpath /etc/nginx/ssl/letsencrypt/IP/IP.cer \
+--reloadcmd '/etc/init.d/nginx restart' 
+
+Testar
+
+https://IP
+
+Uma nota sobre o cron job
+
+Um cron job tentará renovar um certificado para você também. Ele é instalado por padrão da seguinte maneira (nenhuma ação necessária de sua parte):
+
+crontab -l
+
+Trabalho de amostra:
+
+0 0 * * * "/root/.acme.sh"/acme.sh --cron --home "/root/.acme.sh" > /dev/null
+
+
+How do I renew a certificate manually?
+Type the following command:
+
+acme.sh --renew -d IP
+
+How do I upgrade acme.sh client?
+Type the following command to upgrade acme.sh client to the latest code from https://github.com/Neilpang/acme.sh
+
+acme.sh --upgrade
+
+

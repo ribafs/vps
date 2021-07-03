@@ -1,0 +1,101 @@
+Instalar um site em Joomla na pasta /usr/share/nginx/html/portal
+E um site com WordPress na pasta /usr/share/nginx/html/blog
+
+ssh -p 65522 ribafs@159.65.87.220
+
+== Configurações no php.ini
+
+nano /etc/php.ini
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+
+service nginx restart
+
+
+== Enviar o arquivo portal.zip gerado pelo Akeeba Backup do desktop para a pasta /tmp do servidor
+
+No desktop copiar os dois arquivos para a pasta /home/ribafs
+scp -P 55522 portal* ribafs@159.65.87.220:/tmp
+
+
+No servidor
+cd /tmp
+
+
+== Criar o banco de dados do site e um usuário para o mesmmo
+
+mysql -uroot -p
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+\q
+
+
+== Descompactar o arquivo de restore criado com o Akeeba Backup
+
+unzip portal.zip -d /usr/share/nginx/html/portal
+
+
+== Setar corretamente as permissões
+
+nano /root/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+chown -R nginx:nginx /usr/share/nginx/html/$1;
+find /usr/share/nginx/html/$1 -type d -exec chmod 755 {} \;
+find /usr/share/nginx/html/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+	
+chmod +x /root/perms
+
+Executando no diretório /usr/share/nginx/portal
+sh /root/perms portal
+
+Executando no diretório /usr/share/nginx/html
+sh /root/perms
+
+Executo sempre que faço alguma alteração como root no /usr/share/nginx/html
+
+
+Efetuar ajustes no /usr/share/nginx/html/portal/configuration.php se necessário.
+
+
+== Instalar o restore do Akeeba
+
+http://159.65.87.220/portal
+
+
+== Redirecionar acesso ao raiz para /portal
+
+Removi index.html e info.php do raiz
+
+nano /var/www/html/index.php
+
+<?php
+header('location: portal');
+
+
+Depois de testado o site e configurado novamente para proteger o administrator com SSL
+então efetuar um backup full com o Akeeba Backup para guardar.
+
+
+== Backup e Restore
+
+Agora faça um backup completo com o akeeba e quando terminar restaure por exemplo para a pasta
+/var/www/html/portal2
+
+Crie o banco portal2, pode ser o mesmo user e senha
+
+Restaure pela web:
+
+http://IP/portal2
+
+
+== Agora vou implementar o SSL para usar no administrator usando o arquivo
+
+3ssl_nginx
+

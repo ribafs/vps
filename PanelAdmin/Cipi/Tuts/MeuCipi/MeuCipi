@@ -1,0 +1,13 @@
+Meu Cipi
+
+Meu Cipi pega um site criado pelo Cipi e instala nele um painel web administrativo:
+
+- gerenciador de arquivos
+- gerenciador de SGBD: MySQL, PostgreSQL, SQLite, etc
+- Gerenciador dos serviços:
+    - Nginx
+    - MySQL
+    - ...
+- Backup do banco e dos arquivos do site
+
+

@@ -1,0 +1,23 @@
+
+
+https://www.digitalocean.com/community/tutorials/a-comparative-introduction-to-freebsd-for-linux-users
+
+https://www.digitalocean.com/community/tutorials/how-to-get-started-with-freebsd-10-1
+
+Para uma instalação recente e limpa instalar a árvore dos ports
+
+portsnap fetch extract
+
+Aguarde alguns minutos
+
+Atualize o pkg
+
+cd /usr/ports/ports-mgmt/pkg
+make reinstall
+
+make clean
+
+
+Adicionar usuário ribafs ao grupo wheel
+
+pw usermod ribafs -G wheel

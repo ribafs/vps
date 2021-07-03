@@ -1,0 +1,49 @@
+Uma medida importante é se cadastrar na lista de anúncios de segurança do FreeBSD. Esta:
+https://lists.freebsd.org/mailman/listinfo/freebsd-announce
+
+Usuários e Shell
+
+Por questões de segurança é melhor usar o shell padrão do FreeBSD e na criação de usuários forçe senha forte e evite criar usuários sem necessidade.
+
+
+Não esqueça dos seus clientes, eles podem ser uma fragilidade do servidor.
+
+
+What is being started at system startup?
+grep YES /etc/defaults/rc.donf
+grep YES /etc/rc.conf
+ls /usr/local/etc/rc.d
+/etc/inetd.conf
+
+Delete services you are not using.
+Change “YES” entries in rc.conf to “NO”
+
+Remove /usr/local/etc/rc.d start scripts.
+
+Comment out services in
+/etc/inetd.conf if inetd is running
+
+
+Pacotes básicos
+
+mc
+unzip
+wget
+
+
+Cheque o crontab 
+Veja se não encontra alguma entrada estranha no crontab 
+
+
+Senhas
+ 
+Use senhas fortes para o cPanel, para usuários dos bancos, e-mails, para o Joomla, etc. De nada vai adiantar todo o cuidado com a segurança, se você deixa seu usuário com uma senha bem fácil ou medianamente fácil. A senha deve ser forte.
+FTP
+Não use FTP, pois as senhas navegam em texto claro. Em seu lugar prefira sftp (FileZilla), o gerenciador de arquivos do cPanel, etc. 
+
+Não dê oportunidade aos Crackers
+Um cracker precisa ter duas coisas: oportunidade e habilidade. Vários crackers têm habilidade, não dê a eles a oportunidade.
+Notícias Ruins 
+- Não existe segurança perfeita, portanto é melhor prevenir com backup 
+- Não existe a melhor forma, sempre existem várias formas de se fazer, seja criativo e esforce-se 
+- Nada substitui a experiência, portanto estude e pratique. Aqui o que precisamos aprender: GNU/Linux, Apache, MySQL, SQL, PHP, HTTP, CSS, XML, RSS, TCP/IP, FTP, Subversion, JavaScript e Joomla, etc. 

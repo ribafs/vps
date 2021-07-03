@@ -1,0 +1,12 @@
+
+
+apk update
+apk add logrotate
+
+cat /etc/periodic/daily/logrotate
+
+cat /etc/logrotate.conf
+
+cat /etc/logrotate.d/nginx
+
+

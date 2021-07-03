@@ -1,0 +1,32 @@
+Este servidor deu uma pane geral
+
+Após alterar configurações do firewall no /etc/rc.conf e reiniciar ele mostrava a mensagem
+
+Trying to mount root from zfs... e parava
+E ao teclar enter ele entra no prompt sem senha e morre.
+
+Então restaurei o snapshot de quando funcionava para tentar resolver.
+
+Caso tenha dificuldades criarei outro servidor mas sem usar o ZFS e sim o UFS
+
+Restaurando o Snapshot
+
+Acessar o site de administração da DO
+- Abrir a droplet
+- Snapshots
+- No snapshot desta droplet clicar em More
+- Restore droplet
+- Confirmar e aguardar
+
+Não funcionou. Não removeu o servidor existente. O erro continuou.
+
+Então destrui o servidor atual e criei outro usando o Snapshot no Rebuild 
+
+Create - Droplet
+Snapshot
+
+Não deu. Destrui e destruirei o snapshot.
+
+Vou criar m novo com FreeBSD mas usando UFS.
+
+

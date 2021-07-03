@@ -1,0 +1,8 @@
+Melhorar a segurança da memória compartilhada
+
+Edite o fstab e adicione a linha ao final. 
+Somente após o reboot terá efeito:
+
+nano /etc/fstab
+tmpfs     /run/shm     tmpfs     defaults,noexec,nosuid     0     0
+

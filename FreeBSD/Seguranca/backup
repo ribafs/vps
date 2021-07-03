@@ -1,0 +1,24 @@
+Atualização e backup são as medidas mais importantes em termos de segurança
+
+Efetuar backup frequente do servidor
+
+Efetuar Backups é uma das medidas mais importantes em termos de segurança, pois mesmo que o site tenha sido inteiramente destruído, se você tiver um backup confiável poderá em pouco tempo colocar seu site de volta.
+Tenha um planejamento para backup e restore. Mantenha várias cópias do site (todos os arquivos e o banco) e faça testes locais de restauração. 
+Como você nunca sabe quando um ataque pode acontecer então faça backup e vários. 
+Faça backup full do site com muita frequência: simplebackup e akeba backup ajudam (mas apenas para sites abaixo de 100MB, acima disso faça um backup manual). 
+Guarde não apenas uma cópia do backup, mas várias, pois pode ser que a última esteja comprometida ou corrompida. 
+Idealmente faça teste de restauração do site em micro local para se certificar logo após o backup. 
+
+
+Backup com dd
+
+dd if=/dev/ad0 of=/dev/fd0/bootsector.bin bs=512 count=1
+
+Usando tar
+tar xzvf - /home/ | ssh machine2 "cat > machine1-homes.tgz"
+
+Remoto
+rsync -av . remote:/home/docs/
+
+
+

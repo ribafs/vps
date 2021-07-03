@@ -1,0 +1,118 @@
+O FreeBSD tem muitos laços diretos com sua herança Unix. BSD, ou Berkeley Software Distribution, foi uma distribuição de Unix criada na Universidade da Califórnia, Berkeley, que estendia o conjunto de características do sistema operacional Unix da AT&T e tinha condições de licenciamento agradáveis. Mais tarde, foi decidido tentar substituir o quanto possível o sistema operacional original AT&T com alternativas de código aberto de forma que os usuários não fossem obrigados a obter uma licença AT&T para utilizar o BSD. Eventualmente, todos os componentes do Unix AT&T original foram reescritos sob a licença BSD e portados para a arquitetura i386 como 386BSD. O FreeBSD foi bifurcado a partir desta base em um esforço para manter, melhorar, e modernizar o trabalho que já existia, e eventualmente foi realocado em uma versão incompleta chamada BSD-Lite por causa dos problemas de licenciamento.
+
+Através do processo moroso e multi estágio de derivação, o FreeBSD se tornou livre em termos de licenciamento, mas mantendo laços muito próximos com seu passado. Os desenvolvedores que trabalham para criar o sistema se mantiveram investindo na forma Unix de fazer as coisas, provavelmente porque o FreeBSD sempre foi concebido para funcionar como um clone do Unix com licença aberta. Estas raízes influenciaram a direção de futuros desenvolvimentos.
+
+A equipe do FreeBSD desenvolve o kernel e o sistema operacional básico como uma unidade coesa, enquanto o Linux tecnicamente refere-se ao kernel, com os outros componentes vindos de uma variedade de fontes.
+
+O FreeBSD mantém um núcleo inteiro de sistema operacional. O kernel e uma coleção de software, muitos dos quais são criados pelos próprios desenvolvedores do FreeBSD, são mantidos como uma unidade. Não é simples trocar componentes que são parte desta coleção central porque ela é, nesse sentido, um conjunto monolítico de software. Isto permite à equipe do FreeBSD gerenciar muito de perto o sistema operacional principal, garantindo total integração e mais previsibilidade. 
+
+Enquanto a maioria das distribuições Linux fornecem somente pacotes binários pré-compilados do software suportado na distribuição, o FreeBSD contém tanto pacotes pré-compilados quanto um sistema de construção para compilação e instalação a partir do código-fonte. Para a maioria dos softwares, isto permite a você escolher entre os pacotes pré-compilados, construídos com padrões razoáveis, e a capacidade de personalizar seu software durante o processo de compilação, construindo-o por sua conta. O FreeBSD faz isto através de um sistema que ele chama de "ports".
+
+O sistema de port do FreeBSD é uma coleção de software que o FreeBSD sabe como construir. Uma hierarquia organizada representando este software está disponível dentro do diretório /usr/ports, onde os usuários podem aprofundar para diretórios de cada aplicação. Estes diretórios contêm alguns arquivos que especificam a localização onde os arquivos fontes podem ser obtidos, bem como instruções para o compilador sobre como corrigir adequadamente os fontes para trabalhar corretamente com o FreeBSD.
+As versões empacotadas de software são, na verdade, produzidas a partir do sistema de ports, fazendo do FreeBSD uma distribuição que prioriza os fontes e que possui pacotes disponíveis por conveniência. Seu sistema pode ser composto de softwares pré-empacotados e construídos através dos fontes, e o sistema de gerenciamento de software pode manipular adequadamente uma combinação destes dois tipos de métodos de instalação.
+
+Um ponto relacionado que pode causar alguma confusão é que o shell padrão no FreeBSD não é o bash. Em vez disso, o FreeBSD utiliza o tcsh como seu shell padrão.
+Este shell é uma versão melhorada do csh, que é o C shell desenvolvido para o BSD. O shell bash é um componente GNU, fazendo-o uma escolha pobre com um padrão para o FreeBSD. Embora ambos os shells geralmente funcionem de maneira semelhante na linha de comando, os scripts não devem ser feitos em tcsh. Utilizar o Bourne shell básico sh é mais confiável e evita algumas das armadilhas bem documentadas associadas com tcsh e scripts em csh.
+
+No Linux, os executáveis estão tipicamente localizados nos diretórios /bin, /sbin, /usr/sbin, ou /usr/bin, dependendo do seu propósito e quão essenciais eles são para a funcionalidade central. O FreeBSD reconhece estas diferenças, mas também impõe outro nível de separação entre os componentes instalados como parte do sistema operacional e aqueles instalados como ports. O software base de sistema reside em um dos diretórios acima. Quaisquer programas que estejam instalados como um port ou pacote são colocados dentro de /usr/local/bin ou /usr/local/sbin.
+
+O diretório /usr/local contém uma estrutura de diretórios que geralmente replica a estrutura encontrada no diretório / ou /usr. Quase todas as configurações para ports é feita através de arquivos localizados em /usr/local/etc enquanto que a configuração do sistema base é mantida em /etc como usual. Isto torna fácil reconhecer quando uma aplicação é parte do sistema de ports e ajuda a manter o sistema de arquivos limpo.
+
+BSD began as a set of software add-ons to AT&T’s Sixth Edition UNIX.
+
+Over the years, BSD developers split off on their own development path, rewriting software with the intention of replacing all AT&T copyrighted code.
+
+In the early 1990s, AT&T’s UNIX System Laboratories sued BSD developers (Berkeley Software Design, Inc.) for copyright infringement.
+
+Although the lawsuit was eventually settled (with only a few files needing to be changed from the BSD code), the Linux operating system was able to become a
+leader of open source software development while questions surrounding free BSD were being threshed out.
+
+In 1995, the final version of BSD from Berkeley was released under the name 4.4BSD-Lite, release 2. Today’s BSD operating systems, including FreeBSD, NetBSD, and OpenBSD, are all based to some extent on 4.4BSD-Lite.
+
+
+Health Check: FreeBSD - "The unknown giant"
+by Richard Hillesley
+
+FreeBSD is the most accessible and popular of the BSDs, has code at the heart of Darwin and Apple's OS X, and has powered some of the more successful sites on the Web, including Hotmail, Netcraft and Yahoo!, which before the rise of Google was the busiest site on the internet.
+
+FreeBSD rose from the ashes of 386BSD, the original effort to port BSD to the Intel chip, and claims a code lineage that reaches back to Bill Joy's Berkeley Software Distribution of the late seventies. The 386BSD port was begun in 1989 by Bill and Lynne Jolitz, and was destined to be the original free Unix-like operating system for the IBM PC. The first public release of 386BSD (Version 0.0) was on St. Patrick's Day, 1991, accompanied by a series of articles in Dr Dobbs journal, which documented the process.
+
+The first functional release of 386BSD was Version 0.1, which was released on Bastille Day, 1992.
+
+FreeBSD emerged in 1993, after the self-imposed task of supporting 386BSD on their own had proved too much for Bill and Lynne Jolitz. The patchkit which had been the underpinning for the BSD port to the 386 was revived and became the basis for the first FreeBSD release.
+A rose is a rose
+
+FreeBSD is Unix by any other name, and is admired and trusted by sysadmins and programmers around the world for its solidity and strength, and is also used internally by government agencies and many technology companies, as a developer and server platform. Cisco, for instance, maintains its own internal FreeBSD distribution for use in its next generation networking products. The advantage over Linux for such companies is that the BSD license is permissive, and allows companies to incorporate proprietary code and protect their 'IP', while taking advantage of the virtues of open source software.
+
+For legal reasons FreeBSD cannot call itself Unix, but for much of its history, (with a code revision history stretching back to 1978), FreeBSD could claim to be the most sophisticated and technically advanced Unix-like operating system available on commodity servers running Intel or AMD chips.
+
+During the nineties FreeBSD established itself in many sectors as the server operating system for web and ftp servers. It was known for its speed, reliability and years of uptime for the likes of Yahoo! and Walnut Creek, who were serving up terabytes of data before and during the dotcom boom. This period culminated in the release of FreeBSD 4.0, which was widely known as the most sturdy and reliable of server platforms.
+
+The tradition continues. Although the BSDs have never received the publicity or support that Linux has found among industry leaders such as IBM or HP, they can still claim to rival Linux among certain classes of user, with Unix roots and a healthy craving for the old-fashioned virtues of security and reliability. FreeBSD remains a favoured operating system for web hosting services. In Netcraft's survey of the most reliable Web hosting companies for May 2009 FreeBSD was the host operating system for three of the top five.
+
+But just as FreeBSD has always found a natural home on ftp and web servers, FreeBSD also forms a large part of the underlying code for millions of desktop operating systems (courtesy of Apple's OS X), runs Linux applications natively (courtesy of a Linux binary compatibility layer), and is often used as a developer workstation on laptops or PCs.
+
+The devil is in the daemon, and in Apple's choice of Darwin as the name for the evolutionary version of OS X. The two horned devil which is the BSD mascot is sometimes known as Beastie, (which is supposed to sound like BSD when said quickly), and was chosen to represent the smooth operation of the daemons or background processes that run on BSD servers, but – if we are to believe the tale of the Daemon and the Texan, which first appeared on Usenet circa 1989 and told of the encounter between Linda Branigan and a Texan – not everyone gets. it. The Texan took exception to the Beastie on her t-shirt and asked,
+
+"Does the government use these devil computers?" 
+
+Cometh the hour
+
+The BSDs owe their existence to Bill Joy, the former luminary of Sun Microsystems, who wrote vi, NFS and the C Shell while he was a graduate student at Berkeley in the seventies. He was also the main contributor to BSD Unix, the Unix that was better than Unix (which for much of its history was funded by DARPA, which also funded MIT's AI Lab, out of which the free software movement later evolved), and wrote the BSD TCP/IP stack which became a staple of many operating systems, including some versions of Windows.
+Bill Joy
+
+As John Gage, his fellow Berkeley student and later Sun employee, told it, "BBN had a big contract to implement TCP/IP, but their stuff didn't work, and Joy's grad student stuff worked. So they had this big meeting and this grad student in a T-shirt shows up, and they said, 'How did you do this?' And Bill said, 'It's very simple - you read the protocol and write the code.'"
+
+Joy's contribution to BSD, and the evolution of BSD itself have been heavily mythologised, but Berkeley led the way for much of what came later, and BSD became the underpinning for several proprietary flavours of Unix, including SunOS, DEC Ultrix, and NextStep, which later metamorphosed through several incarnations into Apple's OS X. The first port of a free version of BSD to an Apple computer, MacBSD, was released in 1993, and later merged with NetBSD.
+
+In 1985, Bill Joy said that "Just about every computer on the market today runs Unix, except the Mac (and nobody cares about it)." These days the opposite would probably be closer to the truth.
+
+Despite the widespread myth that the core of OS X is FreeBSD, OS X does not use the FreeBSD kernel, but takes elements of FreeBSD such as the network stack, VFS, and subsystems for file handling and inter-process communications, and sits them on top of a Mach kernel.
+
+Apple has employed members of the FreeBSD community, notably Jordan Hubbard, one of the founders of the project, who is now "Director of Engineering of Unix Technologies" at Apple, and notwithstanding some misunderstandings, Apple has donated code back to FreeBSD via Darwin and/or the APSL (Apple Public Source License).
+Light and darkness
+
+But for the early matter of the legal dispute over the ownership of the rights to the BSD code between USL and BSDi the path of FreeBSD and open source Unix has been a tale of steady progress from release to evolutionary release, bolstered by the support of Apple, considerable success with web hosting companies and the manufacturers of networking devices, and the technical support for TrustedBSD from government agencies such as DARPA and the NSA.
+
+The court case has been likened to SCO's dispute with Linux users, and was ultimately significant in that it clarifed the right of the BSDs to build on the work of BSDi. AT&T's Unix System Laboratories (USL) had sued BSDi and the Regents of the University of California in 1992 for distributing USL's 'Intellectual Property' in the form of the 4.3BSD-Lite (Net-2) release. 4.3BSD-Lite was at the heart of FreeBSD's first two releases.
+
+The case was settled out of court in early 1994, with the removal of three files from the 18,000 that were included in 4.3BSD-Lite. As part of the agreement Berkeley released 4.4BSD-Lite, which was incomplete, and the FreeBSD project was forced to re-engineer its base operating system, resulting in the FreeBSD 2.0 release of early 1995.
+
+The terms of the settlement were secret but a copy, dated 2/4/1994 PDF, was unearthed by a Groklaw contributor in 2004. The case ended in triumph, in so much as the judge expressed doubt about the validity of USL's 'IP' and the code that constituted 4.3BSD-Lite was put in the clear, but was undoubtedly a setback, which some have claimed, slowed the uptake of BSD and opened the way for the prodigious growth of Linux. 
+
+Freedom is indivisble
+
+Although FreeBSD hasn't had the public impact or profile of Linux it has grown steadily, as "the unknown giant among free operating systems", and is probably as healthy as it has ever been, offering the traditional virtues that are often associated with Linux, such as price/performance, security and stability on commodity platforms running Intel or AMD Processors, or tucked away quietly on widely used networking devices from the likes of Cisco, Juniper, Force10, and NetApp.
+
+The BSD license has an idealistic and permissive relationship with the code. Third parties can take the code, repackage it, and pass it on in any form they wish without any obligation to feed code changes back to the community. BSD users argue that freedom is indivisible and the user should be able to do as he or she wishes with the code. In the words of Benjamin Franklin:
+
+"Those who would give up essential Liberty, to purchase a little temporary Safety, deserve neither Liberty nor Safety."
+
+A natural corollary of this is that the code can be recycled in any form, proprietary or free, as long as the original attribution is preserved. This position has benefits and drawbacks, depending on your point of view, but from the perspective of those that advocate BSD licensing, reflects a faith in the better side of human nature - and if some parties appropriate the code for proprietary ends, so be it. Such is the price of freedom.
+Free as in beer
+
+The license has had some advantages for the BSDs. Despite the many proven commercial benefits of the GPL, BSD was able to absorb the advanced features of DTrace and ZFS when Linux couldn't, because Sun's CDDL open source license is not compatible with the GPL. Such is the price of staying free, a GPL advocate might say.
+
+Licensing is a divisive issue, but is the core difference between the philosophies of the BSD and GNU/Linux communities, and is one of the reasons why GNU/Linux, and not FreeBSD, has been adopted as the universal operating system among the former Unix companies, because commonality, interoperability and continuity of the software are useful side effects of the GPL.
+
+Where FreeBSD has been adopted by manufacturers it has tended to be used for networking devices or specialist applications that exploit the high performance characteristics of the operating system, or in some cases, because manufacturers can exploit the virtues of 'open source' and free "as in beer" software and still ensure protection of their 'IP', which BSD advocates would argue is an intended benefit of the license.
+
+FreeBSD is not just a kernel, but an operating system, and the FreeBSD community, which is tightly knit and democratic, oversees all the software that constitutes a FreeBSD operating system, including the more than 21,000 packages contained in the ports system, which is roughly equivalent to Debian's package management system, and consists of software that has been developed outside the project. Just as BSD code finds its way into Linux distributions, FreeBSD uses KDE or Gnome and other software written for Linux. The FreeBSD community can be likened, in its focus on technical excellence and quality and the structure of its packaging system, to the Gentoo and Debian communities in the Linux world.
+
+Coincidently, Gentoo has a version of its operating system that uses the FreeBSD kernel, and the Debian project announced last year that its own distribution based on the FreeBSD kernel would be given official slots in Debian's experimental and unstable directories. Both projects have preferred to retain the GNU userland in preference to FreeBSD's userland tools.
+
+Debian GNU/kFreeBSD is described as "a port that consists of GNU userland using the GNU C library on top of FreeBSD's kernel, coupled with the regular Debian package set," and will make for interesting comparisons as the project matures.
+Winning the game
+
+The latest release of FreeBSD is version 8.0, released in November 2009, and follows the FreeBSD tradition of bringing new and stable features to a fast and robust platform. FreeBSD 8.0 offers enhanced virtual hosting with Jail v2 and network stack virtualisation courtesy of VIMAGE, Xen Domu support and VirtualBox, a new USB stack, and enhanced Dtrace and ZFS support.
+
+FreeBSD may not have acheived the giddy heights of Linux in the public imagination, but is secure in its own substantial community of users, has been ported to a variety of architectures, and has spawned a number of offshoots, derivatives and forks, (of which the best known are probably DragonFly BSD and PC-BSD, which is aimed at the desktop user, features a super-friendly package installer, and has won awards for user friendliness).
+
+But winning the game has never the primary issue for the FreeBSD developers. FreeBSD contributor and author of Absolute FreeBSD, Michael Lucas says:
+
+"Competition doesn't really enter into it for most of us ... You don't see FreeBSD developers sitting in a smoke-filled room plotting the overthrow of Microsoft. We sit in light, airy rooms and plot where to get the best drinks."
+
+For other feature articles by Richard Hillesley, please see the archive.
+
+http://www.h-online.com/open/features/Freedom-is-indivisble-920301.html
+

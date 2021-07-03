@@ -1,0 +1,59 @@
+Instalação do Plone
+
+Criar script perms
+
+sudo usermod -aG apache ribafs
+
+sudo nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+find /var/www/html/$1/ -type d -exec chmod 775 {} \;
+find /var/www/html/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/html/$1/ -type f -exec chmod 664 {} \;
+chown -R ribafs:apache /var/www/html/$1/
+echo "";
+echo "Concluído!";
+
+sudo chmod +x /usr/local/bin/perms
+
+cd /var/www/html
+
+sudo dnf install wget
+
+wget https://downloads.joomla.org/cms/joomla3/3-9-24/Joomla_3-9-24-Stable-Full_Package.zip?format=zip
+mv Joomla_3-9-24-Stable-Full_Package.zip?format=zip j.zip
+
+sudo dnf install unzip
+
+unzip j.zip
+rm j.zip
+
+sudo ~/perms
+
+ls -la
+
+mysql -uroot -p
+
+CREATE USER 'ribafs_us' IDENTIFIED BY 'senhaforte';
+
+CREATE DATABASE `ribafs_db` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT CREATE, INSERT, UPDATE, SELECT, DELETE, DROP ON `ribafs_db`.* TO `ribafs_us`@localhost IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+\q
+
+Teste
+
+mysql -uribafs_us -p
+
+Instalar o Joomla no /var/www/html
+
+Abrir o navegador com este virtualhost ou domínio
+
+https://ribafs.me
+
+Se mostrar o código criar o configuration.php
+Remover o installation quando solicitado. 
+

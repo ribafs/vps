@@ -1,0 +1,5 @@
+nano /etc/hosts
+
+::1                     localhost localhost.ceph ceph
+127.0.0.1               localhost localhost.ceph ceph
+108.61.178.110          ceph.domain1.com       ceph

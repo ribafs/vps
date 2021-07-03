@@ -1,0 +1,178 @@
+Instalar um site em Joomla na pasta /var/www/html/portal
+
+IP do Servidor -  138.68.176.116
+IP do trabalho - 177.14.224.187
+
+== Enviar o arquivo de backup criado pelo Akeeba Backup do desktop para a pasta /tmp do servidor
+
+Este site será instalado no raiz /var/www/html/portal
+
+No desktop copiar os dois arquivos (portal.zip e portal.sql) para a pasta /home/ribafs
+scp -P porta portal* ribafs@138.68.176.116:/tmp
+
+No servidor
+cd /tmp
+
+
+== Criar o banco e um usuário dono dele
+
+mysql -uroot -p
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION;
+\q
+
+mysql -uroot -p portal < portalxxx.sql
+
+
+== Descompactar o arquivo
+
+cd /tmp
+
+unzip portal*.zip -d /var/www/html/portal
+
+
+== Ajustar permissões do /var/www/html/portal
+
+nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+chown -R www-data:www-data /var/www/html/$1;
+find /var/www/html/$1 -type d -exec chmod 755 {} \;
+find /var/www/html/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+	
+chmod +x /usr/local/bin/perms
+
+Executando no diretório /var/www/html/portal
+perms portal
+
+Executando no diretório /var/www/html
+perms
+
+Executo sempre que faço alguma alteração como root no /var/www/html
+
+
+== Ajustes no php.ini
+
+nano /etc/php/7.0/fpm/php.ini
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+
+
+Efetuar ajustes no /var/www/html/portal/configuration.php se necessário.
+
+
+== Instalar o site em
+
+Ajustar para o Joomla
+
+nano /etc/nginx/sites-available/default
+
+Altere o location / para
+
+       location /portal {
+                autoindex on;
+                try_files $uri $uri/ /portal/index.php?$args;
+       }
+
+
+service nginx restart
+
+http://159.65.91.104/portal
+
+Acusou erro
+An error occurred while restoring the database. The error message can be found below. Click on the × button at the top right of this dialog message to close it and return to the database restoration page.
+
+Database server error reply:
+ErrNo #1071
+
+Specified key was too long; max key length is 767 bytes
+ SQL=CREATE TABLE `mxj6w_akeeba_common` (   `key` varchar(192) COLLATE utf8mb4_unicode_ci NOT NULL,   `value` longtext COLLATE utf8mb4_unicode_ci NOT NULL,   PRIMARY KEY (`key`) ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+
+
+== Vou tentar um backup feito com o simplebackup
+
+enviarei os dois arquivos, o zip e o sql
+
+Criarei novamente o banco e importarei o script assim
+
+mysql -u root -p < portal.sql
+
+rm -rf /var/www/html/portal
+
+cd /tmp
+unzip portal.zip -d /var/www/html/portal
+
+http://138.68.176.116/portal
+
+Funcionou legal.
+
+
+== Criar outro site instalando o WordPress
+
+Criar o banco e o user
+
+mysql -uroot -p
+create database blog;
+GRANT ALL PRIVILEGES ON blog.* TO blog@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+\q
+
+cd /tmp
+wget -c https://br.wordpress.org/wordpress-4.9.4-pt_BR.zip
+
+unzip wordpress* /var/www/html
+mv /var/www/html/wordpress /var/www/html/blog
+
+perms blog
+
+
+== Instalar
+
+http://138.68.176.116/blog
+
+Instalou normalmente
+
+service nginx restart
+
+nano /etc/php/7.0/fpm/php.ini
+
+Mudar
+output_buffering = Off
+
+service php7.0-fpm restart
+service nginx restart
+
+
+== Redirecionar acesso ao raiz para /portal
+
+Removi index.html e i.php do raiz
+rm /var/www/html/i.*
+
+nano /var/www/html/index.php
+
+<?php
+header('location: portal');
+
+
+Depois de testado o site e configurado novamente para proteger o administrator com SSL
+então efetuar um backup full para guardar. Usarei o componente SimpleBackup
+
+
+== Backup e Restore
+
+Agora faça um backup completo com o akeeba e quando terminar restaure por exemplo para a pasta
+/var/www/html/portal2
+
+Crie o banco portal2, pode ser o mesmo user e senha
+
+Restaure pela web:
+
+http://138.68.176.116/portal2
+
+== Agora implementar a autenticação
+

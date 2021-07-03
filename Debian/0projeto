@@ -1,0 +1,65 @@
+Servidor no Linode com Debian 10
+
+1 CPU Core
+
+25 GB Storage
+
+1 GB RAM
+
+172.104.212.250
+
+ssh root@172.104.212.250
+	
+ssh -t ribafs@lish-newark.linode.com ubuntu
+
+
+DNS
+
+SOA Record
+Primary Domain	Email	Default TTL	Refresh Rate	Retry Rate	Expire Time	
+ribamar.net.br
+	
+ribafs@gmail.com
+	
+Default
+	
+Default
+	
+Default
+	
+Default
+	
+NS Record
+Name Server	Subdomain	TTL	
+ns1.linode.com
+	
+ribamar.net.br
+	
+Default
+	
+ns2.linode.com
+	
+ribamar.net.br
+	
+Default
+	
+ns3.linode.com
+	
+ribamar.net.br
+	
+Default
+	
+ns4.linode.com
+	
+ribamar.net.br
+	
+Default
+	
+ns5.linode.com
+	
+ribamar.net.br
+	
+Default
+	
+MX Record
+Mail Server	Preference	Subdomain	TTL

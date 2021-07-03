@@ -1,0 +1,30 @@
+Instalar um novo servidor
+Vinculado ao cipi-server
+
+Para instalar seu servidor:
+
+     Use um VPS limpo com Ubuntu Server 18.04 LTS ou 20.04 LTS
+     Faça login em seu VPS via SSH (como root):
+     ssh root@159.89.104.97
+
+     Execute este comando:
+     wget -O - http://159.89.10.166/sh/go/cbc841cfc508e95aaaa54aaebf60b150b92a6ead | bash
+
+     A instalação pode demorar até dez minutos dependendo da velocidade de conexão do seu servidor com a internet
+
+     Requisitos de hardware: 
+     - mínimo de 1 GB de disco rígido livre 
+     - pelo menos 1 processador central 
+     - 512 MB ou mais de RAM 
+     - 1 endereço IPv4 público
+
+     Abra as portas 
+     - 22, 
+     - 80 e 
+     - 443 do seu firewall para instalar o Cipi
+
+     Cipi não funciona com NAT VPN e OpenVZ ou em localhost
+
+     AWS desativa o login root por padrão. Para obter privilégios de root, faça o login como usuário padrão e use o comando 'sudo -s'
+
+    

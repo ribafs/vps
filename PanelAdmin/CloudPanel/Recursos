@@ -1,0 +1,76 @@
+Dashboard
+- Informações sobre o servidor
+- Gráficos em tempo real: CPU, RAM, HD, Carga
+
+Domínios
+- Editor de VHost - https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/domains#vhost. Frontend - Domain - Clicar no domínio - VHost
+- Configurações do PHP https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/domains#php-settings  Frontend - Domain - Clicar no domínio - PHP Settings
+- Autenticação Básica - https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/domains#basic-auth  Frontend - Domain - Clicar no domínio - Basic Auth
+- Visualização de Logs - https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/domains#logs  Frontend - Domain - Clicar no domínio - Logs 
+- Free SSL Certificates - https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/domains#ssl-certificates  Frontend - Domain - Clicar no domínio - SSL Certificates
+
+Segurança
+
+Frontend - Security (Bloquei de IP e de alguns bots, podendo adicionar outros)
+
+Usuários
+
+SSH/SFTP
+
+Bancos de Dados
+
+Podemos criarnovos bancos de dados via web e estarão disponíveis imeriatamente
+
+Frontend - Databases (Host: 127.0.0.1, mas podemos adicionar bancos de hosts externos): 
+
+Nome, user e senha
+Não usar _ nos nomes do banco nem do user
+
+Para acessar o banco via phpmyadmin
+Frontend - Databases - phpMydmin
+https://192.168.33.10:8443/phpmyadmin/index.php
+
+Backup
+
+Frontend - Databases - clicar no nome do banco - 
+Para todos os bancos de dados são criadas cópis de segurança toda noite
+Após a criação do backup podem ser baixados via CloudPanel
+Podemos criar backup de um ou de todos os bancos com o CLI e também restaurar 
+https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/databases#database-backups
+
+Cron Jobs
+Podemos criar cron jobs usando templates para rodar um script a cada minuto, 5 minutos ou outros horários
+https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/cron-jobs
+
+Serviços
+
+Frontend - Services - podem ser reiniciados com um único clique
+https://www.cloudpanel.io/docs/cloudpanel-ce/frontend-area/services
+
+
+
+CloudPanel usa componentes leves como NGINX, PHP-FPM e MySQL para desempenho máximo.
+Debian
+Nginx
+PHP-FPM
+MySQL
+Redis
+Node.js
+ProFTPd    
+
+Templates para aplicativos populares
+
+- CakePHP
+- Laravel
+- Symfony
+- Drupal
+- Joomla
+- Type 3
+- WooCommerce
+- Wordpress
+- Magento
+- Shopware
+- OROCommerce
+- Neos
+- Nextcloud
+

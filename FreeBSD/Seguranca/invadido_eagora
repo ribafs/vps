@@ -1,0 +1,65 @@
+E se o site foi invadido?
+Devemos sempre prevenir. Mas e se acontecer de o site ser invadido, o que fazer?
+- Mantenha o site offline para evitar outros ataques 
+- Baixe a última versão do Joomla 
+- Notifique o suporte do servidor e trabalhe com ele para fazer a limpeza do site e para ter certeza de que não ficou nenhum back door no site. 
+- Visite novamente o site das vulnerabilidades e veja se você ainda tem alguma extensão vulnerável 
+- Mude todas as senhas e se possível logins: cPanel, mysql, FTP, joomla Super Admin, etc. 
+- Substitua todos os templates e arquivos por cópias limpas 
+- Verifique atentamente os arquivos de log 
+- Verifique o cron se tem alguma entrada estranha
+- Preferivelmente remova todo o conteúdo adicionado e todos os bancos e todos os e-mails para criar tudo novo 
+- Restaure com backups bem antes do ataque 
+- Confira as permissões de todos os arquivos. Nunca use 777, somente 644 para arquivos e 755 para diretórios 
+- Caso tenha acesso via SSH execute os comandos a seguir para sanear os arquivos: 
+find /home/joao03/public_html/site -type f -exec chmod 644 {} \; 
+find /home/joao03/public_html/site -type d -exec chmod 755 {} \;
+
+Quando temos um site invadido, existe uma grande chance do invasor ter deixado backdoors para poder voltar depois. A procura pelos backdoors é algo demorado e trabalhoso, inclusive sem garantia, por isso é mais prudente remover tudo e instalar do zero, sem contar a hipótese de mudar de servidor, caso suspeite da fragilidade da sua hospedagem.
+
+Para checar os arquivos recentemente alterados no sistema
+find \public_html -ctime -1
+
+Para proteger diretórios que precisam de premissão 777 ou por default
+Crie um .htaccess no diretório images com: 
+# secure directory by disabling script execution 
+AddHandler cgi-script .php .pl .py .jsp .asp .htm .shtml .sh .cgi 
+Options -ExecCGI 
+
+
+Varrer Servidor
+Faça uma varredura em todos os sites/máquinas a procura de malware, virus, trojans, spyware, etc. 
+* Opções disponíveis: 
+- ENOD32 from eSet 
+- Spybot Search and Destroy 
+- Malwarebytes 
+- Microsoft Malicious Software Removal Tool 
+- Linux AntiVirus boot cd 
+* Considere o Ultimate Boot CD para Windows
+
+O que é uma extensão vulnerável? 
+- É uma extensão que contém ou contribui para uma vulnerabilidade de segurança. 
+- Quanto mais complexo for seu código maior a chance de ser vulnerável. 
+- As que lêem e escrevem arquivos 
+- Se não valida entradas de usuários 
+- Usam path explícito 
+- Permite acesso direto pela URL 
+- Permite inclusão de arquivos remotos 
+- Permite SQL injections 
+- Permite XSS 
+- Permite muito acesso a banco para usuários sem privilégios 
+
+Extensões vulneráveis são, não necessariamente extensões com código malfeito. 
+Projetos ativos geralmente lançam novas versões de suas extensões com as alterações. 
+Por estas razões é importante: 
+- Conhecer o número da versão de todas as extensões instaladas 
+- Use somente a última versão estável das extensões 
+- Desinstale e remova completamente todos os arquivos de extensões inseguras
+Caso a última versão estável tenha sido lançada há um ano ou mais considere o projeto abandonado. Não instale extensões antigas. 
+
+Fórum de Ajuda do Google para Webmasters 
+•.Aprenda com outros usuários
+•.Otimização do mecanismo de pesquisa 
+Aprimore o desempenho do seu site em pesquisas [PDF]
+•.Ferramentas de terceiros para Sitemaps 
+Ferramentas para a criação de Sitemaps

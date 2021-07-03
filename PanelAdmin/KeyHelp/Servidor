@@ -1,0 +1,81 @@
+KeyHelper - servidor principal
+
+Criar servidor com Debian 10
+
+Após criar atualizar o domínio ribamar.net.br com o novo IP
+
+Servidor pequeno
+1GB de RAM
+25GB de disco
+root - zmxnxxxxzzzyyyS@
+IP - 45.79.195.21
+
+Primeiro acesso
+
+ssh root@45.79.195.21
+
+1) Atualizar
+
+apt update && apt upgrade -y && reboot
+
+2) Criar usuário e copiar a chave do SSH para ele e add grupo do Apache e ao do sudo
+
+adduser ribafs
+adduser ribafs sudo
+
+Copiar chave do SSH do root para o ribafs com rsync
+
+apt install rsync
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+3) Otimizar SSH
+
+AGORA NÂO
+
+nano /etc/ssh/sshd_config
+
+Porta 55522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+X11Forwarding no
+AllowUsers ribafs
+
+# AllowGroups administradores
+# DenyUsers joao pedro
+
+MaxAuthTries 3
+Isso significa que após 3 tentativas incorretas de senha, a sessão será encerrada. Isso é útil, especialmente quando você deseja bloquear scripts / programas robóticos que tentam obter acesso ao seu sistema.
+
+service ssh restart
+
+4) Configurar o ufw
+
+AGORA nÂO
+
+apt install ufw
+
+O site https://meuip.com.br/ é um dos que mostra online o IP para quem usa em seu desktop internet ADSL como eu
+
+138.122.83.55
+
+ufw allow 80
+ufw allow 443
+ufw allow from 138.122.83.55 to any port 65522
+ufw enable
+ufw status
+
+Remover regra
+
+ufw status numbered
+ufw delete 4
+
+5) Ajustar timezone (America, Fortaleza)
+
+dpkg-reconfigure tzdata
+
+exit
+
+Instalar o keyhelp
+

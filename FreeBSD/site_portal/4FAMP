@@ -1,0 +1,239 @@
+FAMP
+
+== Apach
+
+sudo pkg search apache24
+
+sudo pkg install -y apache24
+
+user - www
+group - www
+
+sudo sysrc apache24_enable=yes
+
+sudo service apache24 start
+
+Testar
+
+http://46.101.50.99
+
+Configurações
+
+sudo nano /usr/local/etc/apache24/httpd.conf
+
+ServerAdmin ribafs@gmail.com
+
+ServerName www.ribafs.org
+
+Rotação de logs, a cada 10.000 requisições gerar em torno de 1MB de log
+ErrorLog "|/usr/local/sbin/rotatelogs /var/log/httpd-mysite-error-log 86400"
+
+mod_rewrite, descomentar a linha
+LoadModule rewrite_module libexec/apache24/mod_rewrite.so
+
+Mudar none para All
+
+Checar
+DocumentRoot "/usr/local/www/apache24/data"
+
+Checar sintaxe
+
+apachectl configtest
+
+sudo service apache24 restart
+
+ou
+sudo apachectl restart
+
+Logs
+/var/log/httpd-error.log
+/var/log/httpd-access.log
+
+
+== Instalar php7.1
+
+sudo pkg install -y php71 mod_php71 php71-gd php71-mbstring php71-mysqli php71-xml php71-curl php71-tidy php71-ctype php71-tokenizer php71-simplexml php71-dom php71-session php71-iconv php71-hash php71-json php71-fileinfo php71-bcmath php71-zip php71-zlib php71-openssl pkg install php71-pecl-memcached php71-pecl-APCu php71-curl php71-openssl
+
+Após a instalação aparece
+
+The 2.7.x series now uses the new subpixel hinting mode (V40 port's option) as
+the default, emulating a modern version of ClearType. This change inevitably
+leads to different rendering results, and you might change port's options to
+adapt it to your taste (or use the new "FREETYPE_PROPERTIES" environment
+variable).
+
+The environment variable "FREETYPE_PROPERTIES" can be used to control the
+driver properties. Example:
+
+FREETYPE_PROPERTIES=truetype:interpreter-version=35 \
+	cff:no-stem-darkening=1 \
+	autofitter:warping=1
+
+This allows to select, say, the subpixel hinting mode at runtime for a given
+application.
+
+The controllable properties are listed in the section "Controlling FreeType
+Modules" in the reference's table of contents
+(/usr/local/share/doc/freetype2/reference/ft2-toc.html, if documentation was installed).
+Message from mod_php71-7.1.15:
+
+***************************************************************
+
+Make sure index.php is part of your DirectoryIndex.
+
+You should add the following to your Apache configuration file:
+
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+*********************************************************************
+
+If you are building PHP-based ports in poudriere(8) with ZTS enabled,
+add WITH_MPM=event to /etc/make.conf to prevent build failures.
+
+
+sudo cp /usr/local/etc/php.ini-production /usr/local/etc/php.ini-production.bakup
+
+sudo ln -s /usr/local/etc/php.ini-production /usr/local/etc/php.ini
+
+sudo nano /usr/local/etc/php.ini
+
+date.timezone = America/Fortaleza
+
+service apache24 restart
+
+mostrou
+Make sure index.php is part of your DirectoryIndex.
+
+You should add the following to your Apache configuration file:
+
+<FilesMatch "\.php$">
+    SetHandler application/x-httpd-php
+</FilesMatch>
+<FilesMatch "\.phps$">
+    SetHandler application/x-httpd-php-source
+</FilesMatch>
+
+sudo nano /usr/local/etc/apache24/httpd.conf
+
+Adicionar
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+</IfModule>
+
+
+Criar
+
+sudo nano /usr/local/etc/apache24/Includes/php.conf
+
+<IfModule dir_module>
+    DirectoryIndex index.php index.html
+    <FilesMatch "\.php$">
+        SetHandler application/x-httpd-php
+    </FilesMatch>
+    <FilesMatch "\.phps$">
+        SetHandler application/x-httpd-php-source
+    </FilesMatch>
+</IfModule>
+
+sudo service apache24 restart
+
+Testar
+nano /usr/local/www/apache24/data/info.php
+
+<?php
+phpinfo();
+
+http://167.99.175.44/info.php
+
+
+== Instalar MariaDB
+
+sudo pkg search mariadb
+
+sudo pkg install -y mariadb102-server mariadb102-client
+
+user e group - mysql
+
+Após a instalação aparece:
+
+MariaDB respects hier(7) and doesn't check /etc and /etc/mysql for
+my.cnf. Please move existing my.cnf files from those paths to
+/usr/local/etc and /usr/local/etc/mysql.
+
+************************************************************************
+Message from unixODBC-2.3.4:
+
+===>   NOTICE:
+
+The unixODBC port currently does not have a maintainer. As a result, it is
+more likely to have unresolved issues, not be up-to-date, or even be removed in
+the future. To volunteer to maintain this port, please create an issue at:
+
+https://bugs.freebsd.org/bugzilla
+
+More information about port maintainership is available at:
+
+https://www.freebsd.org/doc/en/articles/contributing/ports-contributing.html#maintain-port
+Message from mariadb102-server-10.2.13:
+
+************************************************************************
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!                                                                    !!
+!! The default InnoDB storage engine is no longer XtraDB, check your  !!
+!! configuration and switch it to InnoDB                              !!
+!!                                                                    !!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+Remember to run mysql_upgrade (with the optional --datadir=<dbdir> flag)
+the first time you start the MySQL server after an upgrade from an
+earlier version.
+
+MariaDB respects hier(7) and doesn't check /etc and /etc/mysql for
+my.cnf. Please move existing my.cnf files from those paths to
+/usr/local/etc and /usr/local/etc/mysql.
+
+This port does NOT include the mytop perl script, this is included in
+the MariaDB tarball but the most recent version can be found in the
+databases/mytop port
+
+sudo sysrc mysql_enable="yes"
+sudo service mysql-server start
+
+sudo mysql_secure_installation
+
+mysql -u root -p
+
+CREATE DATABASE portal CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'portal'@'localhost' IDENTIFIED BY 'senhaforte';
+GRANT ALL PRIVILEGES ON portal.* TO 'portal'@'localhost';
+FLUSH PRIVILEGES;
+\q
+
+Outros privilégios
+ALL PRIVILEGES- como vimos anteriormente, isso daria a um usuário do MySQL todo o acesso a uma determinada base de dados (ou se nenhuma base de dados for selecionada, todo o sistema)
+CREATE- permite criar novas tabelas ou bases de dados
+DROP- permite deletar tableas ou bases de dados
+DELETE- permite deletar linhas das tabelas
+INSERT- permite inserir linhas nas tabelas
+SELECT- permite utilizar o comando Select para ler bases de dados
+UPDATE- permite atualizar linhas das tabelas
+GRANT OPTION- permite conceder ou revogar privilégios de outros usuários 
+
+== Checar vulnerabilidades
+
+pkg audit -F
+
+Após checar acusou vulnerabilidades no apache24.29
+Seguindo o link sugerido vi que foi corrigido no apache24.32 e 33
+
+Então instalei os ports e instalei o apache24.33 via ports:
+
+Usando o arquivo 6ports
+

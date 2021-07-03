@@ -1,0 +1,61 @@
+Criar um servidor com Ubuntu 20.04
+
+Acessar via SSH como root
+
+ssh root@45.56.113.182
+
+apt update && apt upgrade -y && reboot
+
+wget -O - https://cipi.sh/go.sh | bash
+
+Ao finalziar a instalação mostra os dados para acessar o cipi via SSH e Web e também do MySQL
+
+                    SETUP COMPLETE
+***********************************************************
+
+SSH root user: cipi
+ SSH root pass: odhiote3mtaxytzimmnjngi1owm1ytmz
+ MySQL root user: cipi
+ MySQL root pass: ytblyjnlnjy2zjc2mdy4ymywmja0owji
+
+ To manage your server visit: http://45.56.113.182
+ Default credentials are: administrator / 12345678
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+
+
+ssh cipi@45.56.113.182
+
+Mudar a senha do cipi
+
+
+At the end of installation process, Cipi will show some password that you have to conserve bacause Cipi will disable "root" access so the only way to SSH into your server after Cipi installation as root is using "cipi" user.
+Ele desabilitou o acesso ao root e agora quem faz isso é o user cipi
+Este usuário cipi usa sudo e faz o papel do user ribafs que geralmente crio, então não preciso criar o ribafs, mas usar o cipi para gerenciar
+
+Agora acessar
+
+http://45.79.195.125
+
+administrator / 12345678
+
+E imediatamente trocar login e senha
+
+Ao acessar aparece de vez em quando a mensagem
+
+System Error
+Ops! Something went wrong... try later!
+Mas permite o acesso e alterações nas configurações
+Sendo que não sincroniza com o servidor, pois não mostra os dados de CPU, RAM e HDD no dashboard
+
+Acessar
+
+ssh cipi@http://45.79.195.125
+
+Acessar o mysql
+mysql -ucipi -pzgmxyjy3nzcymgnkntnjzwrhmwmyyzy2
+
+API Endpoint: 
+
+http://45.79.195.125/api

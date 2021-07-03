@@ -1,0 +1,471 @@
+EMP no CentOS 8,3
+
+Nginx
+
+sudo dnf update; sudo dnf install -y nginx
+
+httpd -v
+
+Habiltiar no boot e iniciar
+
+sudo systemctl enable nginx
+
+sudo systemctl start nginx
+
+Liberar Nginx no FirewallD
+
+Não liberarei a porta 80, somente a 443
+
+sudo firewall-cmd --permanent --add-service=https
+
+sudo firewall-cmd --reload
+
+sudo firewall-cmd --permanent --list-all
+
+sudo chown ribafs:apache /var/www/html -R
+
+Verificar se foi habilitado
+
+sudo firewall-cmd --permanent --list-all
+
+Aplicar as alterações
+
+sudo firewall-cmd --reload
+
+O Nginx está instalado e funcionando. Sites estáticos já podem ser acessados.
+
+Mais a frente habilitaremos o uso do PHP e com bancos de dados PostgreSQL
+
+IP
+
+ip addr show eth0 | grep inet | awk '{ print $2; }' | sed 's/\/.*$//'
+
+Testando
+
+curl -4 localhost
+
+https://IP
+
+
+Arquivos e diretórios importantes para o Nginx
+
+Conteúdo
+
+/usr/share/nginx/html: O conteúdo Web em si, que por padrão apenas consiste na página Nginx padrão que você viu antes, é disponibilizado fora do diretório /usr/share/nginx/html. Isso pode ser alterado mudando os arquivos de configuração do Nginx.
+
+Configurações
+
+/etc/nginx: o diretório de configuração do Nginx. Todos os arquivos de configuração do Nginx residem aqui. 
+/etc/nginx/nginx.conf: o arquivo de configuração principal do Nginx. Isso pode ser modificado para fazer alterações na configuração global do Nginx. 
+/etc/nginx/conf.d/: este diretório contém arquivos de configuração de bloco de servidor, onde é possível definir os sites que estão hospedados dentro do Nginx. Uma abordagem típica é ter cada site em um arquivo separado cujo nome provém do domínio do site, como o your_domain.conf. 
+
+Logs do Nginx
+
+/var/log/nginx/access.log: cada pedido ao seu servidor Web é registrado neste arquivo de registro a menos que o Nginx esteja configurado para fazer de outra maneira. 
+/var/log/nginx/error.log: qualquer erro do Nginx será gravado neste registro. 
+
+Blocos do Servidor
+
+No Apache quando queremos hospedar dois ou mais domínios no mesmo servidor usamos virtualhosts. No Nginx usa-se blocos.
+
+No CentOS 8, os blocos de servidor são definidos em arquivos .conf localizados em 
+
+/etc/nginx/conf.d
+
+
+Adicionar um bloco para o domínio my_domain
+
+Por padrão, o Nginx no CentOS 8 está configurado para disponibilizar documentos vindos de /usr/share/nginx/html. Isso funciona bem para um único site, mas se torna difícil de gerenciar se você estiver hospedando vários sites. Em vez de modificar o /usr/share/nginx/html, vamos criar uma estrutura de diretórios dentro do /var/www para o site my_domain, deixando o /usr/share/nginx/html no lugar como o diretório padrão para ser disponibilizado se um pedido de cliente não corresponder a nenhum outro site.
+
+Criar
+
+sudo mkdir /var/www/my_domain
+
+Criaremos um novo bloco de servidor em /etc/nginx/conf.d/my_domain.conf
+
+Colar
+
+server {
+        listen 443;
+        listen [::]:443;
+
+        root /var/www/my_domain/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name my_domain www.my_domain;
+
+        location / {
+                try_files $uri $uri/ =404;
+        }
+}
+
+Salve e feche
+
+Testar a sintaxe
+
+sudo nginx -t
+
+sudo systemctl restart nginx
+
+Atualizar os contextos no SELinux, para que o Nginx possa disponibilizar o conteúdo do diretório /var/www/my_domain.
+
+O seguinte comando permitirá que sua raiz de documento personalizada seja disponibilizada como conteúdo HTTPS:
+
+chcon -vR system_u:object_r:httpd_sys_content_t:s0 /var/www/my_domain/
+
+Testando
+
+https://IP
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-centos-8-pt
+
+
+
+
+
+MariaDB
+
+sudo dnf install -y mariadb-server
+
+sudo systemctl enable mariadb
+
+sudo systemctl start mariadb
+
+mysql_secure_installation
+
+mysql -uroot -p
+
+
+PHP
+
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+
+sudo dnf module list php
+
+sudo dnf module reset php
+
+sudo dnf module enable php:remi-7.4
+
+sudo dnf install php php-fpm php-mysqlnd php-opcache php-curl php-gd php-xml php-mbstring -y
+
+php -v
+
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+sudo systemctl status php-fpm
+
+
+Reinicialização automática do Apache
+
+Se por algum motivo seu processo Apache for encerrado, você precisará executar o seguinte comando para reiniciá-lo.
+
+sudo systemctl restart httpd
+
+Em vez de digitar manualmente este comando, podemos fazer o Apache reiniciar automaticamente editando a unidade de serviço httpd.service systemd. 
+Para substituir a configuração do serviço systemd padrão, criamos um diretório separado.
+
+sudo mkdir -p /etc/systemd/system/httpd.service.d/
+
+Criar
+
+sudo nano /etc/systemd/system/httpd.service.d/restart.conf
+
+Adicione
+
+[Service]
+Restart=always
+RestartSec=5s
+
+Salve, feche e
+
+sudo systemctl daemon-reload
+
+Para testar
+
+sudo pkill httpd
+
+sudo systemctl status httpd
+
+rm /var/www/html/info.php
+
+
+Instruir o SELinux para permitir que o Apache execute o código PHP via PHP-FPM.
+
+sudo setsebool -P httpd_execmem 1
+
+sudo systemctl restart httpd
+
+sudo nano /var/www/html/info.php
+
+
+== Criar dois virtualhosts
+
+sudo mkdir -p /var/www/ribafs
+sudo mkdir -p /var/www/ribafs/log
+sudo chown -R ribafs:apache /var/www/ribafs
+
+sudo chmod -R 755 /var/www
+
+sudo mkdir -p /var/www/despertai
+sudo mkdir -p /var/www/despertai/log
+sudo chown -R ribafs:apache /var/www/despertai
+
+sudo nano /etc/httpd/conf/httpd.conf
+
+Adicione ao final do arquivo
+
+# Supplemental configuration
+#
+# Load config files in the "/etc/httpd/conf.d" directory, if any.
+IncludeOptional conf.d/*.conf
+IncludeOptional sites-enabled/*.conf
+
+Adicionar o ribafs ao grupo do Apache
+
+sudo usermod -a -G apache ribafs
+
+sudo nano /etc/httpd/sites-available/ribafs.conf
+
+sudo permsr
+
+nano /var/www/ribafs/index.html
+
+<html>
+   <head>
+     <title>Welcome!</title>
+   </head>
+   <body>
+      <h1>Welcome to ribafs.me!</h2>
+   </body>
+</html>
+
+Criar
+
+sudo nano /etc/httpd/sites-available/ribafs.conf
+
+<VirtualHost *:80>
+    ServerAdmin ribafs@gmail.com
+    ServerName ribafs.me
+    ServerAlias www.ribafs.me
+    DocumentRoot /var/www/ribafs
+    
+    <Directory /var/www/ribafs>
+        Options -Indexes -FollowSymLinks
+        AllowOverride All
+    </Directory>
+    
+    ErrorLog /var/www/ribafs/log/error.log
+    CustomLog /var/www/ribafs/log/requests.log combined
+</VirtualHost>
+
+
+aptes
+
+Ativar
+
+sudo ln -s /etc/httpd/sites-available/ribafs.conf /etc/httpd/sites-enabled/ribafs.conf
+
+Desativar
+
+unlink /etc/httpd/conf.d/mysite.com
+
+cp /etc/httpd/sites-available/ribafs.conf ~/backup
+
+Ajustando as Permissões SELinux para Virtual Hosts (Recomendado)
+
+O SELinux é um módulo de segurança do Kernel Linux, que aumenta a segurança dos sistemas Linux. O CentOS 8 vem equipado com o SELinux configurado 
+para funcionar com a configuração padrão do Apache. Como você alterou a configuração padrão configurando um diretório de log personalizado no arquivo de configuração de virtual hosts, você receberá um erro caso você tentar iniciar o serviço Apache. Para resolver isso, você precisa atualizar as políticas do SELinux para permitir que o Apache escreva nos arquivos necessários.
+
+Há diferentes maneiras de definir políticas baseadas nas necessidades do seu ambiente, uma vez que o SELinux permite que você personalize seu nível de segurança. Este passo irá abordar dois métodos de ajuste das políticas do Apache: universalmente e em um diretório específico. O ajuste das políticas em diretórios é mais seguro. Portanto, é a abordagem recomendada.
+
+Ajustando as Políticas do Apache Universalmente
+Definir a política do Apache universalmente irá informar ao SELinux para tratar de todos os processos de Apache de maneira idêntica, utilizando o Booleano httpd_unified. Embora essa abordagem seja mais conveniente, ela não lhe dará o mesmo nível de controle como uma abordagem que se concentra em uma política de arquivos ou diretórios.
+
+Execute o seguinte comando para definir uma política universal do Apache:
+
+sudo setsebool -P httpd_unified 1
+
+O comando setsebool altera os valores Booleanos do SELinux. A flag -P atualizará o valor de inicialização, fazendo com que essa alteração persista em reinicializações. O httpd_unified é o Booleano que dirá ao SELinux para tratar todos os processos do Apache como sendo do mesmo tipo, então você o habilitou com um valor de 1.
+
+Ajustando as Políticas do Apache em um Diretório
+
+Configurando individualmente as permissões do SELinux para o diretório /var/www/ribafs/log dará a você mais controle sobre suas políticas do Apache, mas também pode precisar de mais manutenção. Como essa opção não define políticas universalmente, você precisará definir manualmente o tipo de contexto para quaisquer novos diretórios de logs especificados em sua configuração de virtual host.
+Primeiro, verifique o tipo de contexto que o SELinux deu ao diretório /var/www/ribafs/log:
+
+sudo ls -dlZ /var/www/ribafs/log/
+
+drwxr-xr-x. 2 root root unconfined_u:object_r:httpd_sys_content_t:s0 6 Apr 23 23:51 /var/www/ribafs/log/
+
+O contexto atual é o httpd_sys_content_t, que informa ao SELinux que o processo Apache pode ler apenas os arquivos criados neste diretório. Neste tutorial, você alterará o tipo de contexto do diretório /var/www/ribafs/log para httpd_log_t. Este tipo permitirá ao Apache gerar e anexar aos arquivos de log de aplicações web:
+
+sudo semanage fcontext -a -t httpd_log_t "/var/www/ribafs/log(/.*)?"
+ 
+Em seguida, use o comando restorecon para aplicar essas alterações e persisti-las entre as reinicializações:
+
+sudo restorecon -R -v /var/www/ribafs/log
+ 
+A flag -R executa esse comando de maneira recursiva, o que significa que ele atualizará todos os arquivos existentes para usar o novo contexto. A flag -v exibirá as alterações de contexto que o comando fez. Você receberá a seguinte saída confirmando as alterações:
+
+Output
+
+Relabeled /var/www/ribafs/log from unconfined_u:object_r:httpd_sys_content_t:s0 to unconfined_u:object_r:httpd_log_t:s0
+
+Você pode listar os contextos mais uma vez para ver as alterações:
+
+sudo ls -dlZ /var/www/ribafs/log/
+ 
+A saída reflete o tipo de contexto atualizado:
+
+Output
+
+drwxr-xr-x. 2 root root unconfined_u:object_r:httpd_log_t:s0 6 Apr 23 23:51 /var/www/ribafs/log/
+
+Agora que o diretório /var/www/ribafs/log está usando o tipo httpd_log_t, você está pronto para testar sua configuração de virtual host.
+
+Testando o Virtual Host (Recomendado)
+
+Assim que o contexto SELinux for atualizado com qualquer método, o Apache poderá escrever no diretório /var/www/ribafs/log. Agora, você pode reiniciar o serviço Apache com sucesso:
+
+sudo systemctl restart httpd
+ 
+Liste o conteúdo do diretório /var/www/ribafs/log para ver se o Apache criou os arquivos de registro:
+
+ls -lZ /var/www/ribafs/log
+ 
+Você receberá a confirmação de que o Apache foi capaz de criar os arquivos error.log e requests.log especificados na configuração de virtual host:
+
+Output
+
+-rw-r--r--. 1 root root system_u:object_r:httpd_log_t:s0 0 Apr 24 00:06 error.log
+-rw-r--r--. 1 root root system_u:object_r:httpd_log_t:s0 0 Apr 24 00:06 requests.log
+
+Agora que você tem seu virtual host configurado e as permissões do SELinux atualizadas, o Apache agora irá servir seu nome de domínio. Você pode testar isso navegando para http://ribafs.me, onde você deve ver algo assim:
+
+Welcome to ribafs.me!
+
+Isso confirma que seu virtual host está configurado e exibindo conteúdo. Repita os passos para criar novos virtual hosts com as permissões SELinux para domínios adicionais.
+
+
+== despertai.net.br
+
+sudo nano /etc/httpd/sites-available/despertai.conf
+
+sudo permsr
+
+nano /var/www/despertai/index.html
+
+<html>
+   <head>
+     <title>Welcome!</title>
+   </head>
+   <body>
+      <h1>Welcome to despertai.net.br!</h2>
+   </body>
+</html>
+
+Criar
+
+sudo nano /etc/httpd/sites-available/despertai.conf
+
+<VirtualHost *:80>
+    ServerAdmin ribafs@gmail.com
+    ServerName despertai.net.br
+    ServerAlias www.despertai.net.br
+    DocumentRoot /var/www/despertai
+    
+    <Directory /var/www/despertai>
+        Options -Indexes -FollowSymLinks
+        AllowOverride All
+    </Directory>
+    
+    ErrorLog /var/www/despertai/log/error.log
+    CustomLog /var/www/despertai/log/requests.log combined
+</VirtualHost>
+
+
+aptes
+
+Ativar
+
+sudo ln -s /etc/httpd/sites-available/despertai.conf /etc/httpd/sites-enabled/despertai.conf
+
+sudo semanage fcontext -a -t httpd_log_t "/var/www/despertai/log(/.*)?"
+ 
+sudo restorecon -R -v /var/www/despertai/log
+ 
+sudo ls -dlZ /var/www/despertai/log/
+
+Agora que o diretório /var/www/despertai/log está usando o tipo httpd_log_t, você está pronto para testar sua configuração de virtual host.
+
+sudo systemctl restart httpd
+
+ls -lZ /var/www/despertai/log
+
+Acessar pelo navegador
+
+http://despertai.net.br
+
+
+== Testando Apache com PHP
+
+~/permsr
+
+nano /var/www/ribafs/info.php
+
+<?php
+ phpinfo();
+ 
+http://ribafs.me/info.php
+
+rm /var/www/ribafs/info.php
+
+
+== Criar banco no mariadb
+
+mysql -uroot -p
+
+create database teste;
+use teste;
+CREATE TABLE todo_list (
+    item_id INT AUTO_INCREMENT,
+    content VARCHAR(255),
+    PRIMARY KEY(item_id)
+);
+
+INSERT INTO todo_list (content) VALUES ("My first important item");
+\q
+
+sudo nano /var/www/html/todo_list.php
+
+<?php
+$user = "root";
+$password = "senhaforte";
+$database = "teste";
+$table = "todo_list";
+
+try {
+  $db = new PDO("mysql:host=localhost;dbname=$database", $user, $password);
+  echo "<h2>TODO</h2><ol>";
+  foreach($db->query("SELECT content FROM $table") as $row) {
+    echo "<li>" . $row['content'] . "</li>";
+  }
+  echo "</ol>";
+} catch (PDOException $e) {
+    print "Error!: " . $e->getMessage() . "<br/>";
+    die();
+}
+
+
+http://IP/todo_list.php
+
+
+Referências
+
+https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-centos-8-quickstart-pt
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mariadb-php-lamp-stack-on-centos-8-pt
+https://www.tecmint.com/install-lamp-on-centos-8/
+https://www.linuxbabe.com/redhat/install-lamp-stack-centos-8-rhel-8
+https://phoenixnap.com/kb/how-to-install-lamp-stack-centos-8

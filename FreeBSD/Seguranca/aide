@@ -1,0 +1,56 @@
+Advanced Intrusion Detection Environment (AIDE)
+
+https://www.digitalocean.com/community/tutorials/how-to-install-aide-on-a-digitalocean-vps
+
+sudo su
+pkg install aide
+
+ou com pors 
+make install /usr/ports/security/aide
+
+aide --help
+
+aide -v
+
+aide --init
+
+cd /var/lib/aide
+ou
+cd /var/db/aide/database
+
+ls -lt
+
+mv /var/lib/aide/aide.db.new.gz /var/lib/aide/aide.db.gz
+
+ls -lt
+
+aide --check
+
+Para comparar os bancos de dados execute
+
+aide
+
+Criar arquivo de teste
+touch /usr/sbin/mytestfile.txt
+
+aide --check
+
+aide --update
+
+ls -lt
+
+mv aide.db.gz aide.db.gz-Marc152018`
+
+mv aide.db.new.gz aide.db.gz
+
+Automatizar
+
+crontab -e
+
+06 01 * * 0-6 /var/log/aide/chkaide.sh
+
+cat /var/log/aide/chaide.sh
+
+Configurações
+/etc/aide.conf
+

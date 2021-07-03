@@ -1,0 +1,39 @@
+Joomla no CentOS 8.3 com Nginx e PostgreSQL
+
+Não instalar nenhuma extensão de terceiros e ainda remover algumas nativas
+Instalar o simple backup para criar um backup depois de tudo pronto, mas depois disso removê-lo
+Idioma - o en-GB default e somente
+
+Criar script perms
+
+sudo usermod -aG apache testsecvps
+
+sudo nano /usr/local/bin/perms
+
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+find /var/www/html/$1/ -type d -exec chmod 775 {} \;
+find /var/www/html/$1/ -type d -exec chmod ug+s {} \;
+find /var/www/html/$1/ -type f -exec chmod 664 {} \;
+chown -R testsecvps:apache /var/www/html/$1/
+echo "";
+echo "Concluído!";
+
+sudo chmod +x /usr/local/bin/perms
+
+cd /var/www/html
+
+sudo dnf install wget
+
+sudo dnf install unzip
+
+wget https://downloads.joomla.org/cms/joomla3/3-9-25/Joomla_3-9-25-Stable-Full_Package.zip?format=zip
+mv Joomla_3-9-25-Stable-Full_Package.zip?format=zip j.zip
+unzip j.zip
+
+sudo ~/perms
+
+ls -la
+

@@ -1,0 +1,10 @@
+#!/bin/sh
+clear;
+echo "Aguarde enquanto configuro as permissões do /var/www/html/$1";
+echo "";
+chown -R www-data:www-data /var/www/html/$1;
+find /var/www/html/$1 -type d -exec chmod 755 {} \;
+find /var/www/html/$1 -type f -exec chmod 644 {} \;
+echo "";
+echo "Concluído!";
+

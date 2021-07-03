@@ -1,0 +1,6 @@
+
+
+date.timezone = America/Fortaleza;
+output_buffering = Off;
+cgi.fix_pathinfo=0;
+

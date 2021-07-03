@@ -1,0 +1,139 @@
+Install Apache, MySQL And PHP On OpenBSD 5.4
+https://www.unixmen.com/install-apache-mysql-php-openbsd-5-4/
+
+export PKG_PATH=http://ftp.bit.nl/pub/OpenBSD/5.4/packages/`machine -a`/
+
+== Apache
+
+pkg_add  -u apache-httpd
+
+
+== MySQL
+
+pkg_add mysql-server
+
+mysql_install_db
+
+Criar uma nova senha
+
+mysqld_safe
+
+/usr/local/bin/mysqladmin -u root password "senhaforte"
+
+
+== PHP com MySQL
+
+pkg_add  php-mysql
+
+
+ln -sf /var/www/conf/modules.sample/php-5.3.conf /var/www/conf/modules/php.conf
+
+Criou-se o arquivo recomendado
+/etc/php-5.3.ini
+
+ln -sf /etc/php-5.3.sample/mysql.ini /etc/php-5.3/mysql.ini
+
+
+== Configurando Apache com PHP
+
+nano /var/www/conf/httpd.conf
+
+Altere
+DirectoryIndex index.php index.html
+
+
+== Adicionar ao rc.conf
+
+nano /etc/rc.conf
+
+mysqld_flags=""
+httpd_flags=""
+pkg_scripts="mysqld"
+
+
+== Testando
+
+http://IP
+
+
+Apache + PHP + MySQL + ftpd no OpenBSD
+https://www.vivaolinux.com.br/artigos/impressora.php?codigo=8734
+
+export PKG_PATH=ftp://ftp.openbsd.org/pub/OpenBSD/4.3/packages/`uname -m`
+
+== MySQL
+
+pkg_add mysql-server
+
+mysql_install_db
+mysqld_safe
+mysqladmin -u root password 'senha_forte'
+
+
+== rc.conf
+
+nano /etc/rc.conf
+
+mysql=YES
+httpd_flags="" 
+
+
+== rc.local
+
+nano /etc/rc.local
+
+Adicionar
+
+if [ X"${mysql}" == X"YES" -a -x /usr/local/bin/mysqld_safe ]; then
+   echo -n " mysqld"; /usr/local/bin/mysqld_safe --user=_mysql --log --open-files-limit=256 &
+   for i in 1 2 3 4 5 6; do
+      if [ -S /var/run/mysql/mysql.sock ]; then
+         break
+      else
+         sleep 1
+         echo -n "."
+      fi
+   done
+fi 
+
+== Apache
+
+mkdir -p /var/www/var/run/mysql
+ln -f /var/run/mysql/mysql.sock /var/www/var/run/mysql/mysql.sock
+
+
+== PHP
+
+pkg_add -v php5-core-5.2.3.tgz
+pkg_add -v php5-gd-5.2.3.tgz
+pkg_add -v php5-mysql-5.2.3.tgz
+pkg_add -v php5-odbc-5.2.3.tgz
+
+Ativar os módulos (no 6.2 não requer)
+
+phpxs -a gd
+phpxs -a mysql
+phpxs -a odbc
+
+cp /usr/local/share/examples/php5/php.ini-recommended /var/www/conf/php.ini
+
+
+== Configurar Apache
+
+nano /var/www/conf/httpd.conf
+
+# pra carregar o módulo do php5
+LoadModule php5_module /usr/local/lib/php/libphp5.so
+AddType application/x-httpd-php .php .php4 .php3 .htm .html
+AddType application/x-httpd-php-source .phps
+
+DirectoryIndex index.html index.htm index.php index.php5 index.php4 index.php3 
+
+apachectl restart
+
+echo "<? echo phpinfo(); ?>" > /var/www/htdocs/phpinfo.php
+
+http://localhost/phpinfo.php 
+
+
+

@@ -1,0 +1,49 @@
+Redes no OpenBSD
+
+As interfaces são nomeadas pelo tipo de placa e não pela conexão.
+
+Exemplos: fxp0, enc0
+
+ifconfig
+
+netstat
+
+/etc/hostname
+
+/etc/hosts
+
+Logs das interfaces
+
+pflog
+
+
+Defaults hostname e gatway
+
+/etc/myname
+
+/etc/mygate
+
+Ambos usam apenas uma única linha
+
+cat /etc/resolv.conf
+
+search example.com
+nameserver 125.2.2.4
+nameserver 125.2.2.5
+lokup file bind
+
+Para efetuar as mudanças efetue um reboot ou execute
+
+sh /etc/netstart
+
+Sempre que efetuar alterações em placas de rede no OpenBSD efetue um reboot
+
+Testando
+
+netstat -rn
+
+route show
+
+cat /etc/hostname.dc0
+
+

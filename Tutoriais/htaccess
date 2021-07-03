@@ -1,0 +1,109 @@
+Configurando o .htaccess
+
+
+Referências
+https://httpd.apache.org/docs/current/pt-br/howto/htaccess.html
+https://my.justhost.com/cgi/help/htaccess
+http://www.devin.com.br/htaccess/
+
+No geral, você nunca deve usar arquivos .htaccess a não ser que você não tenha acesso ao arquivo de configuração principal do Apache.
+
+Arquivos .htaccess devem ser usados em casos onde os provedores de conteúdo do site precisem fazer mudanças na configuração do servidor por-diretório, mas não tem acesso root ao sistema do servidor. Caso o administrador do servidor não esteja disposto a fazer mudanças freqüentes nas configurações do servidor, é desejável permitir que os usuários possam fazer essas mudanças através de arquivos .htaccess eles mesmos. Isso é particularmente verdade, por exemplo, em casos onde provedores estão fornecendo múltiplos sites para usuários em apenas uma máquina, e querem que seus usuários possam alterar suas configurações.
+
+É o caso dos servidores de hospedagem compartilhada.
+
+No entanto, de modo geral, o uso de arquivos .htaccess deve ser evitado quando possível. Quaisquer configurações que você considerar acrescentar em um arquivo .htaccess, podem ser efetivamente colocadas em uma seção <Directory> no arquivo principal de configuração de seu servidor.
+
+Existem duas razões principais para evitar o uso de arquivos .htaccess.
+
+A primeira delas é a performance. Quando AllowOverride é configurado para permitir o uso de arquivos .htaccess, o Apache procura em todos diretórios por arquivos .htaccess.
+
+A segunda consideração é relativa à segurança. Você está permitindo que os usuários modifiquem as configurações do servidor, o que pode resultar em mudanças que podem fugir ao seu controle. Considere com cuidado se você quer ou não dar aos seus usuários esses privilégios. Note também que dar aos usuários menos privilégios que eles precisam, acarreta em pedidos de suporte técnico adicionais.
+
+O uso de arquivos .htaccess pode ser totalmente desabilitado, ajustando a diretriz AllowOverride na seção <Directory> para none:
+AllowOverride None
+
+Para habilitar configure no apache2.conf:
+
+AllowOverride All
+
+Definir os arquivos de índice
+
+.htaccess
+
+DirectoryIndex index.php index.html
+
+Criando páginas de erro customizadas:
+
+ErrorDocument 404 /404.html
+
+Páginas de erro:
+401 - Authorization Required
+400 - Bad request
+403 - Forbidden
+500 - Internal Server Error
+404 - Wrong page
+
+Permitir que arquivos de diretório sejam listados:
+Options All +Indexes
+
+Impedir a listagem de diretório:
+Options ExecCGI Includes IncludesNOEXEC SymLinksIfOwnerMatch -Indexes
+
+ou
+## No directory listings
+<IfModule autoindex>
+IndexIgnore *
+</IfModule>
+
+Bloquear certos IPs:
+order allow,deny
+deny from 123.123.123.123 #specify a specific address
+deny from 123.123.123.123/30 #specify a subnet range
+deny from 123.123.* #specify an IP address wildcard
+allow from all
+
+Permitir certos IPs:
+order deny,allow
+allow from 123.123.123.123 #specify a specific address
+allow from 123.123.123.123/30 #specify a subnet range
+allow from 123.123.* #specify an IP address wildcard
+deny from all
+
+Redirecionar de um arquivo para outro:
+Redirect /redirect_from.html http://www.newsite.com/folder/redirect_to.html
+
+Redirecionar de uma pasta para outra:
+Redirect /redirect_from http://www.newsite.com/redirect_to
+
+# Deixa a Intranet acessar
+Order allow,deny
+allow from 192.168.0.
+deny from all
+
+# Deixa todo mundo acessar, menos o IP 192.168.0.25
+Order deny,allow
+deny from 192.168.0.25
+allow from all
+
+ErrorDocument 401 /erros/falhaautorizacao.html
+ErrorDocument 404 /erros/naoencontrado.html
+ErrorDocument 403 /erros/acessonegado.html
+ErrorDocument 500 /erros/errointerno.html
+
+Redirecionar páginas de erro 404 para a index do site:
+
+Supondo que o site está na pasta /joomla
+
+1) Criar no raiz a pasta
+
+erros
+
+2) Dentro da pasta criar o arquivo 404.php contendo:
+
+<?php
+header('location: /joomla/index.php');
+
+3) Criar o arquivo .htaccess na pasta do site contendo:
+
+ErrorDocument 404 /erros/404.php

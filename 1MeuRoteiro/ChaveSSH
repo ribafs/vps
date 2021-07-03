@@ -1,0 +1,35 @@
+Adicionar uma chave para SSH
+
+- Caso queira adicionar uma chave para o DigitalOcean a ser associada a cada servidor que criar:
+
+Clique em seu avatar/perfil - Settings - Security - Add SSH key
+
+ou em
+https://cloud.digitalocean.com/settings/security?i=651c46
+
+Entre com o nome abaixo em Name
+
+E cole a chave acima em SSH key content
+
+Para criar a chave faça isso:
+
+Acesse seu terminal no desktop e execute:
+
+ssh-keygen -t rsa -b 4096
+
+Entre com uma senha e tecle enter duas vezes
+
+Para visualizar a chave execute:
+
+cat ~/.ssh/id_rsa.pub
+
+Aparece algo assim:
+
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC1G6T7h0rVN0IbAuzg9EgGT5x7ECAhe/hfFg5m3IDTiIKNTiQqj5u6A3EN2HQ87D0UJKh1otfh7JtBoZ/tNZFKdliO/StnZfN1U63y445e/8bX02EB3SOlXFPoh0kIVuSTaC18y9RQ9TNfdsHdPkxRRnv1YB0/QiIMS5o7ocJu65yJwzGeIynszsQpHiCnsztsG+WIIUkd9NXq78Dl3CWNn7Cj86sEK+EIJonkxdURRCAWkNayZG5fPCnV38ukH1a6R+flYG3yD4oim8pn1+7kFMZLm5g/xwEvV2fGYXlA0sGB0skns3fqnR4u74dN+kibjReY8GLn3zJU7VSz1dK8n3VZFuQZU5wKbo8xDlEhrYDNpvT6BbIMNqkMIdXpaBjUBgXu8BJ/RUAgFeXXbLq02ysWD5ESS8ylYPMkamtVgkyUaL5hSV4DpIbzPJxa+5XnGGz1+WK+4S/ZyNOYwJhITl18hyfaQGONX+oKKhRyyMsIx51UIlRT9voYCD/wvgyWUTuOxKmp0uvZ3tsVgPogM37S8HnfyTrjgNmoMXgSWdA/9XIFTBvGusrVSEuQu9NzHsEYXxiAWidOtymk0CLV1e7m6zoIXbbrx2dktEJx/boC9Ry/aSTrUH+5G6wxMT7slgJzbMtgIFwajqsjXb5NjT7s9hf1Yr5HFjUMW9N0aQ== ola@ribafs.org
+
+Copie desde ssh-rsa até ola@ribafs.org e cole no campo SSH key content no Digital Ocean
+
+No primeiro acesso:
+git config --global user.name "Ribamar FS"
+git config --global user.email "ribafs@gmail.com"
+

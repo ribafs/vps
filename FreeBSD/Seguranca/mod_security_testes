@@ -1,0 +1,167 @@
+Test mod_security
+
+Once everything is configured properly, we will test mod_security by sending some malicious requests to Apache web server and see if the requests are being blocked or not.
+
+First, we will test how mod_security protects Apache web server from XSS attack.
+
+On the remote machine, run the following command to test XSS attack:
+
+curl 'http://192.168.1.10/?q="><script>alert(1)</script>'
+
+You should see a 403 Forbidden response in the following output.
+
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>403 Forbidden</title>
+</head><body>
+<h1>Forbidden</h1>
+<p>You don't have permission to access /
+on this server.<br />
+</p>
+<hr>
+<address>Apache/2.4.18 (Ubuntu) Server at 192.168.1.10 Port 80</address>
+</body></html>
+
+Next, we will test mod_security against SQL Injection attack with the following command:
+
+curl "http://192.168.1.10/?q='1 OR 1=1"
+
+You should get 403 Forbidden response shown in the following output:
+
+   <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>403 Forbidden</title>
+</head><body>
+<h1>Forbidden</h1>
+<p>You don't have permission to access /
+on this server.<br />
+</p>
+<hr>
+<address>Apache/2.4.18 (Ubuntu) Server at 192.168.1.10 Port 80</address>
+</body></html>
+
+
+ModSecurity TestPermalink
+
+OWASP CRS builds on top of ModSecurity so that existing rules can be extended.
+
+    Navigate to the default Apache configuration and add two additional directives, using the default configuration as an example:
+
+    /etc/apache2/sites-available/000-default.conf
+
+         1
+         2
+         3
+         4
+         5
+         6
+         7
+         8
+         9
+        10
+
+        	
+
+        <VirtualHost *:80>
+            ServerAdmin webmaster@localhost
+            DocumentRoot /var/www/html
+
+            ErrorLog ${APACHE_LOG_DIR}/error.log
+            CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+            SecRuleEngine On
+            SecRule ARGS:testparam "@contains test" "id:1234,deny,status:403,msg:'Our test rule has triggered'"
+        </VirtualHost>
+
+    Restart Apache then curl the index page to intentionally trigger the alarms:
+
+    curl localhost/index.html?testparam=test
+
+    The response code should be 403. There should be a message in the logs that shows the defined ModSecurity rule worked. You can check using: sudo tail -f /var/log/apache2/error.log
+
+        ModSecurity: Access denied with code 403 (phase 2). String match “test” at ARGS:testparam. [file “/etc/apache2/sites-enabled/000-default.conf”] [line “24”] [id “1234”] [msg “Our test rule has triggered”] [hostname “localhost”] [uri “/index.html”] [unique_id “WfnEd38AAAEAAEnQyBAAAAAB”]
+
+    Verify the OWASP CRS is in effect:
+
+    curl localhost/index.html?exec=/bin/bash
+
+    Check the error logs again: the rule has caught the attempted execution of an arbitrary bash script.
+
+        ModSecurity: Warning. Matched phrase “bin/bash” at ARGS:. [file “/etc/modsecurity/rules/REQUEST-932-APPLICATION-ATTACK-RCE.conf”] [line “448”] [id “932160”] [rev “1”] [msg “Remote Command Execution: Unix Shell Code Found”] [data “Matched Data: bin/bash found within ARGS:: exec/bin/bash”] [severity “CRITICAL”] [ver “OWASP_CRS/3.0.0”] [maturity “1”] [accuracy “8”] [tag “application-multi”] [tag “language-shell”] [tag “platform-unix”] [tag “attack-rce”] [tag “OWASP_CRS/WEB_ATTACK/COMMAND_INJECTION”] [tag “WASCTC/WASC-31”] [tag “OWASP_TOP_10/A1”] [tag “PCI/6.5.2”] [hostname “localhost”] [uri “/index.html”] [unique_id “WfnVf38AAAEAAEqya3YAAAAC”]
+
+Adicionar ao httpd.conf após o </directory>
+
+<IfModule mod_security2.c>
+  SecRuleRemoveById 980130
+</IfModule>
+
+
+== outro teste
+
+ell let's make a test and see. First of
+all create a PHP file name it anything (for me I chose 
+checkmd.php
+) and add the following code to it: 
+<?  
+    file $text=$_GET['file']; 
+    echo "Content of File $text"; 
+    echo `cat $text`; 
+?> 
+Then goto your favorite web browser and try to browse the to the following link: 
+http://localhost/checkmd.php?file=/etc/passwd 
+Aha, you shall now have got a White Empty page saying in its title "
+501 Method Not Implemented
+",
+and its context is: 
+Method Not Implemented 
+GET to /checkmd.php not supported. 
+Well done, this insures that ModSecurity2 is working and it blocked the try we are making to access the
+/etc/passwd
+ file. 
+
+
+
+
+ make sure the changes have been applied to the apache configuration:
+
+# grep -A9 '<IfModule mod_security2.c>' /etc/httpd/conf/plesk.conf.d/server.conf
+<IfModule mod_security2.c>
+        SecRuleEngine On
+        SecRequestBodyAccess Off
+        SecResponseBodyAccess Off
+        SecAuditEngine RelevantOnly
+        SecAuditLog "/var/log/modsec_audit.log"
+        SecAuditLogType serial
+        SecRuleRemoveById 960021 960015 123123
+        SecRuleRemoveByTag "RULE_TAG1" "RULE_TAG2" "RULE_TAG3"
+</IfModule>
+
+
+SecRule REMOTE_ADDR "@ipMatch 66.249.0.0/16" "id:26091975,phase:2,pass,nolog,allow,ctl:ruleEngine=Off"
+
+
+Adicionar whitelist
+
+adicionar ao final do
+
+nano /usr/local/etc/modsecurity/modsecurity.conf
+
+Include /usr/local/etc/modsecurity/whitelists.conf
+
+No arquivo
+
+nano whitelist.conf
+
+<LocationMatch "/portal/administrator">
+SecRuleRemoveById 981143
+</LocationMatch>
+
+Add ao
+nano /usr/local/etc/modsecurity/modsecurity.conf
+
+SecRule REMOTE_HOST "@ipmatch 1.2.0.0/16" \
+"id:12345,phase:2,t:none,pass,nolog,noauditlog,ctl:ruleRemovebyID=392301"
+
+
+
+

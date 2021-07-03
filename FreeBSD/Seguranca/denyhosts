@@ -1,0 +1,50 @@
+Usando DenyHosts
+
+Scannear logs e banir hosts suspeitos
+
+Denyhosts – bloqueia ataques de SSH adicionando entradas ao /etc/hosts.dny. Também avisa ao administrador sobre hosts suspeitos, ataques de usuários e logins suspeitos.
+
+pkg install denyhosts
+
+nano /etc/rc.conf
+
+denyhosts_enable=YES
+
+Após instalar edite o
+nano /usr/local/etc/denyhosts.conf
+
+E atualize seu e-mail e outras configurações que desejar.
+
+ADMIN_EMAIL = ribafs@gmail.com
+SMTP_HOST = localhost
+SMTP_PORT = 25
+#SMTP_USERNAME=foo
+#SMTP_PASSWORD=bar
+SMTP_FROM = DenyHosts nobody@localhost
+#SYSLOG_REPORT=YES
+service denyhosts restart
+
+Criar o hosts.allow
+nano /etc/hosts.allow
+
+ftpd : all : deny
+
+
+#Permitindo somente casa e trabalho
+sshd : 177.130.208.59 187.130.18.59 : deny
+
+ALL : 216.136.204.0/255.255.255.0 : deny
+
+Exemplo
+
+#reject all connections from hosts with invalid DNS and from our competitor
+ALL : PARANOID 10.5.4.0/23 : deny
+#localhost can talk to itself
+ALL : localhost : allow
+#our local network may access portmap, but no others
+portmap : ALL EXCEPT 192.168.0.0/16 : deny
+#allow SSH, pop3, and ftp, deny everything else
+sshd, POP3, ftpd : ALL : allow
+ALL : ALL : deny
+
+service denyhosts start

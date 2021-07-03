@@ -1,0 +1,40 @@
+== Configurar SSH
+
+Ainda como root
+
+nano /etc/ssh/sshd_config
+
+Porta 65522
+LoginGraceTime 30
+PermitRootLogin no
+PasswordAuthentication no
+MaxAuthTries 3
+X11Forwarding no
+DenyUsers root
+AllowUsers ribafs
+
+sudo service ssh restart
+
+== Sincronizar a chave do ssh do desktop para o servidor
+
+apt install rsync
+
+rsync --archive --chown=ribafs:ribafs ~/.ssh /home/ribafs
+
+Testar
+
+Conectar com ribafs
+
+exit
+
+ssh -p 65522 ribafs@45.56.107.114
+
+cd ~/
+
+
+Referências
+https://kifarunix.com/allow-deny-specific-users-to-login-via-ssh-on-ubuntu-18-04/
+
+reboot
+
+

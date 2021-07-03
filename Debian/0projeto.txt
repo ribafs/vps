@@ -1,0 +1,50 @@
+Criar droplet para testes
+
+ssh -p 65522 ribafs@159.65.43.99
+
+- Debian 9.3
+- mariadb
+- nginx
+- php7
+
+E ver como se comporta 
+
+Mais seguro, estável, robusto e rápido.
+
+
+Logo após a criação de uma droplet com Debian 9.3
+
+df -h
+950M usado no raiz
+
+free -m
+33M usados
+
+
+Após instalar os pacotes do servidor web
+root@debian9:/home/ribafs# free -m
+              total        used        free      shared  buff/cache   available
+Mem:            996          99         788           3         108         771
+Swap:             0           0           0
+
+Implementar o iptables
+
+Realmente, o Debian já começa ganhando do Ubuntu. Depois vouc riar uma droplet com Ubuntu para me ceertificar.
+
+Agora uma droplet Ubuntu 16.04
+
+df -h
+875M usados
+
+free -m
+43M usados
+
+Ambas com 1vCPU e 1GB de RAM
+São muito semelhantes, embora o Debian consuma 10MB de RAM a menos, mas me parece que o mais importante é que ele mantem a memória mais enxuta e menor que o Ubuntu.
+
+Instalei o mailutils
+
+para enviar e-mail pela linha de comando
+echo "Isto é um e-mail de teste" | mail -s "Assunto Teste 2" ribafs@gmail.com
+
+O iredmail está recebendo email de fora(gmail) mas ainda não está entregando.

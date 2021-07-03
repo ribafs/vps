@@ -1,0 +1,48 @@
+Requisitos
+
+    Centos 7.x, Centos 8.x, Ubuntu 18.04, Ubuntu 20.04
+    Python 3.x
+    1024MB or above Ram.
+    10GB Disk Space.
+
+ssh root@165.227.221.216
+The authenticity of host '165.227.221.216 (165.227.221.216)' can't be established.
+ECDSA key fingerprint is SHA256:dOzCDGPkO6GSnARdzsHNx/UMHcEAj0xbgX3wK2Anjfo.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '165.227.221.216' (ECDSA) to the list of known hosts.
+Enter passphrase for key '/home/ribafs/.ssh/id_rsa': 
+
+93 updates can be applied immediately.
+26 of these updates are standard security updates.
+To see these additional updates run: apt list --upgradable
+
+
+
+********************************************************************************
+
+Welcome to LiteSpeed One-Click CyberPanel Server.
+To keep this server secure, the firewalld is enabled.
+CyberPanel One-Click Quickstart guide:
+* https://docs.litespeedtech.com/cloud/images/cyberpanel/
+
+In a web browser, you can view:
+* CyberPanel: https://165.227.221.216:8090
+* phpMyAdmin: https://165.227.221.216:8090/dataBases/phpMyAdmin
+* Rainloop:   https://165.227.221.216:8090/rainloop
+
+On the server:
+user - admin
+* You can get the CyberPanel admin password with the following command:
+  sudo cat .litespeed_password
+admin_pass=St2xPjd3DrXIZpxW
+* You can get the Mysql cyberpanel user password with the following command:
+  sudo cat .db_password
+
+System Status:
+  Load : 0.12, 0.70, 0.41
+  CPU  : 35.2179%
+  RAM  : 301/981MB (30.68%)
+  Disk : 5/25GB (24%)
+
+Your CyberPanel is up to date
+

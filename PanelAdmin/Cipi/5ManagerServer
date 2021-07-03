@@ -1,0 +1,18 @@
+Após a instalação e configurações do cipi, agora vamos instalar o cipi num novo servidor.
+
+Primeiro criamos o servidor na hospedagem
+Então vamos ao cipi para adicionar este servidor criado
+
+Veja que devemos clicar em Manage para configurá-lo (este botão somente estará disponível após a instalalção do cipi no novo servidor. A instalação será detectada automaticamente)
+
+Manage
+
+Server name: cliente1
+
+Server IP: 139.177.202.148
+
+Server Provider: Linode
+
+Server Location: Atlanta, GA
+
+

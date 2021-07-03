@@ -1,0 +1,13 @@
+- LAMP - MariaDB no luar do mysql
+    - apache24 mod_reqwite
+    - php 7.4 e php7.4-xml php7.4-xsl php7.4-curl php7.4-xdebug php7.4-intl php7.4 php7.4-bcmath php7.4-mysql php7.4-pdo-pgsql apt install -y php7.4-zip 
+    php7.4-mbstring php7.4-gettext php7.4-gd php-curl php-pear php-apcu php-memcache php-memcached;
+    - mariadb-server
+    - adminer
+    - PostgreSQL
+- Joomla
+- Wordpress
+- Drupal4
+- Laravel8 - Criar aplicativo "demo" para abrigar o demo do laravel-acl 
+- OpenCart
+

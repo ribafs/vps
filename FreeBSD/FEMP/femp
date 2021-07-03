@@ -1,0 +1,129 @@
+https://www.digitalocean.com/community/tutorials/how-to-install-an-nginx-mysql-and-php-femp-stack-on-freebsd-10-1
+
+
+Como root
+
+pkg install nginx mysql56-server php56 php56-mysql
+
+rehash
+
+grep rcvar /usr/local/etc/rc.d/*
+
+nano /etc/rc.conf
+
+mysql_enable="YES"
+nginx_enable="YES"
+php_fpm_enable="YES"
+
+cd /usr/local/etc
+
+nano php-fpm.conf
+
+Troque
+listen = 127.0.0.1:9000
+
+por
+listen = /var/run/php-fpm.sock
+
+Descomentar as linhas abaixo
+;listen.owner = www
+;listen.group = www
+;listen.mode = 0660
+
+cp php.ini-production php.ini
+
+nano php.ini
+
+Mude
+cgi.fix_pathinfo=0
+
+service php-fpm start
+
+service mysql-server start
+mysql_secure_installation
+service mysql-server restart
+
+service nginx start
+
+cd /usr/local/etc/nginx
+
+nano nginx.conf
+
+O php-fpm usa o usuário
+user www;
+
+worker_processes 2;
+
+error_log /var/log/nginx/error.log info;
+
+access_log /var/log/nginx/access.log;
+
+user  www;
+worker_processes  2;
+error_log /var/log/nginx/error.log info;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  example.com www.example.com;
+        root /usr/local/www/nginx;
+        index index.php index.html index.htm;
+
+        location / {
+            try_files $uri $uri/ =404;
+        }
+
+        error_page      500 502 503 504  /50x.html;
+        location = /50x.html {
+            root /usr/local/www/nginx-dist;
+        }
+
+        location ~ \.php$ {
+                try_files $uri =404;
+                fastcgi_split_path_info ^(.+\.php)(/.+)$;
+                fastcgi_pass unix:/var/run/php-fpm.sock;
+                fastcgi_index index.php;
+                fastcgi_param SCRIPT_FILENAME $request_filename;
+                include fastcgi_params;
+        }
+    }
+}
+
+mkdir -p /var/log/nginx
+
+touch /var/log/nginx/access.log
+touch /var/log/nginx/error.log
+
+rm /usr/local/www/nginx
+mkdir /usr/local/www/nginx
+
+cp /usr/local/www/nginx-dist/index.html /usr/local/www/nginx
+
+nano /usr/local/www/nginx/info.php
+
+<?php
+phpinfo();
+
+nginx -t
+
+service nginx restart
+
+http://example.com
+
+http://example.com/info.php
+
+rm /usr/local/www/nginx/info.php
+
+

@@ -1,0 +1,22 @@
+Monitorar servidor através do
+Desktop
+E do console do DO
+
+ps aux | grep nginx
+
+less /var/log/nginx/error.log
+
+less /var/log/nginx/error.log
+less /var/log/nginx/access.log
+tail -f /var/log/nginx/www.cyberciti.biz_access.log
+grep 'error' /var/log/nginx/www.cyberciti.biz_error.log 
+
+netstat -tulpn | grep :80
+
+
+Nikto
+sudo apt install nikto
+
+nikto -h 165.22.187.179 -p 80
+
+https://geekflare.com/add-x-frame-options-nginx/

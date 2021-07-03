@@ -1,0 +1,365 @@
+How to Install and Use the PF Firewall on FreeBSD — BIN63
+http://bin63.com/how-to-install-and-use-the-pf-firewall-on-freebsd
+
+No OpenBSD o pf é habiltado por default
+
+Paa desabilitar:
+rcctl disable pf
+
+Reboot para surtir efeito
+
+Configurar
+
+nano /etc/blocked_ips.conf
+
+# IPs bloqueados
+
+12.12.12.12
+34.34.34.34
+56.56.56.56
+
+ifconfig
+
+nano /etc/pf.conf
+
+udp_services = "{ ntp }"
+tcp_services = "{ smtp, ssh, http }"
+local_host="123.123.123.123"
+ 
+table <blockedips> persist file "/etc/blocked_ips.conf"
+ 
+interface="re0"
+set block-policy return
+set skip on lo0
+scrub in all
+ 
+block all
+block drop in log quick on $interface from <blockedips> to any
+pass out on $interface inet from $local_host to any
+pass in on $interface inet proto tcp from any to $local_host port $tcp_services
+pass in on $interface inet proto udp from any to $local_host port $udp_services
+pass in on $interface inet proto icmp from any to $local_host icmp-type echoreq
+
+
+nano /etc/rc.conf
+
+pf_enable="YES"
+pf_rules="/etc/pf.conf"
+pf_flags=""
+pflog_enable="YES"
+pflog_logfile="/var/log/pflog"
+pflog_flags=""
+
+O arquivo pf.conf tem várias seções:
+
+Macros
+Tables
+Options
+Filter Rules
+
+Carregando regras
+
+nano /etc/pf.conf
+Gravar regras
+
+pfctl -vnf /etc/pf.conf
+
+Habilitar
+
+Antes de habilitar devemos carregar as regras para efetuar correções com:
+
+pfctl -vnf /etc/pf.conf
+
+pfctl -e
+
+Desabilitar
+
+pfctl -d
+
+reboot
+
+
+Controle
+
+pfctl -f  /etc/pf.conf        Load the pf.conf file
+pfctl -nf /etc/pf.conf        Parse the file, but don't load it
+pfctl -sr                     Show the current ruleset
+pfctl -ss                     Show the current state table
+pfctl -si                     Show filter stats and counters
+pfctl -sa                     Show EVERYTHING it can show
+
+Listas
+Uma lista permite especificar vários critérios similares com uma regra
+
+Exemplo
+
+block out on fxp0 from { 192.168.0.1, 10.5.32.6 } to any
+
+Quando for interpretado será expandido para duuas regras
+
+block out on fxp0 from 192.168.0.1 to any
+block out on fxp0 from 10.5.32.6 to any
+
+Múltiplas listas podem ser especificadas com uma regra
+
+match in on fxp0 proto tcp to port { 22 80 } rdr-to 192.168.0.6
+block out on fxp0 proto { tcp udp } from { 192.168.0.1, 10.5.32.6 } \
+   to any port { ssh https }
+
+Listas também podem conter outras listas aninhadas
+
+trusted = "{ 192.168.1.2 192.168.5.36 }"
+pass in inet proto tcp from { 10.10.0.0/24 $trusted } to port 22
+
+pass in on fxp0 from { 10.0.0.0/8, !10.1.2.3 }
+
+
+Macros
+
+Macros são variáveis definidas pelo usuário que podem manipular IP, portas, interfaces, etc.
+Podem reduzir a complexidades das regras do PF e tornar a manutenção mais fácil.
+
+Nomes de macros precisam iniciar com uma letra e deve conter letras, dígitos e sublinhados. Não podem usar palavras reservadas como pass ou queue.
+
+Exemplos:
+
+ext_if = "fxp0"
+
+block in on $ext_if from any to any
+
+Ao referir para uma macro precedemos seu nome com $, como acima.
+
+Também podem expandir para listas
+
+friends = "{ 192.168.1.1, 10.0.2.5, 192.168.43.53 }"
+
+Macros também podem ser preenchidas por um arquivo texto contendo uma lista de IPs e redes:
+
+table <spammers> persist file "/etc/spammers"
+block in on fxp0 from <spammers> to any
+
+O arquivo /etc/spammers deve conter uma lista de IPs e/ou blocos de rede CIDR um por linha
+
+Exemplo
+
+pre  = "pass in quick on ep0 inet proto tcp from "
+post = "to any port { 80, 6667 }"
+
+$pre 198.51.100.80 $post
+$pre 203.0.113.79  $post
+$pre 203.0.113.178 $post
+
+
+Manipulação com pfctl
+
+Tables podem ser manipuladas usando pfctl(8):
+
+Para adicionar entradas para a tabela <spammers> criada acima:
+pfctl -t spammers -T add 203.0.113.0/24
+
+Isto também criará a tabela <spammers> caso não exista
+
+Listar os endereços na tabela
+pfctl -t spammers -T show
+
+O -V pode ser também uusado com o -T para mostrar estatística para cada entrada na tabela.
+
+Para remover endereços de uma tabela
+pfctl -t spammers -T delete 203.0.113.0/24
+
+Ou
+pfctl -t spammers -T del 203.0.113.0/24
+
+Uma limitação quando especificando endereços é que 0.0.0.0/0 e 0/0 não devem funcionar em tabelas.
+
+Na criação de uma tabela é permitido
+
+table <goodguys> { 172.16.0.0/16, !172.16.1.0/24, 172.16.1.100 }
+
+block in on dc0
+pass  in on dc0 from <goodguys>
+
+Esta relação de regras
+
+block in  quick on egress inet from 127.0.0.0/8 to any
+block in  quick on egress inet from 192.168.0.0/16 to any
+block in  quick on egress inet from 172.16.0.0/12 to any
+block in  quick on egress inet from 10.0.0.0/8 to any
+block out quick on egress inet from any to 127.0.0.0/8
+block out quick on egress inet from any to 192.168.0.0/16
+block out quick on egress inet from any to 172.16.0.0/12
+block out quick on egress inet from any to 10.0.0.0/8
+
+Pode ser simplificada com estas duas listas:
+
+block in quick  on egress inet from { 127.0.0.0/8, 192.168.0.0/16, \
+   172.16.0.0/12, 10.0.0.0/8 } to any
+block out quick on egress inet from any to { 127.0.0.0/8, \
+   192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 }
+
+
+Critério
+
+O critério usado pelo PF quando inspeciona pacotes é baseado nos cabeçalhos das camada 3 (IPv4 e IPv6) e camada 4 (TCP, UDP, ICMP e ICMPv6)
+
+O filtro das regras e avaliado na ordem sequêncial, da primeira para a última. 
+Eté que o pacote encotnre a regra contendo a palavra "quick" o pacote deve ser avaliado contra as regras de filtro "all" antes que a ação seja finalizada.
+
+As regras de filtragem são avaliadas em ordem sequencial, da primeira para a última. A menos que o pacote corresponda a uma regra que contenha a palavra-chave "quick", o pacote será avaliado em relação a todas as regras de filtragem antes que a ação final seja executada. 
+A última regra a ser correspondida é a "vencedora" e determinará qual ação tomar no pacote.
+Há um passo implícito no início de um conjunto de regras de filtragem, o que significa que, se um pacote não corresponder a nenhuma regra de filtro, a ação resultante será aprovada (pass).
+
+A ação a ser tomada para correspondência de pacotes, seja passar (pass) ou bloquear (block). A ação pass passará o pacote de volta ao kernel para processamento adicional, enquanto a ação de block reagirá com base na configuração da opção block-policy. A reação padrão pode ser substituída especificando ou o block drop ou o block return.
+
+
+Default Deny
+A prática recomendada é para se usar por padrão a aproximação "default deny", que iirá negar qualquer coisa e então seletivamente permitir certos tráfegos através do firrewall.
+
+Para criar uma política que filtre usando "default deny" a primeira regra pode ser:
+block in all
+block out all
+
+ou
+
+block all
+
+ou
+
+block
+
+Isto irá bloquear todo o tráfego em todas as interfaces em todas as direções de (from) todo lugar (any) para (to) todo lugar (any).
+
+
+Outro exemplo que resume
+
+block in on rl0 all
+pass  in quick log on rl0 proto tcp from any to any port 22
+
+Pode ficar assim:
+
+block in on rl0
+pass  in quick log on rl0 proto tcp to port 22
+
+
+Simplificação do return
+
+block in all
+block return-rst  in proto tcp all
+block return-icmp in proto udp all
+block out all
+block return-rst  out proto tcp all
+block return-icmp out proto udp all
+
+Pode ficar assim:
+
+block return
+
+Quando o PF vê a palavra-chave return, ele é inteligente o suficiente para enviar a resposta apropriada, ou nenhuma resposta, dependendo do protocolo do pacote que está sendo bloqueado.
+
+
+Palavra-chave quick
+
+Como indicado anteriormente, cada pacote é avaliado em relação ao conjunto de regras de filtragem de cima para baixo, sequencialmente. Por padrão, o pacote é marcado para passagem, que pode ser alterado por qualquer regra, e pode ser alterado várias vezes antes do término das regras de filtragem. A última regra correspondente ganha. Há uma exceção: a opção quick em uma regra de filtragem tem o efeito de cancelar qualquer processamento de regra adicional e faz com que a ação especificada seja executada. Vamos dar uma olhada em alguns exemplos:
+
+Erro
+
+block in on egress proto tcp to port ssh
+pass  in all
+
+Melhor
+
+block in quick on egress proto tcp to port ssh
+pass  in all
+
+Preservando o estado
+
+A inspeção com estado refere-se à capacidade do PF de rastrear o estado ou o progresso de uma conexão de rede. Armazenando (estado) informações sobre cada conexão em uma tabela de estados.
+
+Manter o estado tem muitas vantagens, incluindo conjuntos de regras mais simples e melhor desempenho de filtragem de pacotes.
+
+Quando uma regra cria um estado, o primeiro pacote que corresponde à regra cria um "estado" entre o emissor e o receptor.
+
+Todas as regras pass criam automaticamente uma entrada de estado quando um pacote corresponde à regra. Isso pode ser explicitamente desativado usando a opção sem estado (no state).
+
+pass out on egress proto tcp from any to any
+
+A opção de estado de modulação (modulate state) funciona justamente como manter estado, exceto que isso se aplica somente a pacotes TCP. Com o estado modular (modulate state), o Número de Sequência Inicial (ISN) das conexões de saída é randomizado.
+
+pass out on egress proto { tcp, udp, icmp } from any to any modulate state
+
+Outra vantagem de manter o estado é que o tráfego ICMP correspondente será passado pelo firewall.
+
+
+Bloqueando pacotes spoofed
+
+O endereço "spoofing" é quando um usuário mal-intencionado falsifica o endereço IP de origem em pacotes que eles transmitem para ocultar seu endereço real ou para representar outro nó na rede. Depois que o usuário falsificar seu endereço, ele poderá iniciar um ataque à rede sem revelar a verdadeira origem do ataque ou tentar obter acesso a serviços de rede restritos a determinados endereços IP.
+
+O PF oferece alguma proteção contra spoofing de endereços por meio da palavra-chave antispoof:
+
+antispoof [log] [quick] for interface [af]
+
+Exemplo:
+antispoof for fxp0 inet
+
+Quando um conjunto de regras é carregado, todas as ocorrências da palavra-chave antispoof são expandidas em duas regras de filtragem. Supondo que a interface de saída tenha o endereço IP 10.0.0.1 e uma máscara de sub-rede de 255.255.255.0 (ou seja, a / 24), a regra antispoof acima se expandirá para:
+
+block in on ! fxp0 inet from 10.0.0.0/24 to any
+block in inet from 10.0.0.1 to any
+
+Mostrar sistema operacional passivo
+
+pfctl -s ospf
+
+
+IP Optiions
+
+Por padrão, o PF bloqueia pacotes com opções de IP (IP options) definidas. Isso pode tornar o trabalho mais difícil para os utilitários de impressão digital do sistema operacional, como o nmap. Se você tem um aplicativo que requer a passagem desses pacotes, como multicast ou IGMP, você pode usar a diretiva allow-opts:
+
+pass in quick on fxp0 all allow-opts
+
+Exemplo de configuração para o PF
+
+nano /etc/pf.conf
+
+int_if  = "dc0"
+lan_net = "192.168.0.0/24"
+
+# table containing all IP addresses assigned to the firewall
+table <firewall> const { self }
+
+# don't filter on the loopback interface
+set skip on lo0
+
+# scrub incoming packets
+match in all scrub (no-df)
+
+# set up a default deny policy
+block all
+
+# activate spoofing protection for all interfaces
+block in quick from urpf-failed
+
+# only allow ssh connections from the local network if it's from the
+# trusted computer, 192.168.0.15. use "block return" so that a TCP RST is
+# sent to close blocked connections right away. use "quick" so that this
+# rule is not overridden by the "pass" rules below.
+block return in quick on $int_if proto tcp from ! 192.168.0.15 to $int_if port ssh
+
+# pass all traffic to and from the local network.
+# these rules will create state entries due to the default
+# "keep state" option which will automatically be applied.
+pass in  on $int_if from $lan_net
+pass out on $int_if to   $lan_net
+
+# pass tcp, udp, and icmp out on the external (Internet) interface.
+# tcp connections will be modulated, udp/icmp will be tracked statefully.
+pass out on egress proto { tcp udp icmp } all modulate state
+
+# allow ssh connections in on the external interface as long as they're
+# NOT destined for the firewall (i.e., they're destined for a machine on
+# the local network). log the initial packet so that we can later tell
+# who is trying to connect.
+# Uncomment last part to use the tcp syn proxy to proxy the connection.
+pass in log on egress proto tcp to ! <firewall> port ssh # synproxy state
+
+

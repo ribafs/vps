@@ -1,0 +1,118 @@
+Instalar num servidor com CentOS 8
+
+ssh root@IP
+yum update
+reboot
+
+ssh root@IP
+yum install git -y
+
+ssh-keygen -t rsa -b 4096 -C "ribafs@gmail.com"
+senha
+
+cat ~/.ssh/id_rsa.pub
+
+Copiar e colar no GH
+
+git clone git@github.com:usmannasir/cyberpanel.git cyber
+
+cd cyber
+
+sh install.sh
+
+###################################################################
+                CyberPanel Successfully Installed                  
+                                                                   
+                Current Disk usage : 7/25GB (31%)                        
+                                                                   
+                Current RAM  usage : 299/808MB (37.00%)                         
+                                                                   
+                Installation time  : 0 hrs 17 min 0 sec                 
+                                                                   
+                Visit: https://167.71.241.226:8090                     
+                Panel username: admin                              
+                Panel password: *****                              
+                Visit: https://167.71.241.226:7080                     
+                WebAdmin console username: admin                   
+                WebAdmin console password: G9T3IyXcekxglCkf  
+        
+                                                                   
+                Visit: https://167.71.241.226:8090/rainloop/?admin     
+                Rainloop Admin username: admin                     
+                Rainloop Admin password: wcag07KonRnoNz        
+                                                                   
+             Run cyberpanel help to get FAQ info
+             Run cyberpanel upgrade to upgrade it to latest version.
+             Run cyberpanel utility to access some handy tools .
+                                                                   
+              Website : https://www.cyberpanel.net                 
+              Forums  : https://forums.cyberpanel.net              
+              Wikipage: https://docs.cyberpanel.net                
+              Docs    : https://cyberpanel.net/docs/               
+                                                                   
+            Enjoy your accelerated Internet by                  
+                CyberPanel & OpenLiteSpeed 				                     
+###################################################################
+Digital Ocean detected...
+This provider has a network-level firewall
+Please make sure you have opened following port for both in/out:
+TCP: 8090 for CyberPanel
+TCP: 80, TCP: 443 and UDP: 443 for webserver
+TCP: 21 and TCP: 40110-40210 for FTP
+TCP: 25, TCP: 587, TCP: 465, TCP: 110, TCP: 143 and TCP: 993 for mail service
+TCP: 53 and UDP: 53 for DNS service
+Your provider seems blocked port 25 , E-mail sending may not work properly.
+Would you like to restart your server now? [y/N]: 
+
+    Open the terminal app.
+
+    For remote server log in using the ssh command: 
+ssh vivek@my-centos-8-cloud-server.
+
+    Show information about available update/packages, run: 
+sudo yum check-update
+
+    Issue the command 
+sudo yum update
+ to refresh package database and install updates.
+    Reboot the system if kernel was updated by typing 
+sudo reboot
+ command.
+
+Let us see all commands and steps in details to apply patches.
+Find out info about available security-related updates
+
+It is a good idea to find out if there any updates available for the box. Hence, run the following command:
+sudo yum check-update
+
+sudo yum check-update
+sudo yum check-update | more
+sudo yum check-update | grep kernel
+sudo yum check-update 
+
+Before you apply updates please note down Linux kernel version, run:
+uname -mrs
+
+One can only apply security related updates to the server, run:
+sudo yum --security update
+How do I update a single package?
+
+Run the following command:
+sudo yum update pkg_name
+sudo yum update nginx
+sudo yum update php
+sudo yum update httpd
+
+It is also possible to install all updates except kernel and php packages as follows:
+sudo yum -x 'kernel*' -x 'php*' update
+
+You must reboot system when CentOS 8.x Linux kernel gets updated, run:
+sudo reboot
+
+Verify Linux kernel version and list updates:
+uname -mrs
+sudo yum check-update
+
+https://www.cyberciti.biz/faq/centos-8-update-installed-packages-for-security/
+
+

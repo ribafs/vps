@@ -1,0 +1,19 @@
+
+
+Here is a workaround to temporary reset your password for your account.
+
+    Login to your hosting panel and use the database tool that is available (probably PHPmyAdmin).
+
+    Load the appropriate database and then go to the jos_users table. (The database prefix might be different for your case).
+    Go to the browse view of the PHPmyAdmin, so you get view of the users records.
+    Locate your account and click to edit, or click directly in the 'password' field (Usually PHPmyAdmin, will make the field editable with this).
+    In the password field paste the value below:
+
+    $2y$10$JszAMznv7U2Q4VETQdw7n.CX/HPekafC8sxa9.n0V2gp/t/.xvHYi
+
+    Do not apply any special functions for saving the field and it will set your account password to admin. Save the record.
+
+You can now login with your account, using as password: admin.
+
+After login, make sure you set your desired password.
+

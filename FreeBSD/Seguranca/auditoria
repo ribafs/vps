@@ -1,0 +1,10 @@
+
+nano  /etc/rc.conf
+
+auditd_enable="YES"
+
+Iniciar
+service auditd start
+
+Em /etc/security existem várias configurações sobre a audotoria do sistema
+

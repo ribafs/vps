@@ -1,0 +1,36 @@
+Alpine
+
+Introdução
+Requisitos
+Instalação
+Pos-install
+Usuários
+Sudo
+Rede
+SSH
+Scripts
+Pacotes e Repositórios
+DO
+Snapshots
+Comandos
+Arquivos de configuração
+Apache
+Nginx
+MariaDB
+PostgreSQL
+PHP
+SMS
+
+Aplicativos:
+- Joomla
+- Wordpress
+- Laravel - sozinho no /var/www/localhost/http
+- CakePHP
+- Opencart
+- Humhub
+- Awstats
+- Odoo
+- OsTicket
+- Snort
+- Zabbix
+

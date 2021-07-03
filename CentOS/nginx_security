@@ -1,0 +1,133 @@
+Reforçando a segurança do Nginx
+
+Para ocultar o cabeçalho
+
+    http {
+        server_tokens off;
+    }
+
+
+Controlar o estouro de buffer
+
+nginx.conf
+
+ ## Start: Size Limits & Buffer Overflows ##
+ client_body_buffer_size 1K;
+ client_header_buffer_size 1k;
+ client_max_body_size 1k;
+ large_client_header_buffers 2 1k;
+ ## END: Size Limits & Buffer Overflows ##
+
+
+Controlar Conexões Simultâneas
+
+Você pode usar o módulo Nginx Http Limit Zone para limitar o número de conexões simultâneas para a sessão atribuída ou como caso especial, a partir de um endereço IP. Edite nginx.conf:
+### Directive describes the zone, in which the session states are stored i.e. store in slimits. ###
+### 1m can handle 32000 sessions with 32 bytes/session, set to 5m x 32000 session ###
+ limit_zone slimits $binary_remote_addr 5m;
+ 
+### Control maximum number of simultaneous connections for one session i.e. ###
+### restricts the amount of connections from a single ip address ###
+limit_conn slimits 5;
+
+A configuração acima limitará os clientes remotos a não mais de 5 conexões "abertas" simultaneamente por endereço IP remoto.
+
+Limitar métodos
+
+## Only allow these request methods ##
+ if ($request_method !~ ^(GET|HEAD|POST)$ ) {
+ return 444;
+ }
+## Do not accept DELETE, SEARCH and other methods ##
+
+
+Você pode facilmente bloquear agentes de usuário, ou seja, scanners, bots e spammers que podem estar abusando do seu servidor.
+## Block download agents ##
+ if ($http_user_agent ~* LWP::Simple|BBBike|wget) {
+ return 403;
+ }
+##
+Bloquear robôs chamados msnbot e scrapbot:
+## Block some robots ##
+ if ($http_user_agent ~* msnbot|scrapbot) {
+ return 403;
+ }
+
+
+Bloquear Spam de Referência
+Referer spam é perigoso. Pode prejudicar o seu ranking de SEO através de web-logs (se publicado). Você pode bloquear o acesso de spammers com essas linhas.
+## Deny certain Referers ###
+ if ( $http_referer ~* (babes|forsale|girl|jewelry|love|nudit|organic|poker|porn|sex|teen) )
+ {
+ # return 404;
+ return 403;
+ }
+##
+
+
+Como bloquear hotlink de imagem?
+A imagem ou HTML hotlinking significa que alguém faz um link para o seu site para uma das suas imagens, mas a exibe em seu próprio site. O resultado final você acabará por pagar contas de largura de banda e tornar o conteúdo parecido com parte do site do seqüestrador. Isso geralmente é feito em fóruns e blogs. Eu sugiro fortemente que você bloqueie e pare o hotlinking da imagem no próprio nível do servidor.
+# Stop deep linking or hot linking
+location /images/ {
+ valid_referers none blocked www.example.com example.com;
+ if ($invalid_referer) {
+ return 403;
+ }
+}
+
+
+Limitando o acesso por endereço IP
+Você pode limitar o acesso ao diretório por endereço IP no diretório /docs/:
+location /docs/ {
+ ## block one workstation
+ deny 192.168.1.1;
+
+## allow anyone in 192.168.1.0/24
+ allow 192.168.1.0/24;
+
+ ## drop rest of the world
+ deny all;
+}
+
+
+Proteger com senha o diretório
+Primeiro crie o arquivo de senha e adicione um usuário chamado kallklen:
+mkdir /usr/local/nginx/conf/.htpasswd/
+htpasswd -c /usr/local/nginx/conf/.htpasswd/passwd kallklen
+Edite o nginx.conf e proteja os diretórios necessários da seguinte maneira:
+### Password Protect /personal-images/ and /delta/ directories ###
+location ~ /(personal-images/.*|delta/.*) {
+ auth_basic "Restricted";
+ auth_basic_user_file /usr/local/nginx/conf/.htpasswd/passwd;
+}
+Uma vez que um arquivo de senha foi gerado, os usuários subsequentes podem ser adicionados com o seguinte comando:
+htpasswd -s /usr/local/nginx/conf/.htpasswd/passwd userName
+
+
+Restringir conexões nginx de saída
+
+iptables -A OUTPUT -o eth0 -m owner --uid-owner kallklen -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+
+Manter o SO atualizado
+
+Evitar clickjacking
+
+Adicionar ao nginx.conf
+
+add_header X-Frame-Options SAMEORIGIN;
+
+
+Habilitar Filtro Cross-site scripting (XSS)
+Adicione o seguinte ao nginx.conf ou domínio virtual:
+add_header X-XSS-Protection "1; mode=block";
+
+
+Forcar HTTPS
+
+no location para /administrator/
+
+return 301 https://$server_name$request_uri;
+
+https://sempreupdate.com.br/melhores-praticas-de-seguranca-para-o-nginx-web-server/
+
+

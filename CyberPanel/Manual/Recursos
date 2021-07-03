@@ -1,0 +1,91 @@
+Recursos do Cyber Panel
+
+CRUDs e outros de:
+
+- Pacotes
+- Usuários
+- Sites
+- Bancos de dados
+- DNS
+- FTP
+- Backup
+- Emails
+- SSL
+- Gerenciamento de serviços
+- PHP (versões)
+- Logs
+- Segurança
+- Docker (precisa instalar)
+- Status dos serviços   
+- PHP
+- Gerenciamento de Serviços (para instalar)
+
+
+Detalhando
+
+CRUDs e outros de:
+- Pacotes
+    - nomepacote_nomeuser
+    - domínios (0 - ilimitado)
+    - espaço em disco (0 - ilimitado)
+    - banda (0 - ilimitado)
+    - contas de FTP 
+    - bancos de dados
+    - emails
+    - Enforce Disk Limits 
+- Usuários
+    - admin
+    - reseller
+    - user
+    Segurança de senha: alta e baixa
+- Sites
+    - Pacote
+    - Usuário dono
+    - Domínio
+    - Email do dono
+    - Versão do PHP
+    - SSL, DKIM, open_basedir, mail domain
+    - List Website
+        - Managge
+            - Uso dos recursos: Teste de estresse, Config acesso SSH, Clone/Staging, Gerenciar Git
+            - Rolar a tela: Logs, Comínios, Configurações, Arquivos (Gerenciador, open_basedir, FTP), Email Marketing
+            - Instaladores: WP, Joomla, Git, Prestashop, Magento, Mautic
+        - Mostra: Active/IP/SSL/Pacote/User
+- Bancos de dados
+- DNS
+    - Nameservers
+    - Zonas
+    - Registros
+- FTP
+- Backup
+- Backup incremental
+- Emails
+    - CRUD
+    - Limites
+    - Spam assassin
+    - Marketing
+    - Scanner
+    - Redirecionar
+    - DKIM
+    - Webmail (Rainloop)
+- SSL
+- Gerenciamento de serviços
+- PHP (versões)
+    - Extensões instaladas
+    - PHP ini (Básico e avançado)
+- Logs
+- Segurança
+    - Firewall
+    - SSH Seguro (porta, chave)
+    - CSF
+    - ModSecurity
+- Docker (precisa instalar)
+    - Imagens
+    - Contaienrs
+- Gerenciamento de Serviços (para instalar)
+    - Elastic search
+    - Redis
+    - DNS
+    - Postfix
+    - FTP
+

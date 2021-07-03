@@ -1,0 +1,36 @@
+PostgreSQL no Alpine
+
+apk update
+apk add postgresql
+mkdir /run/postgresql
+chown postgres:postgres /run/postgresql/
+su - postgres
+pwd     # /var/lib/postgresql
+exit
+mkdir /var/lib/postgresql/data
+chmod 0700 /var/lib/postgresql/data
+chown postgres:postgres /var/lib/postgresql/data/
+su - postgres
+initdb -D /var/lib/postgresql/data
+exit
+rc-service postgresql start
+su - postgres
+pg_ctl start -D /var/lib/postgresql/data
+psql
+13.2
+\q
+
+touch /etc/local.d/postgres-custom.start
+chmod +x /etc/local.d/postgres-custom.start
+nano /etc/local.d/postgres-custom.start
+
+#!/bin/sh
+su postgres -c 'pg_ctl start -D /var/lib/postgresql/data'
+
+rc-update add local default
+
+su postgres -c psql
+
+https://luppeng.wordpress.com/2020/02/28/install-and-start-postgresql-on-alpine-linux/
+
+

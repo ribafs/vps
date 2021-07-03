@@ -1,0 +1,81 @@
+Soluções para Administração Web de Servidor
+
+== Atomia DNS
+
+http://atomiadns.com/
+
+
+== AlternC
+
+https://alternc.com/Install-en
+
+
+== Webmin
+
+http://www.webmin.com/
+
+
+== Virtualmin
+
+https://www.virtualmin.com/
+
+
+== CentOS Web Panel
+
+http://centos-webpanel.com/
+
+
+== Sentora
+
+http://sentora.org/
+
+
+== Server Pilot
+https://serverpilot.io
+    
+
+== Ajenti
+
+http://ajenti.org/
+
+
+== VESTACP
+
+https://vestacp.com
+
+Suporta Ubuntu, Debian, RedHat e CentOS
+
+Instalar
+
+OBS: Instalar somente em servidor limpo e recem instalado
+
+# Connect to your server as root via SSH
+ssh -p 65522 ribafs@ribafs.org
+
+# Download installation script 
+curl -O http://vestacp.com/pub/vst-install.sh
+
+# Run it
+
+bash vst-install.sh --nginx yes --phpfpm yes --apache no --named yes --remi yes --vsftpd yes --proftpd no --iptables yes --fail2ban yes --quota yes --exim yes --dovecot yes --spamassassin yes --clamav yes --softaculous yes --mysql yes --postgresql no --hostname ribafs.org --email ribafs@gmail.com
+
+== Cockpit
+
+http://cockpit-project.org/
+
+
+== ZPanel
+
+Ubuntu LTS Server:
+
+bash <(curl -Ss https://raw.github.com/zpanel/installers/master/install/Ubuntu-12_04/10_1_1.sh)
+
+
+== ISPConfig
+https://www.ispconfig.org/
+
+
+== Rolekit
+
+https://github.com/libre-server/rolekit
+Roda no Fedora

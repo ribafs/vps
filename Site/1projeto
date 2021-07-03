@@ -1,0 +1,25 @@
+Criar inicialmente um servidor com
+
+CentOS 7 limpo
+Depois efetuar os ajustes iniciais
+Ajustar segurança
+
+Instalar 
+	- nginx 1.12.2
+	- mysql 5.7.21
+	- php 7.1.14
+	- firewalld 0.4.4.4
+	- Joomla 3.8.5
+
+Instalar meu site com Joomla
+
+Proceder com os ajustes iniciais do documento seguranca.odt
+
+
+ssh -p 65522 ribafs@144.202.38.148
+
+Acabei, depois de testar Ubuntu, Debian e CentOS fiquei com
+
+CentOS - 7.4.1708 de 64 bit
+
+

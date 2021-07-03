@@ -1,0 +1,39 @@
+Instalado com o marketplace do DO
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+Welcome to LiteSpeed One-Click CyberPanel Server.
+To keep this server secure, the firewalld is enabled.
+CyberPanel One-Click Quickstart guide:
+* https://docs.litespeedtech.com/cloud/images/cyberpanel/
+
+In a web browser, you can view:
+* CyberPanel: https://157.230.230.158:8090
+* phpMyAdmin: https://157.230.230.158:8090/dataBases/phpMyAdmin
+* Rainloop:   https://157.230.230.158:8090/rainloop
+
+On the server:
+* You can get the CyberPanel admin password with the following command:
+  sudo cat .litespeed_password
+* You can get the Mysql cyberpanel user password with the following command:
+  sudo cat .db_password
+
+System Status:
+  Load : 1.32, 0.80, 0.32
+  CPU  : 73.1194%
+  RAM  : 300/981MB (30.58%)
+  Disk : 5/25GB (24%)
+
+Your CyberPanel is up to date
+********************************************************************************
+
+You have new mail.
+
+Mostrar senha do admin:
+sudo cat .litespeed_password
+
+User default - admin
+
+Senha - f0eeLOaL8iYfWhKN

@@ -1,0 +1,165 @@
+Instalar o SSL com certbot
+
+Necessário ter um domínio e que o dominio tenha os registros:
+
+ribafs.me
+
+A - dominio - IP
+CNAME www-@
+NS
+
+https://certbot.eff.org/
+
+Acessar o site
+Rolar a tela até
+
+My HTTP website is running Software on System
+
+Clicar em Software e selecionar (Ex: Apache)
+Clicar em System e selecionar (Ex: Ubuntu 20.04)
+
+https://certbot.eff.org/lets-encrypt/ubuntufocal-apache
+
+Rolar a tela até
+
+1 . SSH into the server
+
+SSH into the server running your HTTP website as a user with sudo privileges.
+
+2 . Install snapd
+
+No Ubuntu 20.04 já vem
+
+Acessar o servidor onde deseja instalar o certbot
+
+3 . Garantir que tem a última versão do snap
+Este não vem no 20.04
+
+sudo snap install core
+sudo snap refresh core
+
+4 . Remover qualquer pacote do CertBot
+
+sudo apt-get remove certbot
+
+5 . Install Certbot
+
+sudo snap install --classic certbot
+
+6 . Prepare the Certbot command
+
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+
+7 . Choose how you'd like to run Certbot
+
+    Rodar para receber um certificado e ter Certbot edit as configurações automaticamente para servir este, habilitando o acesso ao HTTPS em um único passo.
+
+sudo certbot --apache
+
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator apache, Installer apache
+Enter email address (used for urgent renewal and security notices)
+ (Enter 'c' to cancel): ribafs@gmail.com
+
+A (Agree)
+
+Y (Yes)
+
+No names were found in your configuration files. Please enter in your domain
+name(s) (comma and/or space separated)  (Enter 'c' to cancel): ribafs.me
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Congratulations! You have successfully enabled https://ribafs.me
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Subscribe to the EFF mailing list (email: ribafs@gmail.com).
+
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/ribafs.me/fullchain.pem
+
+   Your key file has been saved at:
+   /etc/letsencrypt/live/ribafs.me/privkey.pem
+
+   Your cert will expire on 2021-01-09. To obtain a new or tweaked
+   version of this certificate in the future, simply run certbot again
+   with the "certonly" option. To non-interactively renew *all* of
+   your certificates, run "certbot renew"
+
+ - Your account credentials have been saved in your Certbot
+   configuration directory at /etc/letsencrypt. You should make a
+   secure backup of this folder now. This configuration directory will
+   also contain certificates and private keys obtained by Certbot so
+   making regular backups of this folder is ideal.
+
+ - If you like Certbot, please consider supporting our work by:
+
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+
+ - We were unable to subscribe you the EFF mailing list because your
+   e-mail address appears to be invalid. You can try again later by
+   visiting https://act.eff.org.
+
+8 .  Teste automático da enovação
+
+O pacote do Certbot no seu sistema tem um cron job ou um timer systemd que irá renovar o certificado automaticamente antes que ele expire. Vocẽ não precisará executar o certificado novamente, a não ser que você mude as configurações. Você pode fazer o teste de renovação automática para seu certificado executando este comando:
+
+sudo certbot renew --dry-run
+
+Salvando o log do debug em /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Processando /etc/letsencrypt/renewal/ribafs.me.conf
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+O certificado não está previsto para renovar, mas apenas para simular a renovação
+
+Plugins selecionados: Authenticator apache, Installer apache
+Renewing an existing certificate
+Performing the following challenges:
+http-01 challenge for ribafs.me
+
+Waiting for verification...
+Cleaning up challenges
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+new certificate deployed with reload of apache server; fullchain is
+/etc/letsencrypt/live/ribafs.me/fullchain.pem
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates below have not been saved.)
+
+Congratulations, all renewals succeeded. The following certs have been renewed:
+  /etc/letsencrypt/live/ribafs.me/fullchain.pem (success)
+** DRY RUN: simulating 'certbot renew' close to cert expiry
+**          (The test certificates above have not been saved.)
+
+
+IMPORTANT NOTES:
+ - Your account credentials have been saved in your Certbot
+   configuration directory at /etc/letsencrypt. You should make a
+   secure backup of this folder now. This configuration directory will
+   also contain certificates and private keys obtained by Certbot so
+   making regular backups of this folder is ideal.
+
+
+The command to renew certbot is installed in one of the following locations:
+
+    /etc/crontab/
+    /etc/cron.*/*
+    systemctl list-timers
+
+9 . Confirm that Certbot worked
+
+To confirm that your site is set up properly, visit https://yourwebsite.com/ in your browser and look for the lock icon in the URL bar. If you want to check that you have the top-of-the-line installation, you can head to https://www.ssllabs.com/ssltest/. 
+
+Checar se SSL está habilitado em seu site
+
+https://www.ssllabs.com/ssltest/
+
+Referências
+
+https://certbot.eff.org/help/
+https://certbot.eff.org/docs/
+https://supporters.eff.org/donate/support-work-on-certbot

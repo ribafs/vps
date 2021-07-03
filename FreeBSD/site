@@ -1,0 +1,31 @@
+Enviar o backup do site via ssh
+
+scp -p porta root@ip:/tmp
+
+No servidor
+
+cd /tmp
+
+mysql -uroot -p
+
+create database portal;
+GRANT ALL PRIVILEGES ON portal.* TO portal@localhost IDENTIFIED BY 'senhaforte' WITH GRANT OPTION; 
+\q
+
+
+Descompactar o arquivo
+
+unzip portal.zip -d /usr/local/www/apache24/data/
+
+Executar o script que ajusta as permissões
+
+perms
+
+Testar
+
+Remover o index.html
+
+rm /usr/local/www/apache24/data/index.html
+
+http://IP/
+

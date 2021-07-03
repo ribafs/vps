@@ -1,0 +1,223 @@
+Pequeno Guia de Criação de Site
+
+- Criar o subdomínio ou domínio no DO
+- Criar o subdiretório no data para o domínio/subdomínio
+    mkdir /usr/local/etc/apache24/data/recicla
+- Adicionar subdomínio/domínio no httpd.conf e autenticação
+    <VirtualHost recicla.ribafs.org:80 />
+    ServerAdmin ribafs@gmail.com
+    DocumentRoot "/usr/local/www/apache24/data/recicla/"
+    ServerName recicla.ribafs.org
+    </VirtualHost>
+
+- Adicionar entradas ao httpd-ssh.conf
+    <VirtualHost _default_:443>
+      DocumentRoot "/usr/local/www/apache24/data/recicla"
+      ServerName recicla.ribafs.org:443
+      ServerAdmin ribafs@gmail.com
+      ErrorLog "/var/log/httpd-error.log"
+      TransferLog "/var/log/httpd-access.log"
+
+      SSLEngine on
+      
+      SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
+
+      SSLCertificateFile "/usr/local/etc/apache24/ssl.crt/ribafs.crt"
+
+      SSLCertificateKeyFile "/usr/local/etc/apache24/ssl.key/ribafs.key"
+             
+      <FilesMatch "\.(cgi|shtml|phtml|php)$">
+        SSLOptions +StdEnvVars
+      </FilesMatch>
+      <Directory "/usr/local/www/apache24/cgi-bin">
+        SSLOptions +StdEnvVars
+      </Directory>
+
+      BrowserMatch ".*MSIE.*" \
+             nokeepalive ssl-unclean-shutdown \
+             downgrade-1.0 force-response-1.0
+
+      CustomLog "/var/log/httpd-ssl_request.log" "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+    </VirtualHost>
+
+- Criar banco e usuário, com direitos restritos sobre o banco
+- Instalar o Joomla
+    - Acessar a pasta ...data/despertando.net
+    - Baixar o Joomla com
+    wget https://downloads.joomla.org/cms/joomla3/3-8-10/Joomla_3-8-10-Stable-Full_Package.zip
+    - Ajustar as permissões com
+    perms despertando.net
+    - Chamar pela URL
+    https://despertando.net
+    Caso oo DNS ainda não tennha propagado chame coom
+    https://ribafs.org/despertando.net
+- Usar HTTPS apenas no administrator
+- Instalar o helix3 e algumas extensões, juntamente com a encrypt
+- Ativar também o firewall do DO
+    Clicar na droplet - Create - Cloud Firewalls 
+
+
+Exemplo
+
+Criação do site despertando.net
+
+Acessar o DigitalOcean e anotar seus nameservers
+Cadastrei os nameservers do DigitalOcean na seção de gerenciamento de domínio do HostGator
+
+https://financeiro.hostgator.com.br/
+
+Domínios - Meus Domínios
+
+Gerenciar (chave) despertando.net
+
+Nameservers
+
+Marcar a opção
+Utilizar Nameserver - DNS personalizado (coloque abaixo) 
+
+nameserver 1 - ns1.digitalocean.com
+nameserver 2 - ns2.digitalocean.com
+nameserver 3 - ns3.digitalocean.com
+
+Voltar ao DigitalOcean e cadastrar o domínio e os registros A e CNAME para este domínio, assim:
+
+Create - Domain/DNS
+
+Na caixa de texto onde tem Enter domain digitar
+deseprtando.net
+
+E clicar em Add Domain
+
+A - deseprtando.net - 46.101.50.103
+CNAME - www.despertando.net - despertando.net
+
+
+== Configurar os Scripts
+
+nano /usr/local/etc/apache24/httpd.conf
+
+Onde adicionamos as entradas:
+
+Adicionar logo após
+</Directory>
+
+<Directory "/usr/local/www/apache24/data/deseprtando.net/administrator">
+      AuthType Basic
+      AuthName "Restricted Content"
+      IndexIgnore .*
+      AuthName protectthis
+      AuthUserFile  /usr/local/etc/apache24/.httpd_access
+      AuthGroupFile /usr/local/etc/apache24/.httpd_access_group
+      AuthType Basic
+      <Limit GET>
+          # A linha abaixo é para um grupo
+          #Require valid-user
+          require user ribafs
+      </Limit>
+</Directory>
+
+Abaixo, perto do final do script:
+
+<VirtualHost 46.101.50.103:80 />
+ServerAdmin ribafs@gmail.com
+DocumentRoot "/usr/local/www/apache24/data/despertando.net/"
+ServerName despertando.net   
+ServerAlias www.despertando.net
+</VirtualHost>
+
+nano /usr/local/etc/apache24/extra/httpd-ssl.conf
+
+<VirtualHost _default_:443>
+  DocumentRoot "/usr/local/www/apache24/data/despertando.net"
+  ServerName despertando.net:443
+  ServerAdmin ribafs@gmail.com
+  ErrorLog "/var/log/httpd-error.log"
+  TransferLog "/var/log/httpd-access.log"
+
+  SSLEngine on
+
+  SSLCipherSuite ALL:!ADH:!EXPORT56:RC4+RSA:+HIGH:+MEDIUM:+LOW:+SSLv2:+EXP:+eNULL
+  
+  SSLCertificateFile "/usr/local/etc/apache24/ssl.crt/ribafs.crt"
+  
+  SSLCertificateKeyFile "/usr/local/etc/apache24/ssl.key/ribafs.key"
+
+  <FilesMatch "\.(cgi|shtml|phtml|php)$">
+    SSLOptions +StdEnvVars
+  </FilesMatch>
+  <Directory "/usr/local/www/apache24/cgi-bin">
+    SSLOptions +StdEnvVars
+  </Directory>
+
+  BrowserMatch ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+
+  CustomLog "/var/log/httpd-ssl_request.log" "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+</VirtualHost>
+
+
+== Adicionar ao hosts
+
+nano /etc/hosts
+
+46.101.50.103            deseprtando.net www.deseprtando.net
+
+== Criação do banco e usuário
+
+mysql -u root -p
+
+CREATE DATABASE despertando CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'us_despertando'@'localhost' IDENTIFIED BY 'senhaforte';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, INDEX, ALTER, CREATE TEMPORARY TABLES, LOCK TABLES ON despertando.* TO 'us_despertando'@'localhost' IDENTIFIED BY 'senhaforte';
+FLUSH PRIVILEGES;
+\q
+
+Todos os privilégios
+GRANT ALL ON despertando.* TO 'us_despertando'@'localhost' IDENTIFIED BY 'senhaforte';
+
+Remover usuário
+drop user 'us_despertando'@'localhost';
+
+
+== Após a instalação providenciar a remoção do configuration para o /usr/local/www e deixando apenas um require em seu lugar
+
+Mover configuration.php para /usr/llocal/www com nome confdespertando.php
+
+E no configuration.php deixar somente:
+
+<?php
+require_once( dirname( __FILE__ ) . '/../../confdeseprtando.php' );
+
+
+== Instalar idioma pt-br e ahbilitar para site e admin
+
+== Configurações básicas do site:
+
+Servidor
+- Compressão GZip
+- HTTPS somente no administrator
+- URLs amigáveis
+Sistema
+- Cache
+    Pasta - /tmp
+    Cache - Ligado - Cache Progessivo
+
+Então proceder com as configurações:
+    - Instalar template Helix3 - https://www.joomshaper.com/downloads/template/helix3
+        Configurar todo o Helix como template default e para todos os itens de menu
+        Adicionar posição para Menu em Offcanvas. Ocultar para Desktop
+    - Instalar extensões nativas:
+        - Breadcrumbs
+        - Busca
+        - Novidades
+        - Populares
+        - Contato - Add item de menu
+        - Sobre - criar artigo e add em item de menu
+        - Banner (dividir footer1 em dois e add footer2) e configurar para Fixo, Aleatório em caso de mais de um
+    - Instalar extensões de terceiros:
+        - SimpleBackup
+        - GooglePercurso
+        - Pensamento do dia para o deseprtar
+        - Mapa do Site - https://www.joomlashack.com/joomla-extensions/osmap/
+        - Componente encrypt - http://www.ratmilwebsolutions.com/category/10-encryption-configuration.html

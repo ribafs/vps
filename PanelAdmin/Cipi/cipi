@@ -1,0 +1,91 @@
+
+
+== Criando um server pela interface web
+
+Acessar pela web
+Criar um novo server
+Ao clicar em
+LaravelACL has to be installed
+
+Aparece
+
+Server Setup
+To install your server:
+
+    Use a clean VPS with Ubuntu Server 18.04 LTS or 20.04 LTS
+    Login into your VPS via SSH (as root):
+    ssh root@159.89.104.97
+
+    Run this command:
+    wget -O - http://159.89.102.244/sh/go/cf4ad4e217b9941b2c755e0868071062bbcf27a4 | bash
+
+    Installation may take up to ten minutes depending on your server internet connection speed
+    Before you install Cipi, please make sure your server is a clean Ubuntu 18.04 or 20.04 x86_64 LTS VPS (Fresh installation)
+
+    Hardware Requirements: minimum 1GB free HDD / at least 1 core processor / 512MB or more RAM / 1 public IPv4 address
+
+    Please open port 22, 80 and 443 of your firewall to install Cipi
+
+    Cipi doesn't work with NAT VPN and OpenVZ or in localhost
+    AWS disables root login by default. To gain root privileges, login as default user and then use command 'sudo -s'
+
+
+Ao final
+Use http://159.89.102.244 to manage your server.
+
+If you need SSH into this server:
+Cipi SSH username: cipi
+Cipi SSH password: 1c36cf77252243fb389a9bf1760fb5045279b5db
+Cipi MySql root/cipi pass: b76e577483bb53a6051aa3d13cc7e7f8f75feb01
+
+***********************************************************
+          DO NOT LOSE AND KEEP SAFE THIS DATA
+***********************************************************
+
+Não tem acesso ao cipi pela web. Isto somente para o servidor que criou este e o gerencia.
+Agora quem gerencia este faz como quizer.
+Vejamos algumas dicas e facilidades para este server ou tudo é gerenciado pelo servidor com o cipi pela web?
+Muita coisa.
+
+Acessar com
+ssh cipi@159.89.102.244
+1c36cf77252243fb389a9bf1760fb5045279b5db
+
+== Trocar a senha do cipi no terminal
+passwd cipi
+atual - 1c36cf77252243fb389a9bf1760fb5045279b5db
+New - 
+Retype -
+
+== Trocar a senha do root no mysql
+
+sudo systemctl stop mysql
+sudo mkdir -p /var/run/mysqld
+sudo chown mysql:mysql /var/run/mysqld
+sudo /usr/sbin/mysqld --skip-grant-tables --skip-networking &
+exit;
+mysql -u root
+USE mysql;
+update user set plugin="mysql_native_password";
+flush privileges;
+ALTER USER 'root'@'localhost' IDENTIFIED BY 'senhaforte';
+\q
+sudo pkill mysqld
+sudo systemctl start mysql
+mysql -uroot -psenhaforte
+
+https://solidfoundationwebdev.com/blog/posts/how-to-fix-mysql-error-1524-hy000-plugin-auth_socket-is-not-loaded-in-mysql-5-7
+https://linuxconfig.org/how-to-reset-root-mysql-mariadb-password-on-ubuntu-20-04-focal-fossa-linux
+
+
+= Trocar a senha do cipi no mysql
+mysql -uroot -p
+
+use mysql;
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost';
+DROP USER IF EXISTS 'cipi'@'localhost';
+CREATE USER 'cipi'@'localhost' IDENTIFIED BY 'senhaforte';
+GRANT ALL PRIVILEGES ON *.* TO 'cipi'@'localhost';
+
+
+Ao final, após tudo instalado, configurado e funcionando, oferecer para a DO um tutorial em pt-BR

@@ -1,0 +1,2 @@
+vagrant init bento/freebsd-12
+vagrant up

@@ -1,0 +1,24 @@
+Applications
+
+An application is your website/webapp consisting of files that will be used for functionality and display purposes.
+With Cipi, every Application is separated from each other because each app contains its own settings, database, permissions and PHP-FPM pool. This method allows to each user to be secure and protected in its own right. If one of your websites is compromised, the others would be completely safe.
+Applications area is for viewing your applications list, require SSL certificates on main app domain, create new Application or delete one of them. The page will display:
+
+    Application (main) Domain
+    Application Server
+    Application User
+    Application (document root) Path
+    Application PHP Version
+    Application Aliases Number
+    Application Action (Domain SSL and Destroy Application)
+
+Create an application
+
+To create an application, click on button:
+
+and fill the form with these data:
+Domain 	The main application domain (e.g. domain.ltd or subdomain.domain.ltd)
+Server 	Destination Server
+Basepath 	Entrypoint of Document Root (e.g. "public" in Laravel Applications)
+PHP 	PHP Version (7.2, 7.3 or 7.4)
+At the end you will receive a summary with SFTP/SSH and database credentials useful to manage your new Application. 

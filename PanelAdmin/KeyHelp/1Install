@@ -1,0 +1,67 @@
+https://keyhelp.de
+
+Servidor com Debian 10
+
+    Install KeyHelp® now!
+
+Please note the following installation requirements:
+
+    Operating system: Ubuntu LTS or Debian  
+    Memory: At least 1 GB RAM
+    Architecture: 64-bit operating system
+    The installation must be performed on a clean system (minimal image), free of installed / configured software.
+    All required services are installed and configured by KeyHelp.
+    The installation must be done as root user.
+
+To install KeyHelp log on to your server and execute the following command:
+
+ssh root@45.79.195.21
+
+
+Criar user ribafs e add sshkey
+
+wget https://install.keyhelp.de/get_keyhelp.php -O install_keyhelp.sh ; bash install_keyhelp.sh ;
+
+Installation finished successfully!
+
+You will find your login information on your server in the file:
+/root/keyhelp_login_data_2021-05-21_12-34-10
+
+!!! Attention !!! 
+The system will reboot in a few seconds (Cancel with CRTL+C).: 18Curl ...                                    [OKAY]
+Cron daemon ...                             [OKAY]
+
+Installation finished successfully!
+
+You will find your login information on your server in the file:
+/root/keyhelp_login_data_2021-05-21_12-34-10
+
+!!! Attention !!! 
+The system will reboot in a few seconds (Cancel with CRTL+C).: 20
+
+
+
+Installation finished successfully!
+
+You will find your login information on your server in the file:
+/root/keyhelp_login_data_2021-05-21_15-22-58
+
+!!! Attention !!! 
+The system will reboot in a few seconds (Cancel with CRTL+C).: 0 
+
+root@ribamar:~# cat keyhelp_login_data_2021-05-21_15-22-58 
+ Login details
+===============
+
+KeyHelp
+    URL:           https://ribamar.net.br/
+                   https://45.79.195.21/
+    Username:      ribafs
+    Password:      zmxn1029asd123R@
+
+MariaDB/MySQL database
+    Username:      root               | For command line access only
+                   mysqladmin         | For web access
+    Password:      0xCfwtY5Nyp4RDGm
+
+

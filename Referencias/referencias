@@ -1,0 +1,65 @@
+FocaLinux
+http://www.guiafoca.org/?page_id=51
+
+Livros free
+http://ribafs.org/portal/curriculo/livros/administracao-de-servidores-linux.html
+http://ribafs.org/portal/curriculo/livros/servidores-web-linux-tipo-vps.html
+
+CENTOS 7
+https://www.hostinger.com/tutorials/how-to-install-lemp-centos7
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-centos-7
+https://github.com/terrylinooo/daily/wiki/Install-Nginx,-PHP-7,-MariaDB-10-(LEMP)-on-CentOS-7
+https://www.vultr.com/docs/initial-setup-of-a-centos-7-server
+https://linode.com/docs/databases/mysql/how-to-install-mysql-on-centos-7/
+http://acrelinux.org/nginx-php7-centos7/
+https://www.howtoforge.com/perfect-server-centos-7-x86_64-nginx-dovecot-ispconfig-3
+	
+Debian
+https://fatorbinario.com/tutorial-debian-8-x64-com-ispconfig-e-nginx-instalacao-do-site/
+https://www.howtoforge.com/tutorial/perfect-server-debian-jessie-nginx-bind-dovecot-ispconfig-3.1/
+https://www.howtoforge.com/tutorial/perfect-server-debian-9-stretch-apache-bind-dovecot-ispconfig-3-1/
+
+Iptables
+https://www.vivaolinux.com.br/artigo/IPTABLES-Conceitos-e-aplicacao
+https://www.vultr.com/docs/easy-iptables-configuration-and-examples-on-ubuntu-16-04
+
+UFW
+https://linuxconfig.org/how-to-install-and-use-ufw-firewall-on-linux
+
+Nginx
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-on-centos-7
+https://www.hostinger.com/tutorials/how-to-install-lemp-centos7
+https://www.digitalocean.com/community/tutorials/how-to-install-nginx-on-ubuntu-16-04
+https://www.digitalocean.com/community/tutorials/how-to-install-linux-nginx-mysql-php-lemp-stack-in-ubuntu-16-04
+https://linuxconfig.org/basic-php-7-and-nginx-configuration-on-ubuntu-16-04-linux
+
+SSL
+https://www.digitalocean.com/community/tutorials/how-to-create-an-ssl-certificate-on-nginx-for-ubuntu-14-04
+
+Instalação do Joomla pela linha de comando
+http://joomlaresources.com/joomla-tutorials/install-joomla-using-the-ssh-command-line
+
+Tools
+
+Putty - https://www.chiark.greenend.org.uk/~sgtatham/putty/latest.html
+
+WinSCP - https://winscp.net/eng/download.php
+
+Teamviewer - https://www.teamviewer.com/pt/
+
+Skype - https://www.skype.com/pt-br/
+
+Vagrant
+	Virtualbox - https://www.virtualbox.org/wiki/Downloads
+	Extensões - https://download.virtualbox.org/virtualbox/5.2.6/Oracle_VM_VirtualBox_Extension_Pack-5.2.6-120293.vbox-extpack
+	Git - https://git-scm.com/
+	Vagrant - https://www.vagrantup.com/downloads.html
+	Boxes - https://app.vagrantup.com/boxes/search
+
+Formatador de pendrive e instalador de ISO
+
+https://etcher.io/
+
+
+https://github.com/perusio/drupal-with-nginx/commits/D7
+

@@ -1,0 +1,32 @@
+PHP 7.4 no CentOS 8.3
+
+Instalar e habilitar repositórios com PHP 7.4
+
+sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-8.rpm
+
+sudo dnf module list php
+
+sudo dnf module reset php
+
+sudo dnf module enable php:remi-7.4
+
+Instalar PHP 7.4 e o módulo FastCGI para Nginx no CentOS 8 e outros módulos
+
+sudo dnf install -y php php-fpm php-pgsql php-opcache php-curl php-gd php-xml php-mbstring php-pecl-zip php-pecl-imagick
+php -v
+
+sudo systemctl start php-fpm
+sudo systemctl enable php-fpm
+
+Instalar outros módulos
+
+sudo yum search php-
+sudo yum search php- | grep pgsql
+
+nano /etc/php.ini
+/etc/php-fpm.conf – Gloable FPM (FastCGI) configuration file. 
+/etc/php-fpm.d/www.conf – FastCGI (FPM) www pool config file. 
+/etc/php.d/ – PHP modules config file. 
+
+

@@ -1,0 +1,140 @@
+https://www.svennd.be/nginx-php-fpm-centos-7/
+
+yum install epel-release
+yum install nginx
+
+Configuração
+
+server {
+    
+    # listen to port 80 
+    listen 80;
+
+    # server name or names
+    server_name svennd.be;
+
+    # the location of webroot
+    # I always use /var/www/html/*
+    # Nginx by default uses another structure
+    # but this made the transition from Apache allot easier!
+    root  /var/www/html/svennd.be;
+
+    # in root location
+    location / {
+        # look for index.php/index.html/index.htm as "index file"
+        index  index.php index.html index.htm;
+        
+        # this is specifically for wordpress
+        # makes it possible to have url rewrites
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    # default error pages
+    # note that wp already catches most
+    error_page 404 /404.html;
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    # here we have to let nginx know what to do with these php files
+    # as html files are just send directly to the client
+    location ~ \.php$ {
+
+        # if the file is not there show a error : mynonexistingpage.php -> 404
+        try_files $uri =404;
+        
+        # pass to the php-fpm server
+        fastcgi_pass 127.0.0.1:9000;
+
+        # also for fastcgi try index.php
+        fastcgi_index index.php;
+
+        # some tweaking
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+        fastcgi_buffer_size 128k;
+        fastcgi_buffers 256 16k;
+        fastcgi_busy_buffers_size 256k;
+        fastcgi_temp_file_write_size 256k;
+
+        include fastcgi_params;
+    }
+}
+
+SSL
+
+server {
+  listen       443 ssl;
+  server_name  svennd.be;
+  root  /var/www/html/svennd.be;
+
+  ssl_certificate /opt/letsencrypt/certs/svennd.be/fullchain.pem;
+  ssl_certificate_key /opt/letsencrypt/certs/svennd.be/privkey.pem;
+  # verify chain of trust of OCSP response using Root CA and Intermediate certs
+  ssl_trusted_certificate /opt/letsencrypt/certs/svennd.be/chain.pem;
+
+  ssl_session_timeout 1d;
+  ssl_session_cache shared:SSL:50m;
+  ssl_session_tickets off;
+
+  # Diffie-Hellman parameter for DHE ciphersuites, recommended 2048 bits
+  ssl_dhparam /opt/letsencrypt/certs/dhparam.pem;
+
+  # needs more info
+  ssl_ecdh_curve secp384r1; # Requires nginx >= 1.1.0
+
+  # suggested conf (interwebz)
+  ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+  ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:ECDHE-RSA-AES128-GCM-SHA256:AES256+EECDH:DHE-RSA-AES128-GCM-SHA256:AES256+EDH:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+  ssl_prefer_server_ciphers on;
+
+  # OCSP Stapling ---
+  # fetch OCSP records from URL in ssl_certificate and cache them
+  ssl_stapling on;
+  ssl_stapling_verify on;
+
+  # need to lookup options
+  resolver 8.8.8.8 valid=300s;
+  resolver_timeout 5s;
+
+  # headers
+  # note HSTS might break your website if initial setup !
+  # add_header Strict-Transport-Security "max-age=15768000; includeSubDomains; preload";
+  # add_header X-Frame-Options DENY;
+  add_header X-Content-Type-Options nosniff;
+  add_header X-XSS-Protection "1; mode=block";
+
+  # hide version
+  server_tokens off;
+
+    location / {
+        index  index.php index.html index.htm;
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    error_page 404 /404.html;
+    error_page   500 502 503 504  /50x.html;
+    location = /50x.html {
+        root   /usr/share/nginx/html;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass unix:/var/run/php-fpm/php-fpm.sock;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+        fastcgi_buffer_size 128k;
+        fastcgi_buffers 256 16k;
+        fastcgi_busy_buffers_size 256k;
+        fastcgi_temp_file_write_size 256k;
+
+        include fastcgi_params;
+    }
+}
+
+systemctl start nginx
+systemctl enable nginx
+
+

@@ -1,0 +1,62 @@
+Instalar o Joomla 3.8.3 via ports no FreeBSD
+
+
+pkg search joomla
+
+pkg install joomla3-3.8.3
+
+New packages to be INSTALLED:
+	joomla3: 3.8.3
+	php56-session: 5.6.32_1
+	php56: 5.6.32_1
+	libxml2: 2.9.7
+	pcre: 8.40_1
+	php56-xml: 5.6.32_1
+	php56-simplexml: 5.6.32_1
+	pecl-pdflib: 4.1.2
+
+================================================================================
+
+ 1) Add the following to your Apache configuration, and restart the server:
+
+  ### Add the AcceptPathInfo directive only for Apache 2.0.30 or later.
+  Alias /joomla /usr/local/www/joomla3/
+  AcceptPathInfo On
+
+  <Directory /usr/local/www/joomla3>
+      AllowOverride None
+      Order Allow,Deny
+      Allow from all
+      # For Apache 2.4 add:
+      Require all granted
+  </Directory>
+
+ 2) Visit your Joomla site with a browser (i.e. http://your.server.com/joomla/),
+    and you should be taken to the install.php script, which will lead you
+    through creating a config.php file and then setting up Joomla, creating
+    an admin account, etc.
+
+
+ 3) As of 2.5.5, php5-mysqli and php5-zip are installed. Use of mysqli for mysql
+    is recommended over mysql.
+
+ 4) As of 3.6.4, php7 is also supported, and the php*-mysql extension is NOT 
+    asked for.  Also, the php*-pgsql extension is asked for as Joomla supports
+    PostgreSQL as well.
+
+pkg install nano
+
+pkg install apache24
+
+sysrc apache24_enable=yes
+
+service apache24 start
+
+Adicionar
+nano /usr/local/etc/apache24/httpd.conf
+
+
+Instalar MySQL
+
+
+http://159.203.38.79/joomla/

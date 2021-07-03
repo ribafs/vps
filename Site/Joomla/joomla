@@ -1,0 +1,190 @@
+== Acessar o servidor
+
+Scripts úteis usados aqui:
+- docean - acesso SSH com o DO
+- cw (alias) - acesso ao /var/www/html
+
+docean
+
+== Criar o banco de dados para o site e o usuário para o mesmo
+
+sudo su
+
+Impostante. O usuário deve ter este formato no MySQL:
+'nome'@'host'
+
+mysql -uroot
+
+create database portaldb CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE USER 'portalus'@'localhost' IDENTIFIED BY 'senhaforte';
+grant CREATE, DELETE, CREATE TEMPORARY TABLES, LOCK TABLES, DROP, ALTER, INSERT, INDEX, SELECT, UPDATE on portaldb.* to 'portalus'@'localhost';
+FLUSH PRIVILEGES;
+\q
+
+Para instalar o componente extplorer precisei de todos os privilégios acima.
+
+== Ajustes no php.ini
+
+nano /etc/php/7.4/apache2/php.ini
+
+Altere os dois abaixo
+
+date.timezone = America/Fortaleza
+output_buffering = Off
+
+service apache2 restart
+
+
+== Agora implementar a autenticação do Apache para proteger o diretório administrator do site com senha
+
+Usando o arquivo Joomla/AUTH
+
+== Instalar o Joomla
+su - ribafs
+
+cw (para ir ao /var/www/html)
+
+sudo perms
+
+wget https://downloads.joomla.org/cms/joomla3/3-9-22/Joomla_3-9-22-Stable-Full_Package.zip?format=zip
+
+Renomear para
+mv Joomla_3-9-22-Stable-Full_Package.zip?format=zip Joomla_3-9-22-Stable-Full_Package.zip
+
+ls -la
+
+Descompactar na pasta portal
+
+unzip Joomla_3-9-22-Stable-Full_Package.zip -d portal
+
+sudo perms portal
+
+ls -la portal
+
+ls -la portal/templates
+
+ls -la portal/templates/protostar
+
+Veja que 
+- o apache (www-data) é o dono de tudo
+- e que a permissão de leitura (r) é para 
+    - o dono (www-data), 
+    - para o grupo (www-data e ribafs) e
+    - para todos (pela internet)
+- e que a permissão de escrita (w) é para 
+    - o dono (www-data), 
+    - para o grupo (www-data e ribafs)
+
+Acabo de criar um arquivo em /var/www/html
+
+nano index.php
+
+<?php
+header('location: portal');
+
+Após salvar executei
+
+ls -la
+
+Veja
+
+-rw-rw-r--  1 ribafs   www-data   34 Oct 12 01:01 index.php
+
+Será visível pela internet pois o terceiro r, permite leitura pelos outros
+Tem permissão rw para ribafs e o seu grupo www-data.
+Mas ao rodar o script
+
+sudo perms, ele ficará igual aos demais
+
+O mais importane é que as permissões permitam para o público somene leitura e para o dono e grupo leitura e escrita.
+
+Após instalar o Joomla e clicar no botão para remover o diretório Installation, o mesmo foi removido.
+Isso mostra que as permissões estão corretas.
+
+Configurar as permissões
+
+sudo perms portal
+
+
+== Criar um snapshot
+
+Após instalar, configurar e testar criar um snapshot com o nome
+
+ribafs-joomla_11102020_2159
+
+== Acessar o administrator
+
+Efetuar as devidas configurações
+
+- Idioma pt_BR para site e admin
+
+Quando tentei instalar o idioma apareceu o erro:
+
+Warning
+Access denied for user 'portalus'@'localhost' to database 'portaldb'
+Error
+Error installing package
+
+Irei adicionar um a um os privilégios abaixo
+Começando com INDEX
+
+Funcionou. Vou continuar sem os privilégios abaixo. Caso solicite irei adicionando.
+
+ALTER, CREATE TEMPORARY TABLES, LOCK TABLES
+
+Acessei a pasta
+/var/www/html/portal
+
+E renomeei
+mv htaccess.txt .htaccess
+
+Removi o arquivo
+web.config.txt
+
+Que é usada apenas em servidores windows.
+
+Configurar o SEO
+
+Administrator
+Sistema
+Aba Site
+Configurações Globais
+- Usar mod_rewrite do Apache - Sim
+- Adicionar sufixo a URL - Sim
+- Incluir Nome do Site no Título - Depois
+Salvar
+
+Aba Sistema
+- Gerenciador de Cache - Memcache
+- Cache - Ligado - Cache Progressivo
+
+Aba Servidor
+- Forçar HTTPS - Todo o site
+- Fuso horário do site - America - Fortaleza
+Salvar
+
+Desabilitar a mensagem de solicitação de permissão de coleta de estatística
+Extensões
+Plugins
+Sistema - Estatísticas do Joomla!
+Desativado
+
+
+
+- Instalar Helix Ultimate
+
+- Configurar Helix
+- Instalar akeeba-backup
+
+Procurar um template bem bonito, impactante, instalar e configurar. Se for o caso instalar o QuickStart
+Instalar no desktop para selecionar.
+
+== Após finalizar o site criar novo snapshot
+
+## Conteúdo
+
+Não usar Plugin highlight
+
+Artigos com código, criar em tutoriais no GH e efetuar apenas uma chamada no portal.
+
+
