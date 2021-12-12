@@ -1,0 +1,6 @@
+# Retorna os nomes de todos os arquivos de uma pasta que contém determinada string
+# $1 - pasta
+# $2 - string
+
+find $1 -type f -exec grep -l "$2" {} +
+

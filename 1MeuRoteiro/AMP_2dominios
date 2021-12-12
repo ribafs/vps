@@ -1,40 +1,23 @@
-== Somente IP
-
-Não requer ajustes em domínios
-
-
-== Um único domínio na hospedagem
-
-- Criar o servidor na hospedagem
-- Mudar o DNS na adminsitração do domínio
-- Editar o domínio e trocar o IP pelo do Servidor
-
-
-== Dois ou mais domínios
-
-sudo nano /etc/hosts
-
-127.0.1.1 ubuntu ubuntu
-127.0.0.1 localhost
-avcsaberes.com.br       127.0.0.1
-ribamar.net.br          127.0.0.1
-
-# The following lines are desirable for IPv6 capable hosts
-::1 ip6-localhost ip6-loopback
-fe00::0 ip6-localnet
-ff00::0 ip6-mcastprefix
-ff02::1 ip6-allnodes
-ff02::2 ip6-allrouters
-ff02::3 ip6-allhosts
-
+Um único servidor abrigando dois domínios
 
 ribamar.net.br
 avcsaberes.com.br
 
+Adaptado de:
+https://www.vivaolinux.com.br/topico/Apache-Web-Server/virtualHost
 
-avcsaberes.com.br
+Instalar o joomla na pasta
 
-VirtualHost *:80>
+/var/www/html/avc
+
+sudo nano /etc/hosts
+
+Adicionar a linha abaixo
+avcsaberes.com.br	127.0.0.1
+
+sudo nano /etc/apache2/sites-available/avc.conf
+
+<VirtualHost *:80>
     ServerName avcsaberes.com.br
     ServerAlias www.avcsaberes.com.br
     ServerAdmin ribafs@gmail.com
@@ -54,18 +37,26 @@ VirtualHost *:80>
 </VirtualHost>
 
 sudo a2ensite avc
-sudo service apache2 avc
+sudo systemctl reload apache2
 
+Instalar o Joomla em
 
-ribamar.net.br
+/var/www/html/portal
 
-VirtualHost *:80>
+sudo nano /etc/hosts
+
+Adicionar a linha abaixo
+ribamar.net.br	127.0.0.1
+
+sudo nano /etc/apache2/sites-available/portal.conf
+
+<VirtualHost *:80>
     ServerName ribamar.net.br
     ServerAlias www.ribamar.net.br
     ServerAdmin ribafs@gmail.com
-    DocumentRoot /var/www/html/ribamar
+    DocumentRoot /var/www/html/portal
 
-    <Directory /var/www/html/ribamar>
+    <Directory /var/www/html/portal>
        Order allow,deny
        Allow from all
        # New directive needed in Apache 2.4.3: 
@@ -78,7 +69,6 @@ VirtualHost *:80>
     CustomLog ${APACHE_LOG_DIR}/domain1.com-access.log combined
 </VirtualHost>
 
-sudo a2ensite ribamar
-sudo service apache2 ribamar
-
+sudo a2ensite portal
+sudo systemctl reload apache2
 
